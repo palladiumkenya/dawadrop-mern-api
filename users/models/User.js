@@ -5,12 +5,14 @@ module.exports = model(
     username: {
       type: String,
       required: true,
-      unique: true,
+      unique: [true, "User with that username already exist!"],
+      maxlength: 30,
+      minlength: 4,
     },
     email: {
       type: String,
       required: true,
-      unique: true,
+      unique: [true, "User with that email already exist!"],
     },
     firstName: {
       type: String,
