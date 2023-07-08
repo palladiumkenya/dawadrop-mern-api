@@ -35,7 +35,7 @@ router.post("/login", async (req, res) => {
     if (!valid) {
       return res.status(400).json({ detail: "Invalid Username or password" });
     }
-    return res.json({ user: users[0], token: "" });
+    return res.json({ user: users[0], token: users[0].generateAuthToken() });
   } catch (error) {
     return res.status(400).json(getValidationErrrJson(error));
   }
