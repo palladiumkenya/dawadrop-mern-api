@@ -46,13 +46,14 @@ const User = model(
         type: Boolean,
         default: true,
       },
-      isSuperUser: {
-        type: Boolean,
-        default: false,
-      },
       lastLogin: {
         type: Date,
         default: Date.now,
+      },
+      roles: {
+        type: [Schema.Types.ObjectId],
+        ref: "Role",
+        default: [],
       },
     },
     {

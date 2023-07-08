@@ -19,9 +19,17 @@ const loginSchema = Joi.object({
   username: Joi.string().required().min(3).max(30),
   password: Joi.string().required(),
 });
+
+const privilegeSchema = Joi.object({
+  name: Joi.string().required().min(4).max(30).label("Name"),
+  description: Joi.string().min(4).label("Description"),
+});
 exports.userValidator = async (data) => {
   return await userSchema.validateAsync(data);
 };
 exports.loginValidator = async (data) => {
   return await loginSchema.validateAsync(data);
+};
+exports.privilegesValidator = async (data) => {
+  return await privilegeSchema.validateAsync(data);
 };

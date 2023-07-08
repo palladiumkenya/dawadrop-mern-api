@@ -1,13 +1,18 @@
 const { Router } = require("express");
-const { userValidator, loginValidator } = require("./validators");
+const {
+  userValidator,
+  loginValidator,
+  privilegesValidator,
+} = require("./validators");
 const { getValidationErrrJson } = require("../utils/helpers");
 const bcrypt = require("bcrypt");
 const User = require("./models/User");
 const router = Router();
 const _ = require("lodash");
 const auth = require("../middleware/auth");
+const Privilege = require("./models/Privilege");
 
-router.post("/", async (req, res) => {
+router.post("/register", async (req, res) => {
   // let user = User.findOne({email})
   try {
     const value = await userValidator(req.body);
@@ -72,9 +77,54 @@ router.post("/login", async (req, res) => {
 router.get("/profile", auth, async (req, res) => {
   try {
     let user = await User.findById(req.user._id).select("-password");
+    if (!user) return res.status(404).json({ detail: "User not Found" });
     return res.json(user);
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
+});
+router.get("/privileges", async (req, res) => {
+  const privileges = await Privilege.find();
+  res.json({ results: privileges });
+});
+router.post("/privileges", auth, async (req, res) => {
+  try {
+    const value = await privilegesValidator(req.body);
+    console.log(value);
+    const privilege = new Privilege(value);
+    await privilege.save();
+    return res.json(privilege);
+  } catch (ex) {
+    const { error: err, status } = getValidationErrrJson(ex);
+    return res.status(status).json(err);
+  }
+});
+router.put("/privileges/:id", auth, async (req, res) => {
+  try {
+    const value = await privilegesValidator(req.body);
+    const privilege = await Privilege.findById(req.params.id);
+    if (!privilege) {
+      throw new Error("Privilege not found");
+    }
+    privilege.name = value.name;
+    privilege.description = value.description;
+    await privilege.save();
+    return res.json(privilege);
+  } catch (ex) {
+    const { error: err, status } = getValidationErrrJson(ex);
+    return res.status(status).json(err);
+  }
+});
+router.get("/privileges/:id", async (req, res) => {
+  try {
+    const privilege = await Privilege.findById(req.params.id);
+    if (!privilege) {
+      throw new Error("Privilege not found");
+    }
+    return res.json(privilege);
+  } catch (ex) {
+    const { error: err, status } = getValidationErrrJson(ex);
     return res.status(status).json(err);
   }
 });
