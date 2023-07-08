@@ -1,13 +1,14 @@
 const { model, Schema } = require("mongoose");
 
-module.exports = model(
-  "Privilege",
+const Role = model(
+  "Role",
   new Schema({
     name: {
       type: String,
       maxlength: 30,
       minlength: 4,
       required: true,
+      unique: true,
     },
     description: {
       type: String,
@@ -21,3 +22,5 @@ module.exports = model(
     },
   })
 );
+
+module.exports = Role;

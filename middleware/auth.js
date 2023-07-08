@@ -1,7 +1,9 @@
 const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
 const config = require("config");
 
-module.exports = (req, res, next) => {
+const auth = (req, res, next) => {
   const token = req.header("x-auth-token");
   if (!token)
     return res.status(401).json({ detail: "Access Denied.No token Provided" });
@@ -13,3 +15,5 @@ module.exports = (req, res, next) => {
     res.status(401).json({ detail: "Invalid token" });
   }
 };
+
+module.exports = auth;

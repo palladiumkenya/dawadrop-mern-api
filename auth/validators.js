@@ -24,6 +24,11 @@ const privilegeSchema = Joi.object({
   name: Joi.string().required().min(4).max(30).label("Name"),
   description: Joi.string().min(4).label("Description"),
 });
+const roleSchema = Joi.object({
+  name: Joi.string().required().min(4).max(30).label("Name"),
+  description: Joi.string().min(4).label("Description"),
+  privileges: Joi.array().label("Privilege").default([]),
+});
 exports.userValidator = async (data) => {
   return await userSchema.validateAsync(data);
 };
@@ -32,4 +37,7 @@ exports.loginValidator = async (data) => {
 };
 exports.privilegesValidator = async (data) => {
   return await privilegeSchema.validateAsync(data);
+};
+exports.rolesValidator = async (data) => {
+  return await roleSchema.validateAsync(data);
 };

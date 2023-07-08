@@ -1,6 +1,6 @@
 const { model, Schema } = require("mongoose");
 
-module.exports = model(
+const Privilege = model(
   "Privilege",
   new Schema({
     name: {
@@ -17,3 +17,5 @@ module.exports = model(
     },
   })
 );
+
+module.exports = Privilege;
