@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const User = require("./models/User");
 const router = Router();
 const _ = require("lodash");
+const auth = require("../middleware/auth");
 
 router.post("/", async (req, res) => {
   // let user = User.findOne({email})
@@ -62,6 +63,24 @@ router.post("/login", async (req, res) => {
           "lastName",
         ])
       );
+  } catch (error) {
+    return res.status(400).json(getValidationErrrJson(error));
+  }
+});
+router.get("/profile", auth, async (req, res) => {
+  try {
+    let user = await User.findById(req.user._id);
+    return res.json(
+      _.pick(user, [
+        "_id",
+        "username",
+        "email",
+        "phoneNumber",
+        "isSuperUser",
+        "firstName",
+        "lastName",
+      ])
+    );
   } catch (error) {
     return res.status(400).json(getValidationErrrJson(error));
   }
