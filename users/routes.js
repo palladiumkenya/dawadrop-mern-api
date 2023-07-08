@@ -4,8 +4,9 @@ const { getValidationErrrJson } = require("../utils/helpers");
 const bcrypt = require("bcrypt");
 const User = require("./models/User");
 const router = Router();
+const _ = require("lodash");
 
-router.post("/register", async (req, res) => {
+router.post("/", async (req, res) => {
   // let user = User.findOne({email})
   try {
     const value = await userValidator(req.body);
@@ -15,7 +16,19 @@ router.post("/register", async (req, res) => {
     value.password = hash;
     const user = new User(value);
     await user.save();
-    return res.json(user);
+    return res
+      .header("x-auth-token", user.generateAuthToken())
+      .json(
+        _.pick(user, [
+          "_id",
+          "username",
+          "email",
+          "phoneNumber",
+          "isSuperUser",
+          "firstName",
+          "lastName",
+        ])
+      );
   } catch (error) {
     return res.status(400).json(getValidationErrrJson(error));
   }
@@ -35,7 +48,20 @@ router.post("/login", async (req, res) => {
     if (!valid) {
       return res.status(400).json({ detail: "Invalid Username or password" });
     }
-    return res.json({ user: users[0], token: users[0].generateAuthToken() });
+
+    return res
+      .header("x-auth-token", users[0].generateAuthToken())
+      .json(
+        _.pick(users[0], [
+          "_id",
+          "username",
+          "email",
+          "phoneNumber",
+          "isSuperUser",
+          "firstName",
+          "lastName",
+        ])
+      );
   } catch (error) {
     return res.status(400).json(getValidationErrrJson(error));
   }
