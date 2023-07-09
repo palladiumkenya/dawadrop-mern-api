@@ -1,5 +1,7 @@
 {
     "name": "DawaDrop Mern",
     "db": "",
-    "jwt": ""
+    "jwt": "",
+    "nishauri": "https://ushauriapi.kenyahmis.org/nishauri/",
+    "ushauri": "https://ushauriapi.kenyahmis.org/"
 }

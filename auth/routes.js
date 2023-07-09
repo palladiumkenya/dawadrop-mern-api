@@ -15,6 +15,7 @@ const {
   roleDetail,
   roleUpdate,
   roleCreate,
+  addRollPrivilege,
 } = require("./views/role");
 
 router.post("/register", register);
@@ -28,5 +29,6 @@ router.get("/roles", rolesListing);
 router.post("/roles", auth, roleCreate);
 router.get("/roles/:id", roleDetail);
 router.put("/roles/:id", auth, roleUpdate);
+router.put("/roles/:id/privilege-add", auth, addRollPrivilege);
 
 module.exports = router;

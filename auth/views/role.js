@@ -56,9 +56,28 @@ const roleUpdate = async (req, res) => {
   }
 };
 
+const addRollPrivilege = async (req, res) => {
+  try {
+    const value = await rolesValidator(req.body);
+    const role = await Role.findById(req.params.id);
+    if (!role) {
+      throw new Error("Role not found");
+    }
+    role.name = value.name;
+    role.description = value.description;
+    role.privileges = value.privileges;
+    await role.save();
+    return res.json(await role.populate("privileges", ["name", "description"]));
+  } catch (ex) {
+    const { error: err, status } = getValidationErrrJson(ex);
+    return res.status(status).json(err);
+  }
+};
+
 module.exports = {
   rolesListing,
   roleDetail,
   roleCreate,
   roleUpdate,
+  addRollPrivilege,
 };

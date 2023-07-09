@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const morgan = require("morgan");
 const authRoutes = require("./auth/routes");
+const patientRoute = require("./patients/routes");
 dotenv.config();
 const config = require("config");
 console.log(`[-]App name: ${config.get("name")}`);
@@ -21,7 +22,8 @@ if (app.get("env") === "development") {
   console.log("[-]Morgan Enabled");
 }
 app.use("/auth", authRoutes);
+app.use("/patients", patientRoute);
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-  console.log("Server running on port " + port + " ....");
+  console.log("[-]Server running on port " + port + " ....");
 });

@@ -1,4 +1,7 @@
 {
     "db": "DB_URL",
-    "jwt": "JWT_PRVATE_KEY"
+    "jwt": "JWT_PRVATE_KEY",
+    "sms_url": "SMS_API_URL",
+    "short_code":"SMS_SHORTCODE",
+    "sms_api_key":"SMS_API_KEY"
 }
