@@ -2,7 +2,11 @@ const { Router } = require("express");
 const auth = require("../middleware/auth");
 const Patient = require("./models/Patient");
 const { profileValidator } = require("./validators");
-const { getValidationErrrJson } = require("../utils/helpers");
+const {
+  getValidationErrrJson,
+  base64Decode,
+  base64Encode,
+} = require("../utils/helpers");
 const { searchPatient, sendOtp } = require("./api");
 const AccountVerification = require("./models/AccountVerification");
 const moment = require("moment/moment");
@@ -18,9 +22,9 @@ router.get("/", auth, async (req, res) => {
   res.json({ results: patients });
 });
 router.get("/appointments", [auth, isValidPatient], async (req, res) => {
-  const patient = await Patient.findOne({ user: req.user._id })
-  
-  res.json(patient);
+  const patient = await Patient.findOne({ user: req.user._id });
+  res.json({ encoded: base64Encode(2), decoded: base64Decode("Mg==") });
+  // res.json(base64Decode("Mg=="));
 });
 router.post("/create-profile", [auth, hasNoProfile], async (req, res) => {
   try {

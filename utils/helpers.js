@@ -22,7 +22,7 @@ const getValidationErrrJson = (err) => {
     validationErrors.errors = _errors;
   } else if (err.status) {
     status = err.status;
-    validationErrors.detail = err.message
+    validationErrors.detail = err.message;
   } else {
     status = 404;
     validationErrors.detail = err.message;
@@ -30,4 +30,17 @@ const getValidationErrrJson = (err) => {
   return { error: validationErrors, status };
 };
 
+const base64Encode = (data) => {
+  const dataToEncode = JSON.stringify(data);
+  const encoded = Buffer.from(dataToEncode, "utf8").toString("base64");
+  return encoded;
+};
+const base64Decode = (encoded) => {
+  const dataToEncode = JSON.stringify(encoded);
+  const decoded = Buffer.from(dataToEncode, "base64").toString("utf-8");
+  return decoded;
+};
+
 module.exports.getValidationErrrJson = getValidationErrrJson;
+module.exports.base64Encode = base64Encode;
+module.exports.base64Decode = base64Decode;
