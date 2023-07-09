@@ -2,7 +2,6 @@ const Patient = require("../patients/models/Patient");
 
 const hasProfile = async (req, res, next) => {
   // must follow auth middleware
-  console.log(next);
   if (!req.user) {
     return res.status(401).json({ detail: "Access Denied.No token Provided" });
   }

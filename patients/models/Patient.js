@@ -14,7 +14,6 @@ const Patient = model(
       },
       upiNumber: {
         type: String,
-        unique: true,
       },
       nationalId: {
         type: Number,

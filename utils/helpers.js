@@ -20,6 +20,9 @@ const getValidationErrrJson = (err) => {
       message: error.message,
     }));
     validationErrors.errors = _errors;
+  } else if (err.status) {
+    status = err.status;
+    validationErrors.detail = err.message
   } else {
     status = 404;
     validationErrors.detail = err.message;

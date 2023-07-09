@@ -27,6 +27,12 @@ router.post("/create-profile", [auth, hasProfile], async (req, res) => {
       );
 
     const patient = await Patient.getOrCreatePatientFromRemote(remotePatient);
+    if (patient.user) {
+      throw {
+        status: 403,
+        message: "User with provided CCC Number already exist",
+      };
+    }
     const verification = await AccountVerification.getOrCreate({
       user: req.user._id,
       extra: patient._id,
