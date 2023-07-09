@@ -6,13 +6,14 @@ const { getValidationErrrJson } = require("../utils/helpers");
 const { searchPatient, sendOtp } = require("./api");
 const AccountVerification = require("./models/AccountVerification");
 const moment = require("moment/moment");
+const hasProfile = require("../middleware/hasProfile");
 const router = Router();
 
 router.get("/", auth, async (req, res) => {
   const patients = await Patient.find().populate("user");
   res.json({ results: patients });
 });
-router.post("/create-profile", auth, async (req, res) => {
+router.post("/create-profile", [auth, hasProfile], async (req, res) => {
   try {
     const { cccNumber, firstName, upiNo } = await profileValidator(req.body);
     const remotePatient = await searchPatient(cccNumber);
@@ -31,7 +32,7 @@ router.post("/create-profile", auth, async (req, res) => {
       extra: patient._id,
     });
     await sendOtp(verification.otp, req.user.phoneNumber);
-    res.json({
+    return res.json({
       message: `Account verification Success.use OTP sent to ${req.user.phoneNumber} to complete your profile creation in the next 5 minutes`,
     });
   } catch (error) {

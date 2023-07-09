@@ -11,7 +11,7 @@ const auth = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, config.get("jwt"));
     const userId = decoded._id;
-    const user = await User.findOne({ _id: userId });
+    const user = await User.findOne({ _id: userId }).select("-password");
     if (!user) return res.status(400).json({ detail: "Invalid Token" });
     req.user = user;
     next();
