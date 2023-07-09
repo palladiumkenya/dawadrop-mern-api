@@ -6,14 +6,23 @@ const { getValidationErrrJson } = require("../utils/helpers");
 const { searchPatient, sendOtp } = require("./api");
 const AccountVerification = require("./models/AccountVerification");
 const moment = require("moment/moment");
-const hasProfile = require("../middleware/hasProfile");
+const hasNoProfile = require("../middleware/hasNoProfile");
+const isValidPatient = require("../middleware/isValidPatient");
 const router = Router();
 
 router.get("/", auth, async (req, res) => {
-  const patients = await Patient.find().populate("user");
+  const patients = await Patient.find().populate("user", {
+    password: false,
+    __v: false,
+  });
   res.json({ results: patients });
 });
-router.post("/create-profile", [auth, hasProfile], async (req, res) => {
+router.get("/appointments", [auth, isValidPatient], async (req, res) => {
+  const patient = await Patient.findOne({ user: req.user._id })
+  
+  res.json(patient);
+});
+router.post("/create-profile", [auth, hasNoProfile], async (req, res) => {
   try {
     const { cccNumber, firstName, upiNo } = await profileValidator(req.body);
     const remotePatient = await searchPatient(cccNumber);

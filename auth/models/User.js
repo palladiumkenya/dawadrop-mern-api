@@ -61,6 +61,7 @@ const User = model(
         generateAuthToken() {
           return jwt.sign({ _id: this._id }, config.get("jwt"));
         },
+        
       },
     }
   )
