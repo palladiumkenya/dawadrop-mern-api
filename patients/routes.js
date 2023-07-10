@@ -12,6 +12,9 @@ const AccountVerification = require("./models/AccountVerification");
 const moment = require("moment/moment");
 const hasNoProfile = require("../middleware/hasNoProfile");
 const isValidPatient = require("../middleware/isValidPatient");
+const { getPatientAppointments } = require("../appointments/api");
+const { isEmpty } = require("lodash");
+const User = require("../auth/models/User");
 const router = Router();
 
 router.get("/", auth, async (req, res) => {
@@ -23,7 +26,9 @@ router.get("/", auth, async (req, res) => {
 });
 router.get("/appointments", [auth, isValidPatient], async (req, res) => {
   const patient = await Patient.findOne({ user: req.user._id });
-  res.json({ encoded: base64Encode(2), decoded: base64Decode("Mg==") });
+  const appointments = await getPatientAppointments(patient.cccNumber);
+  if (isEmpty(appointments)) return res.json({ results: [] });
+  else res.json({ results: appointments });
   // res.json(base64Decode("Mg=="));
 });
 router.post("/create-profile", [auth, hasNoProfile], async (req, res) => {
@@ -40,7 +45,7 @@ router.post("/create-profile", [auth, hasNoProfile], async (req, res) => {
       );
 
     const patient = await Patient.getOrCreatePatientFromRemote(remotePatient);
-    if (patient.user) {
+    if (patient.user && (await User.findOne({ _id: patient.user }))) {
       throw {
         status: 403,
         message: "User with provided CCC Number already exist",

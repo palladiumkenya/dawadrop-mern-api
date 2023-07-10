@@ -81,12 +81,12 @@ const changePassword = async (req, res) => {
       user.username !== value.username ||
       !(await bcrypt.compare(value.currentPassword, user.password))
     ) {
-      console.log(user);
-      return res.status(400).json({ detail: "Invalid Username or password" });
+       return res.status(400).json({ detail: "Invalid Username or password" });
     }
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(value.newPassword, salt);
     user.password = hash;
+
     await user.save();
     return res
       .header("x-auth-token", user.generateAuthToken())
