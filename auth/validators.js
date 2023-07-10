@@ -21,6 +21,13 @@ const loginSchema = Joi.object({
   password: Joi.string().required(),
 });
 
+const changePaswordSchema = Joi.object({
+  username: Joi.string().required().min(3).max(30).label("Username"),
+  currentPassword: Joi.string().required().label("Current Password"),
+  newPassword: Joi.string().required().label("New Password"),
+  confirmNewPassword: Joi.ref("newPassword"),
+});
+
 const privilegeSchema = Joi.object({
   name: Joi.string().required().min(4).max(30).label("Name"),
   action: Joi.string().required(),
@@ -40,6 +47,9 @@ exports.userValidator = async (data) => {
 };
 exports.loginValidator = async (data) => {
   return await loginSchema.validateAsync(data);
+};
+exports.changePaswordValidator = async (data) => {
+  return await changePaswordSchema.validateAsync(data);
 };
 exports.privilegesValidator = async (data) => {
   return await privilegeSchema.validateAsync(data);

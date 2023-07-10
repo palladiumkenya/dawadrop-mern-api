@@ -3,7 +3,12 @@ const { Router } = require("express");
 const router = Router();
 const auth = require("../middleware/auth");
 
-const { register, login, profile } = require("./views/authenticate");
+const {
+  register,
+  login,
+  profile,
+  changePassword,
+} = require("./views/authenticate");
 const {
   privilegeList,
   privilegeCreate,
@@ -27,6 +32,7 @@ const {
 
 router.post("/register", register);
 router.post("/login", login);
+router.post("/change-password", auth, changePassword);
 router.get("/profile", auth, profile);
 router.get("/privileges", privilegeList);
 router.post(
