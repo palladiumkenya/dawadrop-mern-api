@@ -1,7 +1,12 @@
 const { isEmpty } = require("lodash");
 const { getValidationErrrJson } = require("../../utils/helpers");
-const { privilegesValidator, rolesValidator } = require("../validators");
+const {
+  privilegesValidator,
+  rolesValidator,
+  rolePrivilegeAddValidator,
+} = require("../validators");
 const Role = require("./../models/Role");
+const Privilege = require("../models/Privilege");
 
 const rolesListing = async (req, res) => {
   const roles = await Role.find().populate(
@@ -59,16 +64,45 @@ const roleUpdate = async (req, res) => {
 
 const addRollPrivilege = async (req, res) => {
   try {
-    const value = await rolesValidator(req.body);
-    const role = await Role.findById(req.params.id);
-    if (!role) {
-      throw new Error("Role not found");
+    const role = await Role.findOne({ _id: req.params.id });
+    if (!role)
+      throw {
+        status: 404,
+        message: "Role not found!",
+      };
+    const { privileges } = await rolePrivilegeAddValidator(req.body);
+    for (const privilege of privileges) {
+      if (await Privilege.findOne({ _id: privilege })) {
+        await role.addPrivilege(privilege, false);
+      }
     }
-    role.name = value.name;
-    role.description = value.description;
-    role.privileges = value.privileges;
     await role.save();
-    return res.json(await role.populate("privileges", ["name", "description"]));
+    return res.json(
+      await role.populate("privileges", ["name", "description", "action"])
+    );
+  } catch (ex) {
+    const { error: err, status } = getValidationErrrJson(ex);
+    return res.status(status).json(err);
+  }
+};
+const deleteRollPrivilege = async (req, res) => {
+  try {
+    const role = await Role.findOne({ _id: req.params.id });
+    if (!role)
+      throw {
+        status: 404,
+        message: "Role not found!",
+      };
+    const { privileges } = await rolePrivilegeAddValidator(req.body);
+    for (const privilege of privileges) {
+      if (await Privilege.findOne({ _id: privilege })) {
+        await role.deletePrivilege(privilege, false);
+      }
+    }
+    await role.save();
+    return res.json(
+      await role.populate("privileges", ["name", "description", "action"])
+    );
   } catch (ex) {
     const { error: err, status } = getValidationErrrJson(ex);
     return res.status(status).json(err);
@@ -81,4 +115,5 @@ module.exports = {
   roleCreate,
   roleUpdate,
   addRollPrivilege,
+  deleteRollPrivilege,
 };
