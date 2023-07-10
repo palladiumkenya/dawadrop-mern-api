@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const { surpotedPermisionAction } = require("../utils/constants");
 
 const userSchema = Joi.object({
   username: Joi.string().required().max(30).min(4).label("Username"),
@@ -22,6 +23,7 @@ const loginSchema = Joi.object({
 
 const privilegeSchema = Joi.object({
   name: Joi.string().required().min(4).max(30).label("Name"),
+  action: Joi.string().required(),
   description: Joi.string().min(4).label("Description"),
 });
 const roleSchema = Joi.object({

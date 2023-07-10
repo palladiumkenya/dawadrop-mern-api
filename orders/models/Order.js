@@ -32,7 +32,7 @@ module.exports = model(
       minlength: 9,
       unique: true,
     },
-    orderItem: {
+    drug: {
       type: String,
       required: true,
     },

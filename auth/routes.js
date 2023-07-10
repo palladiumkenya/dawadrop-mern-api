@@ -17,12 +17,18 @@ const {
   roleCreate,
   addRollPrivilege,
 } = require("./views/role");
+const hasPrivileges = require("../middleware/hasPermission");
+const { patientActions } = require("../utils/constants");
 
 router.post("/register", register);
 router.post("/login", login);
-router.get("/profile", auth, profile);
+router.get(
+  "/profile",
+  [auth, hasPrivileges([patientActions.create, patientActions.update, patientActions.read])],
+  profile
+);
 router.get("/privileges", privilegeList);
-router.post("/privileges", auth, privilegeCreate);
+router.post("/privileges", [auth], privilegeCreate);
 router.put("/privileges/:id", auth, privilegeUpdate);
 router.get("/privileges/:id", privilegeDetail);
 router.get("/roles", rolesListing);

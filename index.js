@@ -13,7 +13,10 @@ mongoose
   .then((result) => {
     console.log("[-]Connected to database Successfully");
   })
-  .catch((err) => console.log("[x]Could not connect to database" + err));
+  .catch((err) => {
+    console.log("[x]Could not connect to database" + err);
+    process.exit(1); // Exit the application on database connection error
+  });
 const app = express();
 
 app.use(express.json());

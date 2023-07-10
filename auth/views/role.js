@@ -5,7 +5,7 @@ const Role = require("./../models/Role");
 const rolesListing = async (req, res) => {
   const roles = await Role.find().populate(
     "privileges",
-    "_id name description"
+    "_id name description action"
   );
   res.json({ results: roles });
 };
