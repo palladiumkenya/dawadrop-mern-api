@@ -79,7 +79,7 @@ const changePassword = async (req, res) => {
     const user = await User.findOne({ _id: req.user._id });
     if (
       user.username !== value.username ||
-      !(await bcrypt.compare(value.newPassword, user.password))
+      !(await bcrypt.compare(value.currentPassword, user.password))
     ) {
       console.log(user);
       return res.status(400).json({ detail: "Invalid Username or password" });
