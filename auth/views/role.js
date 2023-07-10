@@ -1,3 +1,4 @@
+const { isEmpty } = require("lodash");
 const { getValidationErrrJson } = require("../../utils/helpers");
 const { privilegesValidator, rolesValidator } = require("../validators");
 const Role = require("./../models/Role");
@@ -47,7 +48,7 @@ const roleUpdate = async (req, res) => {
     }
     role.name = value.name;
     role.description = value.description;
-    role.privileges = value.privileges;
+    if (!isEmpty(value.privileges)) role.privileges = value.privileges;
     await role.save();
     return res.json(await role.populate("privileges", ["name", "description"]));
   } catch (ex) {

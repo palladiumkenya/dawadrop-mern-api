@@ -1,3 +1,4 @@
+const { isEmpty } = require("lodash");
 const Privilege = require("../auth/models/Privilege");
 
 const hasPrivileges =
@@ -11,12 +12,20 @@ const hasPrivileges =
         .json({ detail: "Access Denied. No token provided" });
     }
 
-    // 2. Get privileges with requested actions
+    // 3. Check if is a super Admin and give all privileges
+    if (user.isSuperUser) return next();
+
+    // 4. Get privileges with requested actions
     const requiredPrivileges = await Privilege.find({
       action: { $in: actions },
     });
 
-    // 3. Check if user has all the required privileges
+    // 5. Check if no previleges then raise error
+    if (isEmpty(requiredPrivileges))
+      return res.status(403).json({
+        detail: "Forbidden. Insufficient permission to perform that action",
+      });
+    // 6 . Check if user has all the required privileges
     const privilegePromises = requiredPrivileges.map(({ _id }) =>
       user.hasPrivilege(_id)
     );
