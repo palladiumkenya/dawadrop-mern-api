@@ -85,6 +85,21 @@ const User = model(
             ) !== -1
           );
         },
+        hasRole(roleId) {
+          return this.roles.findIndex((role) => role.equals(roleId)) !== -1;
+        },
+        async addRole(roleId, commit = true) {
+          if (!this.hasRole(roleId)) {
+            this.roles.push(roleId);
+            if (commit) await this.save();
+          }
+        },
+        async deleteRole(roleId, commit = true) {
+          if (this.hasRole(roleId)) {
+            this.roles = this.roles.filter((role) => !role.equals(roleId));
+            if (commit) await this.save();
+          }
+        },
       },
     }
   )

@@ -22,6 +22,8 @@ const {
   roleCreate,
   addRollPrivilege,
   deleteRollPrivilege,
+  assignUserRoles,
+  deleteUserRoles,
 } = require("./views/role");
 const hasPrivileges = require("../middleware/hasPermission");
 const {
@@ -52,5 +54,7 @@ router.get("/roles/:id", roleDetail);
 router.put("/roles/:id", [auth, hasPrivileges(roleActions.update)], roleUpdate);
 router.put("/roles/:id/privilege-add", auth, addRollPrivilege);
 router.delete("/roles/:id/privilege-delete", auth, deleteRollPrivilege);
+router.post("user/:id/asign-role", [auth], assignUserRoles);
+router.delete("user/:id/delete-role", [auth], deleteUserRoles);
 
 module.exports = router;

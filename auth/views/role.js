@@ -4,9 +4,11 @@ const {
   privilegesValidator,
   rolesValidator,
   rolePrivilegeAddValidator,
+  userRolesValidator,
 } = require("../validators");
 const Role = require("./../models/Role");
 const Privilege = require("../models/Privilege");
+const User = require("../models/User");
 
 const rolesListing = async (req, res) => {
   const roles = await Role.find().populate(
@@ -108,6 +110,52 @@ const deleteRollPrivilege = async (req, res) => {
     return res.status(status).json(err);
   }
 };
+const assignUserRoles = async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.params.id });
+    if (!user)
+      throw {
+        status: 404,
+        message: "User not found!",
+      };
+    const { roles } = await userRolesValidator(req.body);
+    for (const role of roles) {
+      if (await Role.findOne({ _id: role })) {
+        await user.addRole(role, false);
+      }
+    }
+    await user.save();
+    return res.json(
+      await user.populate("roles", ["_id", "name", "description", "privileges"])
+    );
+  } catch (ex) {
+    const { error: err, status } = getValidationErrrJson(ex);
+    return res.status(status).json(err);
+  }
+};
+const deleteUserRoles = async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.params.id });
+    if (!user)
+      throw {
+        status: 404,
+        message: "User not found!",
+      };
+    const { roles } = await rolePrivilegeAddValidator(req.body);
+    for (const role of roles) {
+      if (await Role.findOne({ _id: role })) {
+        await user.deleteRole(role, false);
+      }
+    }
+    await user.save();
+    return res.json(
+      await user.populate("roles", ["_id", "name", "description", "privileges"])
+    );
+  } catch (ex) {
+    const { error: err, status } = getValidationErrrJson(ex);
+    return res.status(status).json(err);
+  }
+};
 
 module.exports = {
   rolesListing,
@@ -116,4 +164,6 @@ module.exports = {
   roleUpdate,
   addRollPrivilege,
   deleteRollPrivilege,
+  assignUserRoles,
+  deleteUserRoles,
 };

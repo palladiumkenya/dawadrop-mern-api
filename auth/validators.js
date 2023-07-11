@@ -42,6 +42,9 @@ const roleSchema = Joi.object({
 const rolePrivilegeAddSchema = Joi.object({
   privileges: Joi.array().required().min(1),
 });
+const userRolesSchema = Joi.object({
+  roles: Joi.array().required().min(1),
+});
 exports.userValidator = async (data) => {
   return await userSchema.validateAsync(data);
 };
@@ -59,4 +62,7 @@ exports.rolesValidator = async (data) => {
 };
 exports.rolePrivilegeAddValidator = async (data) => {
   return await rolePrivilegeAddSchema.validateAsync(data);
+};
+exports.userRolesValidator = async (data) => {
+  return await userRolesSchema.validateAsync(data);
 };
