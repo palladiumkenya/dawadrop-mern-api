@@ -46,23 +46,25 @@ const userRolesSchema = Joi.object({
   roles: Joi.array().required().min(1),
 });
 exports.userValidator = async (data) => {
-  return await userSchema.validateAsync(data);
+  return await userSchema.validateAsync(data, { abortEarly: false });
 };
 exports.loginValidator = async (data) => {
-  return await loginSchema.validateAsync(data);
+  return await loginSchema.validateAsync(data, { abortEarly: false });
 };
 exports.changePaswordValidator = async (data) => {
-  return await changePaswordSchema.validateAsync(data);
+  return await changePaswordSchema.validateAsync(data, { abortEarly: false });
 };
 exports.privilegesValidator = async (data) => {
-  return await privilegeSchema.validateAsync(data);
+  return await privilegeSchema.validateAsync(data, { abortEarly: false });
 };
 exports.rolesValidator = async (data) => {
-  return await roleSchema.validateAsync(data);
+  return await roleSchema.validateAsync(data, { abortEarly: false });
 };
 exports.rolePrivilegeAddValidator = async (data) => {
-  return await rolePrivilegeAddSchema.validateAsync(data);
+  return await rolePrivilegeAddSchema.validateAsync(data, {
+    abortEarly: false,
+  });
 };
 exports.userRolesValidator = async (data) => {
-  return await userRolesSchema.validateAsync(data);
+  return await userRolesSchema.validateAsync(data, { abortEarly: false });
 };

@@ -4,21 +4,18 @@ const getValidationErrrJson = (err) => {
   if (err.errors) {
     status = 400;
     // Mongo db validation
-    const _errors = [];
+    const _errors = {};
     for (field in err.errors) {
-      _errors.push({
-        field: err.errors[field].path,
-        message: err.errors[field].message,
-      });
+      _errors[err.errors[field].path] = err.errors[field].message;
     }
     validationErrors.errors = _errors;
   } else if (err.details) {
     status = 400;
     // Joi validation
-    const _errors = err.details.map((error) => ({
-      field: error.path[0],
-      message: error.message,
-    }));
+    const _errors = {};
+    for (const e of err.details) {
+      _errors[e.path[0]] = e.message;
+    }
     validationErrors.errors = _errors;
   } else if (err.status) {
     status = err.status;
