@@ -12,14 +12,34 @@ const User = model(
       username: {
         type: String,
         required: true,
-        unique: [true, "User with that username already exist!"],
+        unique: true,
         maxlength: 30,
         minlength: 4,
+        validate: {
+          validator: async (v) => {
+            const existingUser = await User.findOne({ username: v });
+            if (existingUser) {
+              throw new Error("User with username " + v + " already exist!");
+            }
+            return true;
+          },
+          message: "User with username {VALUE} already exist!",
+        },
       },
       email: {
         type: String,
         required: true,
-        unique: [true, "User with that email already exist!"],
+        unique: true,
+        validate: {
+          validator: async (v) => {
+            const existingUser = await User.findOne({ email: v });
+            if (existingUser) {
+              throw new Error("User with email " + v + " already exist!");
+            }
+            return true;
+          },
+          message: "User with email {VALUE} already exist!",
+        },
       },
       firstName: {
         type: String,
@@ -34,6 +54,16 @@ const User = model(
         maxlength: 14,
         minlength: 9,
         unique: true,
+        validate: {
+          validator: async (v) => {
+            const existingUser = await User.findOne({ phoneNumber: v });
+            if (existingUser) {
+              throw new Error("User with phon number " + v + " already exist!");
+            }
+            return true;
+          },
+          message: "User with phone number {VALUE} already exist!",
+        },
       },
       password: {
         type: String,
@@ -99,6 +129,12 @@ const User = model(
             this.roles = this.roles.filter((role) => !role.equals(roleId));
             if (commit) await this.save();
           }
+        },
+      },
+      statics: {
+        async isExisting(filterQuery) {
+          const users = await this.find(query);
+          return users.length > 0;
         },
       },
     }
