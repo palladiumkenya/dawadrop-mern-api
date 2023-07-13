@@ -8,6 +8,7 @@ const {
   login,
   profile,
   changePassword,
+  updateProfile,
 } = require("./views/authenticate");
 const {
   privilegeList,
@@ -36,6 +37,7 @@ router.post("/register", register);
 router.post("/login", login);
 router.post("/change-password", auth, changePassword);
 router.get("/profile", auth, profile);
+router.post("/profile", auth, updateProfile);
 router.get("/privileges", privilegeList);
 router.post(
   "/privileges",

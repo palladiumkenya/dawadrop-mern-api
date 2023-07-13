@@ -15,6 +15,14 @@ const userSchema = Joi.object({
     .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
   confirmPassword: Joi.ref("password"),
 });
+const profileSchema = Joi.object({
+  username: Joi.string().required().max(30).min(4).label("Username"),
+  email: Joi.string().email().required().label("Email Address"),
+  firstName: Joi.string().max(20),
+  lastName: Joi.string().max(20),
+  phoneNumber: Joi.string().min(9).max(14).label("Phone Number").required(),
+  image: Joi.string().label("Image"),
+});
 
 const loginSchema = Joi.object({
   username: Joi.string().required().min(3).max(30),
@@ -24,7 +32,7 @@ const loginSchema = Joi.object({
 const changePaswordSchema = Joi.object({
   username: Joi.string().required().min(3).max(30).label("Username"),
   currentPassword: Joi.string().required().label("Current Password"),
-  newPassword: Joi.string().required().label("New Password"),
+  newPassword: Joi.string().required().label("New Password").min(4),
   confirmNewPassword: Joi.ref("newPassword"),
 });
 
@@ -67,4 +75,7 @@ exports.rolePrivilegeAddValidator = async (data) => {
 };
 exports.userRolesValidator = async (data) => {
   return await userRolesSchema.validateAsync(data, { abortEarly: false });
+};
+exports.profileValidator = async (data) => {
+  return await profileSchema.validateAsync(data, { abortEarly: false });
 };

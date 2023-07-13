@@ -7,7 +7,7 @@ const {
 const { getValidationErrrJson } = require("../../utils/helpers");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
-const _ = require("lodash");
+const { isEmpty, pick } = require("lodash");
 
 const register = async (req, res) => {
   // let user = User.findOne({email})
@@ -22,7 +22,7 @@ const register = async (req, res) => {
     return res
       .header("x-auth-token", user.generateAuthToken())
       .json(
-        _.pick(user, [
+        pick(user, [
           "_id",
           "username",
           "email",
@@ -57,7 +57,7 @@ const login = async (req, res) => {
     return res
       .header("x-auth-token", users[0].generateAuthToken())
       .json(
-        _.pick(users[0], [
+        pick(users[0], [
           "_id",
           "username",
           "email",
@@ -77,12 +77,20 @@ const changePassword = async (req, res) => {
   try {
     const value = await changePaswordValidator(req.body);
     const user = await User.findOne({ _id: req.user._id });
-    if (
-      user.username !== value.username ||
-      !(await bcrypt.compare(value.currentPassword, user.password))
-    ) {
-       return res.status(400).json({ detail: "Invalid Username or password" });
+    const errors = {};
+    if (user.username !== value.username) {
+      errors.username = { path: "username", message: "Invalid username" };
     }
+    if (!(await bcrypt.compare(value.currentPassword, user.password))) {
+      errors.currentPassword = {
+        path: "currentPassword",
+        message: "Invalid password",
+      };
+    }
+    if (!isEmpty(errors)) {
+      throw { errors };
+    }
+
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(value.newPassword, salt);
     user.password = hash;
@@ -91,7 +99,7 @@ const changePassword = async (req, res) => {
     return res
       .header("x-auth-token", user.generateAuthToken())
       .json(
-        _.pick(user, [
+        pick(user, [
           "_id",
           "username",
           "email",
@@ -117,9 +125,15 @@ const profile = async (req, res) => {
   }
 };
 
+const updateProfile = (req, res) => {
+  console.log(req.body);
+  return res.json({ success: true });
+};
+
 module.exports = {
   register,
   login,
   profile,
   changePassword,
+  updateProfile,
 };
