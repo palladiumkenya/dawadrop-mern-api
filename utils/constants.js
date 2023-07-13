@@ -1,3 +1,4 @@
+const fs = require("fs");
 const actions = [
   // patient actions
   "create_patient",
@@ -34,7 +35,11 @@ const privilegeActions = {
   update: actions[11],
   all: actions.filter((value, index) => index >= 8 && index <= 11),
 };
+const BASE_DIR = process.cwd();
+const MEDIA_ROOT = `${BASE_DIR}/media`;
 exports.surpotedPermisionAction = actions;
 exports.patientActions = patientActions;
 exports.roleActions = roleActions;
 exports.privilegeActions = privilegeActions;
+exports.BASE_DIR = BASE_DIR;
+exports.MEDIA_ROOT = MEDIA_ROOT;

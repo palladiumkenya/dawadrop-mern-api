@@ -32,12 +32,13 @@ const {
   privilegeActions,
   roleActions,
 } = require("../utils/constants");
+const upload = require("../middleware/upload");
 
 router.post("/register", register);
 router.post("/login", login);
 router.post("/change-password", auth, changePassword);
 router.get("/profile", auth, profile);
-router.post("/profile", auth, updateProfile);
+router.post("/profile", [auth, upload.single("image")], updateProfile);
 router.get("/privileges", privilegeList);
 router.post(
   "/privileges",

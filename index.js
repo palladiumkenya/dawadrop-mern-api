@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const authRoutes = require("./auth/routes");
 const patientRoute = require("./patients/routes");
 dotenv.config();
+
 const config = require("config");
 console.log(`[-]App name: ${config.get("name")}`);
 console.log(`[-]Database: ${config.get("db")}`);

@@ -125,9 +125,22 @@ const profile = async (req, res) => {
   }
 };
 
-const updateProfile = (req, res) => {
-  console.log(req.body);
-  return res.json({ success: true });
+const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      {
+        ...req.body,
+        image: req.file ? req.file.path : null,
+      },
+      { new: true }
+    );
+    console.log(user);
+    return res.json(user);
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
 };
 
 module.exports = {
