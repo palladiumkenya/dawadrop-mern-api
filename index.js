@@ -7,6 +7,7 @@ const patientRoute = require("./patients/routes");
 dotenv.config();
 
 const config = require("config");
+const { MEDIA_ROOT, BASE_DIR } = require("./utils/constants");
 console.log(`[-]App name: ${config.get("name")}`);
 console.log(`[-]Database: ${config.get("db")}`);
 mongoose
@@ -21,6 +22,7 @@ mongoose
 const app = express();
 
 app.use(express.json());
+app.use(express.static(`${BASE_DIR}/${MEDIA_ROOT}`));
 if (app.get("env") === "development") {
   app.use(morgan("tiny"));
   console.log("[-]Morgan Enabled");

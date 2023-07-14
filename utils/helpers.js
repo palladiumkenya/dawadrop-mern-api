@@ -1,3 +1,4 @@
+const _ = require("lodash");
 const getValidationErrrJson = (err) => {
   const validationErrors = {};
   let status = 500;
@@ -38,6 +39,17 @@ const base64Decode = (encoded) => {
   return decoded;
 };
 
+const pickX = (obj, paths, defaultValue = null) =>
+  _.transform(
+    paths,
+    (result, path) => {
+      const value = _.get(obj, path);
+      _.set(result, path, value !== undefined ? value : defaultValue);
+    },
+    {}
+  );
+
 module.exports.getValidationErrrJson = getValidationErrrJson;
 module.exports.base64Encode = base64Encode;
 module.exports.base64Decode = base64Decode;
+module.exports.pickX = pickX;

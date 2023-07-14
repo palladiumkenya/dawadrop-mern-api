@@ -3,11 +3,14 @@ const {
   loginValidator,
   privilegesValidator,
   changePaswordValidator,
+  profileValidator,
 } = require("../validators");
-const { getValidationErrrJson } = require("../../utils/helpers");
+const { getValidationErrrJson, pickX } = require("../../utils/helpers");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const { isEmpty, pick } = require("lodash");
+const { PROFILE_MEDIA } = require("../../utils/constants");
+const { use } = require("../routes");
 
 const register = async (req, res) => {
   // let user = User.findOne({email})
@@ -99,7 +102,7 @@ const changePassword = async (req, res) => {
     return res
       .header("x-auth-token", user.generateAuthToken())
       .json(
-        pick(user, [
+        pickX(user, [
           "_id",
           "username",
           "email",
@@ -107,6 +110,7 @@ const changePassword = async (req, res) => {
           "isSuperUser",
           "firstName",
           "lastName",
+          "image",
         ])
       );
   } catch (error) {
@@ -118,7 +122,20 @@ const changePassword = async (req, res) => {
 const profile = async (req, res) => {
   try {
     const user = req.user;
-    return res.json(user);
+    return res.json(
+      pickX(user, [
+        "_id",
+        "username",
+        "email",
+        "phoneNumber",
+        "isSuperUser",
+        "firstName",
+        "lastName",
+        "image",
+        "roles",
+        "isSuperUser",
+      ])
+    );
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
     return res.status(status).json(err);
@@ -127,16 +144,29 @@ const profile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
+    const values = await profileValidator(req.body);
     const user = await User.findByIdAndUpdate(
       req.user._id,
       {
-        ...req.body,
-        image: req.file ? req.file.path : null,
+        ...values,
+        image: req.file ? "/" + PROFILE_MEDIA + req.file.filename : null,
       },
       { new: true }
     );
-    console.log(user);
-    return res.json(user);
+    return res.json(
+      pickX(user, [
+        "_id",
+        "username",
+        "email",
+        "phoneNumber",
+        "isSuperUser",
+        "firstName",
+        "lastName",
+        "image",
+        "roles",
+        "isSuperUser",
+      ])
+    );
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
     return res.status(status).json(err);

@@ -18,8 +18,8 @@ const userSchema = Joi.object({
 const profileSchema = Joi.object({
   username: Joi.string().required().max(30).min(4).label("Username"),
   email: Joi.string().email().required().label("Email Address"),
-  firstName: Joi.string().max(20),
-  lastName: Joi.string().max(20),
+  firstName: Joi.string().max(20).label("First Name"),
+  lastName: Joi.string().max(20).label("Last Name"),
   phoneNumber: Joi.string().min(9).max(14).label("Phone Number").required(),
   image: Joi.string().label("Image"),
 });
