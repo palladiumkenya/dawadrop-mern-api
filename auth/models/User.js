@@ -122,7 +122,7 @@ const User = model(
           });
           return privileges;
         },
-        async getMenuOptions() {
+        async getMenuOptionsIds() {
           const options = [];
           const roles = await Role.find({ _id: { $in: this.roles } });
           roles.forEach((role) => {
