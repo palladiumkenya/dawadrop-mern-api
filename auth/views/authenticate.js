@@ -67,6 +67,7 @@ const login = async (req, res) => {
           "isSuperUser",
           "firstName",
           "lastName",
+          "roles",
         ])
       );
   } catch (error) {

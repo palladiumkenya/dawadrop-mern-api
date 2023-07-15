@@ -16,25 +16,35 @@ const User = model(
         maxlength: 30,
         minlength: 4,
         validate: {
-          validator: async (v) => {
+          validator: async function (v) {
+            const currentUser = this; // Reference to the current user document
+
+            // Check if another user exists with the same username
             const existingUser = await User.findOne({ username: v });
-            if (existingUser) {
-              throw new Error("User with username " + v + " already exist!");
+
+            // If an existing user is found and it is not the current user, throw an error
+            if (existingUser && !existingUser._id.equals(currentUser._id)) {
+              throw new Error("User with username " + v + " already exists!");
             }
+
             return true;
           },
-          message: "User with username {VALUE} already exist!",
+          message: "User with username {VALUE} already exists!",
         },
       },
+
       email: {
         type: String,
         required: true,
         unique: true,
         validate: {
-          validator: async (v) => {
+          validator: async function (v) {
+            const currentUser = this; // Reference to the current user document
+            // Check if another user exists with the same email
             const existingUser = await User.findOne({ email: v });
-            if (existingUser) {
-              throw new Error("User with email " + v + " already exist!");
+            // If an existing user is found and it is not the current user, throw an error
+            if (existingUser && !existingUser._id.equals(currentUser._id)) {
+              throw new Error("User with email " + v + " already exists!");
             }
             return true;
           },
@@ -55,10 +65,14 @@ const User = model(
         minlength: 9,
         unique: true,
         validate: {
-          validator: async (v) => {
+          validator: async function (v) {
+            const currentUser = this; // Reference to the current user document
+            // Check if another user exists with the same phone number
             const existingUser = await User.findOne({ phoneNumber: v });
-            if (existingUser) {
-              throw new Error("User with phon number " + v + " already exist!");
+            if (existingUser && !existingUser._id.equals(currentUser._id)) {
+              throw new Error(
+                "User with phone number " + v + " already exists!"
+              );
             }
             return true;
           },
@@ -107,6 +121,18 @@ const User = model(
             });
           });
           return privileges;
+        },
+        async getMenuOptions() {
+          const options = [];
+          const roles = await Role.find({ _id: { $in: this.roles } });
+          roles.forEach((role) => {
+            role.menuOptions.forEach((menu) => {
+              if (!options.includes(menu)) {
+                options.push(menu);
+              }
+            });
+          });
+          return options;
         },
         async hasPrivilege(privilegeId) {
           return (

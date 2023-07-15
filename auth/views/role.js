@@ -259,6 +259,12 @@ const menuOptionUpdate = async (req, res) => {
   }
 };
 
+const userMenuOptionsList = async (req, res) => {
+  const user = await User.findOne({ _id: req.user._id });
+  const menuOptions = await user.getMenuOptions();
+  res.json({ results: menuOptions });
+};
+
 module.exports = {
   rolesListing,
   roleDetail,
@@ -274,4 +280,5 @@ module.exports = {
   menuOptionDetail,
   addRollMenuOptions,
   deleteRollMenuOption,
+  userMenuOptionsList,
 };
