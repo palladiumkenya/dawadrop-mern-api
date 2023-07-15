@@ -9,6 +9,7 @@ const {
 const Role = require("./../models/Role");
 const Privilege = require("../models/Privilege");
 const User = require("../models/User");
+const MenuOption = require("../models/MenuOption");
 
 const rolesListing = async (req, res) => {
   const roles = await Role.find().populate(
@@ -157,6 +158,16 @@ const deleteUserRoles = async (req, res) => {
   }
 };
 
+const menuOptionsList = async (req, res) => {
+  const options = await MenuOption.find();
+  res.json({ results: options });
+};
+const menuOptionCreate = async (req, res) => {
+  console.log(req.body);
+  console.log(req.file);
+  res.json({ res: req.body });
+};
+
 module.exports = {
   rolesListing,
   roleDetail,
@@ -166,4 +177,6 @@ module.exports = {
   deleteRollPrivilege,
   assignUserRoles,
   deleteUserRoles,
+  menuOptionsList,
+  menuOptionCreate,
 };

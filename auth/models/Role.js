@@ -21,6 +21,11 @@ const Role = model(
         default: [],
         ref: "Privilege",
       },
+      menuOptions: {
+        type: [Schema.Types.ObjectId],
+        default: [],
+        ref: "MenuOption",
+      },
     },
     {
       methods: {

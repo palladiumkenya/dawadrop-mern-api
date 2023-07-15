@@ -53,6 +53,10 @@ const rolePrivilegeAddSchema = Joi.object({
 const userRolesSchema = Joi.object({
   roles: Joi.array().required().min(1),
 });
+
+const roleMenuMappingSchema = Joi.object({
+  
+});
 exports.userValidator = async (data) => {
   return await userSchema.validateAsync(data, { abortEarly: false });
 };
@@ -78,4 +82,7 @@ exports.userRolesValidator = async (data) => {
 };
 exports.profileValidator = async (data) => {
   return await profileSchema.validateAsync(data, { abortEarly: false });
+};
+exports.roleMenuMappingValidator = async (data) => {
+  return await roleMenuMappingSchema.validateAsync(data, { abortEarly: false });
 };
