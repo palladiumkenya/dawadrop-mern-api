@@ -175,7 +175,13 @@ const assignUserRoles = async (req, res) => {
     }
     await user.save();
     return res.json(
-      await user.populate("roles", ["_id", "name", "description", "privileges"])
+      await user.populate("roles", [
+        "_id",
+        "name",
+        "description",
+        "privileges",
+        "menuOptions",
+      ])
     );
   } catch (ex) {
     const { error: err, status } = getValidationErrrJson(ex);
@@ -190,7 +196,7 @@ const deleteUserRoles = async (req, res) => {
         status: 404,
         message: "User not found!",
       };
-    const { roles } = await rolePrivilegeAddValidator(req.body);
+    const { roles } = await userRolesValidator(req.body);
     for (const role of roles) {
       if (await Role.findOne({ _id: role })) {
         await user.deleteRole(role, false);
