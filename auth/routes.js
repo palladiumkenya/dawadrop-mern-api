@@ -40,7 +40,11 @@ router.post("/register", register);
 router.post("/login", login);
 router.post("/change-password", auth, changePassword);
 router.get("/profile", auth, profile);
-router.post("/profile", [auth, upload.single("image")], updateProfile);
+router.post(
+  "/profile",
+  [auth, upload({ dest: "uploads/" }).single("image")],
+  updateProfile
+);
 router.get("/privileges", privilegeList);
 router.post(
   "/privileges",
@@ -62,6 +66,10 @@ router.delete("/roles/:id/privilege-delete", auth, deleteRollPrivilege);
 router.post("/user/:id/asign-role", [auth], assignUserRoles);
 router.delete("/user/:id/delete-role", [auth], deleteUserRoles);
 router.get("/menu-options", [auth], menuOptionsList);
-router.post("/menu-options", [auth], menuOptionCreate);
+router.post(
+  "/menu-options",
+  [auth, upload({ dest: "menu-icons" }).single("image")],
+  menuOptionCreate
+);
 
 module.exports = router;

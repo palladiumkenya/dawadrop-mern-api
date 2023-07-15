@@ -54,8 +54,10 @@ const userRolesSchema = Joi.object({
   roles: Joi.array().required().min(1),
 });
 
-const roleMenuMappingSchema = Joi.object({
-  
+const menuOptionSchema = Joi.object({
+  label: Joi.string().required().min(4).label("Label"),
+  image: Joi.string().required().label("Menu Image"),
+  link: Joi.string().required().label("Menu Image"),
 });
 exports.userValidator = async (data) => {
   return await userSchema.validateAsync(data, { abortEarly: false });
@@ -83,6 +85,6 @@ exports.userRolesValidator = async (data) => {
 exports.profileValidator = async (data) => {
   return await profileSchema.validateAsync(data, { abortEarly: false });
 };
-exports.roleMenuMappingValidator = async (data) => {
-  return await roleMenuMappingSchema.validateAsync(data, { abortEarly: false });
+exports.menuOptionValidator = async (data) => {
+  return await menuOptionSchema.validateAsync(data, { abortEarly: false });
 };

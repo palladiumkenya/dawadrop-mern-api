@@ -37,11 +37,9 @@ const privilegeActions = {
 };
 const BASE_DIR = process.cwd();
 const MEDIA_ROOT = `media/`;
-const PROFILE_MEDIA = `uploads/`;
 exports.surpotedPermisionAction = actions;
 exports.patientActions = patientActions;
 exports.roleActions = roleActions;
 exports.privilegeActions = privilegeActions;
 exports.BASE_DIR = BASE_DIR;
 exports.MEDIA_ROOT = MEDIA_ROOT;
-exports.PROFILE_MEDIA = PROFILE_MEDIA;

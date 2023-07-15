@@ -163,9 +163,14 @@ const menuOptionsList = async (req, res) => {
   res.json({ results: options });
 };
 const menuOptionCreate = async (req, res) => {
-  console.log(req.body);
-  console.log(req.file);
-  res.json({ res: req.body });
+  try {
+    console.log(req.body);
+    console.log(req.file);
+    res.json({ res: req.body });
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(ex);
+    return res.status(status).json(err);
+  }
 };
 
 module.exports = {
