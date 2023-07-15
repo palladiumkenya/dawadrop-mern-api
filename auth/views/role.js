@@ -1,15 +1,21 @@
 const { isEmpty } = require("lodash");
-const { getValidationErrrJson } = require("../../utils/helpers");
+const {
+  getValidationErrrJson,
+  deleteUploadedFileAsyncMannual,
+} = require("../../utils/helpers");
 const {
   privilegesValidator,
   rolesValidator,
   rolePrivilegeAddValidator,
   userRolesValidator,
+  menuOptionValidator,
+  roleMenuOptionsAddValidator,
 } = require("../validators");
 const Role = require("./../models/Role");
 const Privilege = require("../models/Privilege");
 const User = require("../models/User");
 const MenuOption = require("../models/MenuOption");
+const { MENU_MEDIA } = require("../../utils/constants");
 
 const rolesListing = async (req, res) => {
   const roles = await Role.find().populate(
@@ -111,6 +117,48 @@ const deleteRollPrivilege = async (req, res) => {
     return res.status(status).json(err);
   }
 };
+const addRollMenuOptions = async (req, res) => {
+  try {
+    const role = await Role.findOne({ _id: req.params.id });
+    if (!role)
+      throw {
+        status: 404,
+        message: "Role not found!",
+      };
+    const { menuOptions } = await roleMenuOptionsAddValidator(req.body);
+    for (const menu of menuOptions) {
+      if (await MenuOption.findOne({ _id: menu })) {
+        await role.addMenuOption(menu, false);
+      }
+    }
+    await role.save();
+    return res.json(await role.populate("menuOptions"));
+  } catch (ex) {
+    const { error: err, status } = getValidationErrrJson(ex);
+    return res.status(status).json(err);
+  }
+};
+const deleteRollMenuOption = async (req, res) => {
+  try {
+    const role = await Role.findOne({ _id: req.params.id });
+    if (!role)
+      throw {
+        status: 404,
+        message: "Role not found!",
+      };
+    const { menuOptions } = await roleMenuOptionsAddValidator(req.body);
+    for (const menu of menuOptions) {
+      if (await MenuOption.findOne({ _id: menu })) {
+        await role.deleteMenuOption(menu, false);
+      }
+    }
+    await role.save();
+    return res.json(await role.populate("menuOptions"));
+  } catch (ex) {
+    const { error: err, status } = getValidationErrrJson(ex);
+    return res.status(status).json(err);
+  }
+};
 const assignUserRoles = async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.params.id });
@@ -164,10 +212,48 @@ const menuOptionsList = async (req, res) => {
 };
 const menuOptionCreate = async (req, res) => {
   try {
-    console.log(req.body);
-    console.log(req.file);
-    res.json({ res: req.body });
-  } catch (error) {
+    const value = await menuOptionValidator({
+      ...req.body,
+      image: req.file ? `/${MENU_MEDIA}${req.file.filename}` : undefined,
+    });
+    const menuOption = new MenuOption(value);
+    await menuOption.save();
+    res.json(menuOption);
+  } catch (ex) {
+    if (req.file) await deleteUploadedFileAsyncMannual(req.file.path);
+    const { error: err, status } = getValidationErrrJson(ex);
+    return res.status(status).json(err);
+  }
+};
+const menuOptionDetail = async (req, res) => {
+  try {
+    const menuOption = await MenuOption.findById(req.params.id);
+    if (!menuOption) {
+      throw {
+        status: 404,
+        message: "Menu Option not found",
+      };
+    }
+    res.json(menuOption);
+  } catch (ex) {
+    const { error: err, status } = getValidationErrrJson(ex);
+    return res.status(status).json(err);
+  }
+};
+const menuOptionUpdate = async (req, res) => {
+  try {
+    const value = await menuOptionValidator({
+      ...req.body,
+      image: req.file ? `/${MENU_MEDIA}${req.file.filename}` : undefined,
+    });
+    const menuOption = await MenuOption.findByIdAndUpdate(
+      req.params.id,
+      value,
+      { new: true }
+    );
+    res.json(menuOption);
+  } catch (ex) {
+    if (req.file) await deleteUploadedFileAsyncMannual(req.file.path);
     const { error: err, status } = getValidationErrrJson(ex);
     return res.status(status).json(err);
   }
@@ -184,4 +270,8 @@ module.exports = {
   deleteUserRoles,
   menuOptionsList,
   menuOptionCreate,
+  menuOptionUpdate,
+  menuOptionDetail,
+  addRollMenuOptions,
+  deleteRollMenuOption,
 };

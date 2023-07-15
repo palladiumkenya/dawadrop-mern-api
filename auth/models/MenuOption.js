@@ -6,6 +6,7 @@ const MenuOption = model(
     label: {
       type: String,
       required: true,
+      unique: true,
     },
     image: {
       type: String,

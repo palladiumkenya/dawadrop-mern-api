@@ -1,4 +1,5 @@
 const _ = require("lodash");
+const fs = require("fs");
 const getValidationErrrJson = (err) => {
   const validationErrors = {};
   let status = 500;
@@ -49,7 +50,47 @@ const pickX = (obj, paths, defaultValue = null) =>
     {}
   );
 
+const deleteUploadedFile = (filePath) => {
+  fs.unlink(filePath, (error) => {
+    if (error) {
+      console.log("Error deleting file:", error);
+    } else {
+      console.log("File deleted successfully:", filePath);
+    }
+  });
+};
+
+const deleteUploadedFileAsync = async (filePath) => {
+  const { promisify } = require("util");
+  const unlinkPromise = promisify(fs.unlink);
+
+  try {
+    await unlinkPromise(filePath);
+    console.log("File deleted successfully:", filePath);
+    return true;
+  } catch (error) {
+    console.log("Error deleting file:", error);
+    return false;
+  }
+};
+
+const deleteUploadedFileAsyncMannual = async (filePath) => {
+  return new Promise((resolve, reject) => {
+    fs.unlink(filePath, (error) => {
+      if (error) {
+        console.log('Error deleting file:', error);
+        reject(false);
+      } else {
+        console.log('File deleted successfully:', filePath);
+        resolve(true);
+      }
+    });
+  });
+};
+
+
 module.exports.getValidationErrrJson = getValidationErrrJson;
 module.exports.base64Encode = base64Encode;
 module.exports.base64Decode = base64Decode;
 module.exports.pickX = pickX;
+module.exports.deleteUploadedFileAsyncMannual = deleteUploadedFileAsyncMannual;

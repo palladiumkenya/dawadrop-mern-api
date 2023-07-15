@@ -27,12 +27,18 @@ const {
   deleteUserRoles,
   menuOptionsList,
   menuOptionCreate,
+  menuOptionUpdate,
+  menuOptionDetail,
+  addRollMenuOptions,
+  deleteRollMenuOption,
 } = require("./views/role");
 const hasPrivileges = require("../middleware/hasPermission");
 const {
   patientActions,
   privilegeActions,
   roleActions,
+  PROFILE_MEDIA,
+  MENU_MEDIA,
 } = require("../utils/constants");
 const upload = require("../middleware/upload");
 
@@ -42,7 +48,7 @@ router.post("/change-password", auth, changePassword);
 router.get("/profile", auth, profile);
 router.post(
   "/profile",
-  [auth, upload({ dest: "uploads/" }).single("image")],
+  [auth, upload({ dest: PROFILE_MEDIA }).single("image")],
   updateProfile
 );
 router.get("/privileges", privilegeList);
@@ -62,14 +68,22 @@ router.post("/roles", [auth, hasPrivileges(roleActions.create)], roleCreate);
 router.get("/roles/:id", roleDetail);
 router.put("/roles/:id", [auth, hasPrivileges(roleActions.update)], roleUpdate);
 router.put("/roles/:id/privilege-add", auth, addRollPrivilege);
+router.put("/roles/:id/menu-add", auth, addRollMenuOptions);
 router.delete("/roles/:id/privilege-delete", auth, deleteRollPrivilege);
+router.delete("/roles/:id/menu-delete", auth, deleteRollMenuOption);
 router.post("/user/:id/asign-role", [auth], assignUserRoles);
 router.delete("/user/:id/delete-role", [auth], deleteUserRoles);
 router.get("/menu-options", [auth], menuOptionsList);
 router.post(
   "/menu-options",
-  [auth, upload({ dest: "menu-icons" }).single("image")],
+  [auth, upload({ dest: MENU_MEDIA }).single("image")],
   menuOptionCreate
+);
+router.get("/menu-options/:id", [auth], menuOptionDetail);
+router.put(
+  "/menu-options/:id",
+  [auth, upload({ dest: MENU_MEDIA }).single("image")],
+  menuOptionUpdate
 );
 
 module.exports = router;
