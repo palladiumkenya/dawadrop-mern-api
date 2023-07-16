@@ -9,6 +9,7 @@ const {
   profile,
   changePassword,
   updateProfile,
+  usersList,
 } = require("./views/authenticate");
 const {
   privilegeList,
@@ -47,6 +48,7 @@ router.post("/register", register);
 router.post("/login", login);
 router.post("/change-password", auth, changePassword);
 router.get("/profile", auth, profile);
+router.get("/users", auth, usersList);
 router.post(
   "/profile",
   [auth, upload({ dest: PROFILE_MEDIA }).single("image")],

@@ -5,7 +5,11 @@ const {
   changePaswordValidator,
   profileValidator,
 } = require("../validators");
-const { getValidationErrrJson, pickX } = require("../../utils/helpers");
+const {
+  getValidationErrrJson,
+  pickX,
+  constructMongooseFilter,
+} = require("../../utils/helpers");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const { isEmpty, pick } = require("lodash");
@@ -142,6 +146,20 @@ const profile = async (req, res) => {
   }
 };
 
+const usersList = async (req, res) => {
+  try {
+    const filters = constructMongooseFilter(
+      pick(req.query, ["roles", "privileges", "menuOptions"]),
+      { lookup: "$in" }
+    );
+    const users = await User.find(filters);
+    return res.json({ results: users });
+  } catch (error) {
+    // const { error: err, status } = getValidationErrrJson(error);
+    return res.json({ results: [] });
+  }
+};
+
 const updateProfile = async (req, res) => {
   try {
     const values = await profileValidator(req.body);
@@ -179,4 +197,5 @@ module.exports = {
   profile,
   changePassword,
   updateProfile,
+  usersList,
 };

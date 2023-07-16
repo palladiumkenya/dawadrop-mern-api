@@ -8,6 +8,9 @@ const MenuOption = model(
       required: true,
       unique: true,
     },
+    description: {
+      type: String,
+    },
     image: {
       type: String,
       required: true,

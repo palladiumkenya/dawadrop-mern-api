@@ -61,6 +61,7 @@ const userRolesSchema = Joi.object({
 const menuOptionSchema = Joi.object({
   label: Joi.string().required().min(4).label("Label"),
   image: Joi.string().required().label("Menu Image"),
+  description: Joi.string().label("Menu Description"),
   link: Joi.string().required().label("Menu Image"),
 });
 exports.userValidator = async (data) => {

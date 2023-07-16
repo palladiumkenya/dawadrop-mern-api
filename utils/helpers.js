@@ -78,19 +78,32 @@ const deleteUploadedFileAsyncMannual = async (filePath) => {
   return new Promise((resolve, reject) => {
     fs.unlink(filePath, (error) => {
       if (error) {
-        console.log('Error deleting file:', error);
+        console.log("Error deleting file:", error);
         reject(false);
       } else {
-        console.log('File deleted successfully:', filePath);
+        console.log("File deleted successfully:", filePath);
         resolve(true);
       }
     });
   });
 };
 
+const constructMongooseFilter = (filterParamsObj, { lookup }) => {
+  const filter = {};
+  for (const key in filterParamsObj) {
+    const value = filterParamsObj[key];
+    if (value instanceof Array) {
+      filter[key] = { lookup: value };
+    } else if (value) {
+      filter[key] = value;
+    }
+  }
+  return filter;
+};
 
 module.exports.getValidationErrrJson = getValidationErrrJson;
 module.exports.base64Encode = base64Encode;
 module.exports.base64Decode = base64Decode;
 module.exports.pickX = pickX;
 module.exports.deleteUploadedFileAsyncMannual = deleteUploadedFileAsyncMannual;
+module.exports.constructMongooseFilter = constructMongooseFilter;
