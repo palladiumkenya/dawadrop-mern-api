@@ -45,6 +45,7 @@ const roleSchema = Joi.object({
   name: Joi.string().required().min(4).max(30).label("Name"),
   description: Joi.string().min(4).label("Description"),
   privileges: Joi.array().label("Privilege").default([]),
+  menuOptions: Joi.array().label("Menu Options").default([]),
 });
 
 const rolePrivilegeAddSchema = Joi.object({

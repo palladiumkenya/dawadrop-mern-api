@@ -18,10 +18,9 @@ const MenuOption = require("../models/MenuOption");
 const { MENU_MEDIA } = require("../../utils/constants");
 
 const rolesListing = async (req, res) => {
-  const roles = await Role.find().populate(
-    "privileges",
-    "_id name description action"
-  );
+  const roles = await Role.find()
+    .populate("privileges", "_id name description action")
+    .populate("menuOptions");
   res.json({ results: roles });
 };
 const roleDetail = async (req, res) => {
@@ -62,9 +61,13 @@ const roleUpdate = async (req, res) => {
     }
     role.name = value.name;
     role.description = value.description;
+    console.log(value);
     if (!isEmpty(value.privileges)) role.privileges = value.privileges;
+    if (!isEmpty(value.menuOptions)) role.menuOptions = value.menuOptions;
+
+    console.log(role);
     await role.save();
-    return res.json(await role.populate("privileges", ["name", "description"]));
+    return res.json(role);
   } catch (ex) {
     const { error: err, status } = getValidationErrrJson(ex);
     return res.status(status).json(err);
