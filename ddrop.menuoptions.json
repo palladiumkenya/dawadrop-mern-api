@@ -1,0 +1,48 @@
+[{
+  "_id": {
+    "$oid": "64b4cc98c9a227215ea757cd"
+  },
+  "label": "Manage Privileges",
+  "image": "/menu-icons/1689591962949-1689577756766-permissions.png",
+  "link": "Privileges",
+  "__v": 0,
+  "description": "Menu that appears to user that have permission to mange privilges"
+},
+{
+  "_id": {
+    "$oid": "64b4e2fec9a227215ea7594e"
+  },
+  "label": "Patients",
+  "image": "/menu-icons/1689591999801-1689576190368-1689413825395-patients.png",
+  "link": "Patients",
+  "__v": 0,
+  "description": "Some description for patients men"
+},
+{
+  "_id": {
+    "$oid": "64b4e97fc9a227215ea75988"
+  },
+  "label": "Manage Roles",
+  "image": "/menu-icons/1689577855310-1689404981106-permission.png",
+  "link": "Roles",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64b4ea37c9a227215ea75993"
+  },
+  "label": "Manage User Roles",
+  "image": "/menu-icons/1689592992193-1689578039730-team.png",
+  "link": "UserRoles",
+  "__v": 0,
+  "description": "User roles mangemnt"
+},
+{
+  "_id": {
+    "$oid": "64b50753c9a227215ea75ce3"
+  },
+  "label": "Manage Menu Options",
+  "image": "/menu-icons/1689585491464-menu.png",
+  "link": "MenuOption",
+  "__v": 0
+}]

@@ -1,0 +1,34 @@
+[{
+  "_id": {
+    "$oid": "64abbc439e2b96e638fda8f6"
+  },
+  "name": "Dispensor",
+  "description": "Dispens medicin to patients",
+  "privileges": [
+    {
+      "$oid": "64abb0fe49b9434e9f6c8308"
+    }
+  ],
+  "__v": 2,
+  "menuOptions": [
+    {
+      "$oid": "64b4e97fc9a227215ea75988"
+    }
+  ]
+},
+{
+  "_id": {
+    "$oid": "64abe0d2749bb8b412ddcf26"
+  },
+  "name": "Doctors",
+  "description": "Doctor  roles",
+  "privileges": [
+    {
+      "$oid": "64abd4af50b6ebee9d5dff17"
+    },
+    {
+      "$oid": "64abde3aa750c7c16fb0322a"
+    }
+  ],
+  "__v": 12
+}]
