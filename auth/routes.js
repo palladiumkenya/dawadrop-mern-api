@@ -33,6 +33,7 @@ const {
   addRollMenuOptions,
   deleteRollMenuOption,
   userMenuOptionsList,
+  addUserRoles,
 } = require("./views/role");
 const hasPrivileges = require("../middleware/hasPermission");
 const {
@@ -75,6 +76,7 @@ router.put("/roles/:id/menu-add", auth, addRollMenuOptions);
 router.delete("/roles/:id/privilege-delete", auth, deleteRollPrivilege);
 router.delete("/roles/:id/menu-delete", auth, deleteRollMenuOption);
 router.post("/user/:id/asign-role", [auth], assignUserRoles);
+router.post("/user/:id/add-role", [auth], addUserRoles);
 router.delete("/user/:id/delete-role", [auth], deleteUserRoles);
 router.get("/menu-options", [auth], menuOptionsList);
 router.get("/my-menu-options", [auth], userMenuOptionsList);

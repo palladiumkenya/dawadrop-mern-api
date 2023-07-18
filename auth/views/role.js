@@ -64,8 +64,6 @@ const roleUpdate = async (req, res) => {
     console.log(value);
     if (!isEmpty(value.privileges)) role.privileges = value.privileges;
     if (!isEmpty(value.menuOptions)) role.menuOptions = value.menuOptions;
-
-    console.log(role);
     await role.save();
     return res.json(role);
   } catch (ex) {
@@ -163,6 +161,31 @@ const deleteRollMenuOption = async (req, res) => {
   }
 };
 const assignUserRoles = async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.params.id });
+    if (!user)
+      throw {
+        status: 404,
+        message: "User not found!",
+      };
+    const { roles } = await userRolesValidator(req.body);
+    user.roles = roles;
+    await user.save();
+    return res.json(
+      await user.populate("roles", [
+        "_id",
+        "name",
+        "description",
+        "privileges",
+        "menuOptions",
+      ])
+    );
+  } catch (ex) {
+    const { error: err, status } = getValidationErrrJson(ex);
+    return res.status(status).json(err);
+  }
+};
+const addUserRoles = async (req, res) => {
   try {
     const user = await User.findOne({ _id: req.params.id });
     if (!user)
@@ -292,4 +315,5 @@ module.exports = {
   addRollMenuOptions,
   deleteRollMenuOption,
   userMenuOptionsList,
+  addUserRoles,
 };

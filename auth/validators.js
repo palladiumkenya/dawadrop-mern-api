@@ -55,7 +55,7 @@ const roleMenuOptionsAddSchema = Joi.object({
   menuOptions: Joi.array().required().min(1).label("Menu Options"),
 });
 const userRolesSchema = Joi.object({
-  roles: Joi.array().required().min(1),
+  roles: Joi.array().required(),
 });
 
 const menuOptionSchema = Joi.object({
