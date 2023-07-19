@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const morgan = require("morgan");
 const authRoutes = require("./auth/routes");
 const patientRoute = require("./patients/routes");
+const providorAppointmentRoute = require("./appointments/routes");
+const deliveryRoutes = require("./deliveries/routes");
 dotenv.config();
 
 const config = require("config");
@@ -29,6 +31,8 @@ if (app.get("env") === "development") {
 }
 app.use("/auth", authRoutes);
 app.use("/patients", patientRoute);
+app.use("/appointments", providorAppointmentRoute);
+app.use("/deliveries", deliveryRoutes);
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log("[-]Server running on port " + port + " ....");

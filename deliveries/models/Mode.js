@@ -6,6 +6,7 @@ module.exports = model(
     name: {
       type: String,
       required: true,
+      unique: true,
     },
   })
 );

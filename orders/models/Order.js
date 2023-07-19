@@ -10,6 +10,9 @@ module.exports = model(
       ref: "Patient",
       required: true,
     },
+    appointMent: {
+      type: Number,
+    },
     updated: {
       type: Date,
       default: Date.now,

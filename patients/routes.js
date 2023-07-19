@@ -31,6 +31,9 @@ router.get("/appointments", [auth, isValidPatient], async (req, res) => {
   else res.json({ results: appointments });
   // res.json(base64Decode("Mg=="));
 });
+router.get("/orders", [auth, isValidPatient], async(req, res)=>{
+  const orders = await Order
+})
 router.post("/create-profile", [auth, hasNoProfile], async (req, res) => {
   try {
     const { cccNumber, firstName, upiNo } = await profileValidator(req.body);
