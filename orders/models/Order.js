@@ -40,5 +40,9 @@ module.exports = model(
       type: String,
       required: true,
     },
+  }, {
+    virtuals: {
+      created: ()=>{}
+    }
   })
 );

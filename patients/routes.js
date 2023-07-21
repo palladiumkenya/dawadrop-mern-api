@@ -7,7 +7,7 @@ const {
   base64Decode,
   base64Encode,
 } = require("../utils/helpers");
-const { searchPatient, sendOtp, getRegimen } = require("./api");
+const { searchPatient, sendOtp, getRegimen, sendSms } = require("./api");
 const AccountVerification = require("./models/AccountVerification");
 const moment = require("moment/moment");
 const hasNoProfile = require("../middleware/hasNoProfile");
@@ -77,6 +77,10 @@ router.post("/orders", [auth, isValidPatient], async (req, res) => {
       drug: currRegimen[0].regimen,
     });
     await order.save();
+    await sendSms(
+      `Dear dawadrop user,Your order has been received successfully.Your order id is ${order._id}`,
+      req.user.phoneNumber
+    );
     // 5. If 3 & 4 are successfull, create local order
     // 6. Send success sms message on sucess Order
     return res.json(await order.populate("patient"));

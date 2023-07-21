@@ -46,6 +46,30 @@ const sendOtp = async (otp, phone, create = true) => {
   };
   await fetch(url, requestOptions);
 };
+const sendSms = async (message, phone) => {
+  const url = config.get("sms_url");
+  const apiKey = config.get("sms_api_key");
+  const shortCode = config.get("short_code");
+  const myHeaders = new Headers();
+  myHeaders.append("Accept", "application/json");
+  myHeaders.append("api-token", apiKey);
+  myHeaders.append("Content-Type", "application/json");
+  const raw = JSON.stringify({
+    destination: phone,
+    msg: message,
+    sender_id: phone,
+    gateway: shortCode,
+  });
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    // redirect: "follow",
+    // mode: "cors",
+    // credentials: "omit",
+  };
+  await fetch(url, requestOptions);
+};
 
 const getRegimen = async (cccNumber) => {
   const url = `http://prod.kenyahmis.org:8002/api/patient/${cccNumber}/regimen`;
@@ -63,4 +87,5 @@ module.exports = {
   searchPatient,
   sendOtp,
   getRegimen,
+  sendSms,
 };
