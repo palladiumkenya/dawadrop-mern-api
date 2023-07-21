@@ -38,6 +38,49 @@ router.get("/orders", [auth, isValidPatient], async (req, res) => {
   const orders = await Order.find({ patient: patient._id }).populate("patient");
   return res.json({ results: orders });
 });
+router.get(
+  "/orders/check-eligibility",
+  [auth, isValidPatient],
+  async (req, res) => {
+    try {
+      const patient = await Patient.findOne({ user: req.user._id });
+      const orders = await Order.find({ patient: patient._id }).populate(
+        "patient"
+      );
+
+      const appoinments = await getPatientAppointments(patient.cccNumber);
+      const latest = appoinments
+        .filter((apt) => apt.appointment_type === "Re-Fill")
+        .sort((a, b) => {
+          const dateA = new Date(a.appointment.split("-").reverse().join("-"));
+          const dateB = new Date(b.appointment.split("-").reverse().join("-"));
+          return dateB - dateA;
+        });
+      if (isEmpty(latest)) {
+        throw {
+          status: 404,
+          message: "You have no appointmet",
+        };
+      }
+      const appointment = latest[0];
+      // 2. Check if user is eligible for appoinment based on last appointment refill
+      // 3. Get current Regimen
+      const currRegimen = await getRegimen(patient.cccNumber);
+      if (isEmpty(currRegimen)) {
+        throw {
+          status: 404,
+          message: "You must be subscribed to regimen",
+        };
+      }
+
+      return res.json({ appointment, currentRegimen: currRegimen[0] });
+    } catch (error) {
+      const { error: err, status } = getValidationErrrJson(error);
+      return res.status(status).json(err);
+    }
+  }
+);
+
 router.post("/orders", [auth, isValidPatient], async (req, res) => {
   try {
     const patient = await Patient.findOne({ user: req.user._id });
@@ -70,6 +113,7 @@ router.post("/orders", [auth, isValidPatient], async (req, res) => {
     // 3. Create a new appointment on EMR
 
     // 4. Create Drug order in Kenya EMR
+    // 5. If 3 & 4 are successfull, create local order
     const order = new Order({
       ...values,
       patient: patient._id,
@@ -77,12 +121,11 @@ router.post("/orders", [auth, isValidPatient], async (req, res) => {
       drug: currRegimen[0].regimen,
     });
     await order.save();
+    // 6. Send success sms message on sucess Order
     await sendSms(
       `Dear dawadrop user,Your order has been received successfully.Your order id is ${order._id}`,
       req.user.phoneNumber
     );
-    // 5. If 3 & 4 are successfull, create local order
-    // 6. Send success sms message on sucess Order
     return res.json(await order.populate("patient"));
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
