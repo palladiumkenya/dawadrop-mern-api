@@ -4,17 +4,16 @@ module.exports = model(
   "Address",
   new Schema({
     latitude: {
-      type: Schema.Types.Decimal128,
+      type: Number,
       required: true,
     },
     longitude: {
-      type: Schema.Types.Decimal128,
-      required: true
+      type: Number,
+      required: true,
     },
     address: {
       type: String,
       maxlength: 255,
     },
-    
   })
 );
