@@ -47,7 +47,20 @@ const sendOtp = async (otp, phone, create = true) => {
   await fetch(url, requestOptions);
 };
 
+const getRegimen = async (cccNumber) => {
+  const url = `http://prod.kenyahmis.org:8002/api/patient/${cccNumber}/regimen`;
+  const response = await fetch(url, { method: "GET" });
+  if (response.status === 200) {
+    const data = await response.json();
+    if (data["status"] === "success") {
+      return data.message;
+    }
+  }
+  return null;
+};
+
 module.exports = {
   searchPatient,
   sendOtp,
+  getRegimen,
 };

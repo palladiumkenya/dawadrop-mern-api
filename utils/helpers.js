@@ -14,9 +14,12 @@ const getValidationErrrJson = (err) => {
   } else if (err.details) {
     status = 400;
     // Joi validation
+    // console.log(err.details);
     const _errors = {};
     for (const e of err.details) {
-      _errors[e.path[0]] = e.message;
+      _errors[e.path[0]] = `${
+        _errors[e.path[0]] ? _errors[e.path[0]] + ", " : ""
+      }${e.message}`;
     }
     validationErrors.errors = _errors;
   } else if (err.status) {

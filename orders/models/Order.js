@@ -10,8 +10,9 @@ module.exports = model(
       ref: "Patient",
       required: true,
     },
-    appointMent: {
+    appointment: {
       type: Number,
+      required: true,
     },
     updated: {
       type: Date,
@@ -23,7 +24,7 @@ module.exports = model(
     },
     deliveryTimeSlot: {
       type: TimeSlot.schema,
-      required: true,
+      // required: true,
     },
     deliveryMode: {
       type: Schema.Types.ObjectId,

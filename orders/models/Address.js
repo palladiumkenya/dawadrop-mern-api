@@ -9,10 +9,12 @@ module.exports = model(
     },
     longitude: {
       type: Schema.Types.Decimal128,
+      required: true
     },
     address: {
       type: String,
       maxlength: 255,
     },
+    
   })
 );

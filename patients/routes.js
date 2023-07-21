@@ -7,7 +7,7 @@ const {
   base64Decode,
   base64Encode,
 } = require("../utils/helpers");
-const { searchPatient, sendOtp } = require("./api");
+const { searchPatient, sendOtp, getRegimen } = require("./api");
 const AccountVerification = require("./models/AccountVerification");
 const moment = require("moment/moment");
 const hasNoProfile = require("../middleware/hasNoProfile");
@@ -15,6 +15,8 @@ const isValidPatient = require("../middleware/isValidPatient");
 const { getPatientAppointments } = require("../appointments/api");
 const { isEmpty } = require("lodash");
 const User = require("../auth/models/User");
+const Order = require("../orders/models/Order");
+const { patientOrderValidator } = require("../orders/validators");
 const router = Router();
 
 router.get("/", auth, async (req, res) => {
@@ -31,9 +33,58 @@ router.get("/appointments", [auth, isValidPatient], async (req, res) => {
   else res.json({ results: appointments });
   // res.json(base64Decode("Mg=="));
 });
-router.get("/orders", [auth, isValidPatient], async(req, res)=>{
-  const orders = await Order
-})
+router.get("/orders", [auth, isValidPatient], async (req, res) => {
+  const patient = await Patient.findOne({ user: req.user._id });
+  const orders = await Order.find({ patient: patient._id }).populate("patient");
+  return res.json({ results: orders });
+});
+router.post("/orders", [auth, isValidPatient], async (req, res) => {
+  try {
+    const patient = await Patient.findOne({ user: req.user._id });
+    const values = await patientOrderValidator(req.body);
+    // 1. Get patient refill appointments
+    const appoinments = await getPatientAppointments(patient.cccNumber);
+    const latest = appoinments
+      .filter((apt) => apt.appointment_type === "Re-Fill")
+      .sort((a, b) => {
+        const dateA = new Date(a.appointment.split("-").reverse().join("-"));
+        const dateB = new Date(b.appointment.split("-").reverse().join("-"));
+        return dateB - dateA;
+      });
+    if (isEmpty(latest)) {
+      throw {
+        status: 404,
+        message: "You have no appointmet",
+      };
+    }
+    const appointment = latest[0].id;
+    // 2. Check if user is eligible for appoinment based on last appointment refill
+    // 3. Get current Regimen
+    const currRegimen = await getRegimen(patient.cccNumber);
+    if (isEmpty(currRegimen)) {
+      throw {
+        status: 404,
+        message: "You must be subscribed to regimen",
+      };
+    }
+    // 3. Create a new appointment on EMR
+
+    // 4. Create Drug order in Kenya EMR
+    const order = new Order({
+      ...values,
+      patient: patient._id,
+      appointment: appointment,
+      drug: currRegimen[0].regimen,
+    });
+    await order.save();
+    // 5. If 3 & 4 are successfull, create local order
+    // 6. Send success sms message on sucess Order
+    return res.json(await order.populate("patient"));
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
+});
 router.post("/create-profile", [auth, hasNoProfile], async (req, res) => {
   try {
     const { cccNumber, firstName, upiNo } = await profileValidator(req.body);

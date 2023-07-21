@@ -6,6 +6,7 @@ const authRoutes = require("./auth/routes");
 const patientRoute = require("./patients/routes");
 const providorAppointmentRoute = require("./appointments/routes");
 const deliveryRoutes = require("./deliveries/routes");
+const ordersRoutes = require("./orders/routes");
 dotenv.config();
 
 const config = require("config");
@@ -33,6 +34,7 @@ app.use("/auth", authRoutes);
 app.use("/patients", patientRoute);
 app.use("/appointments", providorAppointmentRoute);
 app.use("/deliveries", deliveryRoutes);
+app.use("/orders", ordersRoutes);
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log("[-]Server running on port " + port + " ....");
