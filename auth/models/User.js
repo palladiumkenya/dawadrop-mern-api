@@ -4,6 +4,9 @@ const dotenv = require("dotenv");
 dotenv.config();
 const config = require("config");
 const Role = require("./Role");
+const Patient = require("../../patients/models/Patient");
+const MenuOption = require("./MenuOption");
+const Privilege = require("./Privilege");
 
 const User = model(
   "User",
@@ -111,8 +114,13 @@ const User = model(
           return jwt.sign({ _id: this._id }, config.get("jwt"));
         },
         async getPrivilegeIds() {
+          if (this.isSuperUser) {
+            return await Privilege.find().select("_id");
+          }
           const privileges = [];
-          const roles = await Role.find({ _id: { $in: this.roles } });
+          const roles = await Role.find({
+            _id: { $in: await this.getAllRoleIds() },
+          });
           roles.forEach((role) => {
             role.privileges.forEach((privilege) => {
               if (!privileges.includes(privilege)) {
@@ -123,8 +131,13 @@ const User = model(
           return privileges;
         },
         async getMenuOptionsIds() {
+          if (this.isSuperUser) {
+            return await MenuOption.find().select("_id");
+          }
           const options = [];
-          const roles = await Role.find({ _id: { $in: this.roles } });
+          const roles = await Role.find({
+            _id: { $in: await this.getAllRoleIds() },
+          });
           roles.forEach((role) => {
             role.menuOptions.forEach((menu) => {
               if (!options.includes(menu)) {
@@ -156,6 +169,23 @@ const User = model(
             if (commit) await this.save();
           }
         },
+        async isPatient() {
+          return Boolean(await Patient.findOne({ user: this._id }));
+        },
+        async getAllRoleIds() {
+          if (this.isSuperUser) {
+            return await Role.find().select("_id");
+          }
+          let roles;
+          if (await this.isPatient()) {
+            roles = await Role.find()
+              .or([{ _id: { $in: this.roles } }, { assignAllPatients: true }])
+              .select("_id");
+          } else {
+            roles = await Role.find({ _id: { $in: this.roles } }).select("_id");
+          }
+          return roles;
+        },
       },
       statics: {
         async isExisting(filterQuery) {
@@ -164,6 +194,7 @@ const User = model(
         },
       },
       virtuals: {
+        // Only takes syncronoues, for async use tile in isPatient and autoAssignedRoles Field above
         created: {
           get: function () {
             const timestamp = this._id.getTimestamp();

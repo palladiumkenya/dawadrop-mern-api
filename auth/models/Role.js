@@ -26,6 +26,14 @@ const Role = model(
         default: [],
         ref: "MenuOption",
       },
+      assignAllPatients: {
+        type: Boolean,
+        default: false,
+      },
+      assignAllProvidors: {
+        type: Boolean,
+        default: false,
+      },
     },
     {
       methods: {

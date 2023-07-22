@@ -292,11 +292,24 @@ const menuOptionUpdate = async (req, res) => {
 };
 
 const userMenuOptionsList = async (req, res) => {
-  if (req.user.isSuperUser)
-    return res.json({ results: await MenuOption.find() });
+  // if (req.user.isSuperUser)
+  //   return res.json({ results: await MenuOption.find() });
   const user = await User.findOne({ _id: req.user._id });
   const menuOptions = await user.getMenuOptionsIds();
   res.json({ results: await MenuOption.find({ _id: { $in: menuOptions } }) });
+};
+
+const userAuthInfo = async (req, res) => {
+  const user = await User.findById(req.params.id);
+  return res.json({
+    roles: await Role.find({ _id: { $in: await user.getAllRoleIds() } }),
+    menuOptions: await MenuOption.find({
+      _id: { $in: await user.getMenuOptionsIds() },
+    }),
+    privileges: await Privilege.find({
+      _id: { $in: await user.getPrivilegeIds() },
+    }),
+  });
 };
 
 module.exports = {
@@ -316,4 +329,5 @@ module.exports = {
   deleteRollMenuOption,
   userMenuOptionsList,
   addUserRoles,
+  userAuthInfo,
 };

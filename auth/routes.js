@@ -34,6 +34,7 @@ const {
   deleteRollMenuOption,
   userMenuOptionsList,
   addUserRoles,
+  userAuthInfo,
 } = require("./views/role");
 const hasPrivileges = require("../middleware/hasPermission");
 const {
@@ -50,6 +51,7 @@ router.post("/login", login);
 router.post("/change-password", auth, changePassword);
 router.get("/profile", auth, profile);
 router.get("/users", auth, usersList);
+router.get("/user/:id", auth, userAuthInfo);
 router.post(
   "/profile",
   [auth, upload({ dest: PROFILE_MEDIA }).single("image")],

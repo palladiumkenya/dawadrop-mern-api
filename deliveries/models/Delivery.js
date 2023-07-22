@@ -10,13 +10,9 @@ module.exports = model(
         required: true,
         unique: true,
       },
-      code: {
-        type: String,
-        unique: true,
-      },
       dispencedBy: {
         type: Schema.Types.ObjectId,
-        ref: "Agent",
+        ref: "User",
       },
       status: {
         type: String,

@@ -14,6 +14,8 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const { isEmpty, pick } = require("lodash");
 const { PROFILE_MEDIA } = require("../../utils/constants");
+const { use } = require("../routes");
+const Role = require("../models/Role");
 
 const register = async (req, res) => {
   // let user = User.findOne({email})
@@ -126,20 +128,10 @@ const changePassword = async (req, res) => {
 const profile = async (req, res) => {
   try {
     const user = req.user;
-    return res.json(
-      pickX(user, [
-        "_id",
-        "username",
-        "email",
-        "phoneNumber",
-        "isSuperUser",
-        "firstName",
-        "lastName",
-        "image",
-        "roles",
-        "isSuperUser",
-      ])
-    );
+    // for(true){
+    //   if(user.roles.findIndex() === -1)
+    // }
+    return res.json(user);
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
     return res.status(status).json(err);
