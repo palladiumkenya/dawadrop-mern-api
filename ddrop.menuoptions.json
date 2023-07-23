@@ -3,7 +3,7 @@
     "$oid": "64b4cc98c9a227215ea757cd"
   },
   "label": "Manage Privileges",
-  "image": "/menu-icons/1689591962949-1689577756766-permissions.png",
+  "image": "/menu-icons/1689734657068-3009e2e2-0e53-4f79-bf49-220055c90d4b.png",
   "link": "Privileges",
   "__v": 0,
   "description": "Menu that appears to user that have permission to mange privilges"
@@ -13,7 +13,7 @@
     "$oid": "64b4e2fec9a227215ea7594e"
   },
   "label": "Patients",
-  "image": "/menu-icons/1689591999801-1689576190368-1689413825395-patients.png",
+  "image": "/menu-icons/1689734695945-d49abe45-0cf7-494c-b61c-0f903306ba87.png",
   "link": "Patients",
   "__v": 0,
   "description": "Some description for patients men"
@@ -23,16 +23,17 @@
     "$oid": "64b4e97fc9a227215ea75988"
   },
   "label": "Manage Roles",
-  "image": "/menu-icons/1689577855310-1689404981106-permission.png",
+  "image": "/menu-icons/1689734742416-142dbba0-30a9-48ef-a789-14e93285c593.png",
   "link": "Roles",
-  "__v": 0
+  "__v": 0,
+  "description": "Manage riles"
 },
 {
   "_id": {
     "$oid": "64b4ea37c9a227215ea75993"
   },
   "label": "Manage User Roles",
-  "image": "/menu-icons/1689592992193-1689578039730-team.png",
+  "image": "/menu-icons/1689734776983-39ff10d2-46cf-4241-90bb-985d6b39f3c1.png",
   "link": "UserRoles",
   "__v": 0,
   "description": "User roles mangemnt"
@@ -42,7 +43,68 @@
     "$oid": "64b50753c9a227215ea75ce3"
   },
   "label": "Manage Menu Options",
-  "image": "/menu-icons/1689585491464-menu.png",
+  "image": "/menu-icons/1689734816952-65dec299-e4ea-487f-bf1f-3b0e5af92c88.png",
   "link": "MenuOption",
+  "__v": 0,
+  "description": "Menu options seen by user"
+},
+{
+  "_id": {
+    "$oid": "64b74f6d98a59970e5d99284"
+  },
+  "label": "Orders",
+  "description": "Orders",
+  "image": "/menu-icons/1689735021332-2834c660-7a56-4272-a5a9-d119ac938c73.png",
+  "link": "PatientOrders",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64b7514198a59970e5d992d1"
+  },
+  "label": "Appointments",
+  "description": "Appointments",
+  "image": "/menu-icons/1689735489422-04c0a56a-b30b-4b46-8024-145d1f6d1f72.png",
+  "link": "Appointments",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64b7701578b2c6d3997a222f"
+  },
+  "label": "Delivery Modes",
+  "description": "Delivery modes",
+  "image": "/menu-icons/1689743381090-f8ebbc68-3a4a-4f0d-9b48-7b687b38a913.png",
+  "link": "DeliveryModes",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64bba8d07079280b50c7868f"
+  },
+  "label": "Checkout Delivery",
+  "description": "Patient delivery feedback",
+  "image": "/menu-icons/1690020048019-843fc246-5b5a-4166-ae8c-2fd97d61d608.png",
+  "link": "CheckoutDelivery",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64bccff8e8b243d73b59f1ce"
+  },
+  "label": "My deliveries",
+  "description": "Patient Deliveries",
+  "image": "/menu-icons/1690095608503-88ae519f-7665-4abc-933f-b60d9afefb43.png",
+  "link": "PatientDeliveries",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64bcd0f5e8b243d73b59f1d5"
+  },
+  "label": "My delivery tasks",
+  "description": "Agent delivery tasks",
+  "image": "/menu-icons/1690095861864-573d3ec3-0f0f-4580-ab74-cf321c7da1aa.png",
+  "link": "CurriourDeliveryTasks",
   "__v": 0
 }]

@@ -137,12 +137,13 @@ router.post("/create-profile", [auth, hasNoProfile], async (req, res) => {
     const { cccNumber, firstName, upiNo } = await profileValidator(req.body);
     const remotePatient = await searchPatient(cccNumber);
     if (!remotePatient)
-      throw Error("Verification Error!CCC Number / First Name do not match");
-    if (remotePatient.f_name !== firstName)
-      throw Error("Verification Error!CCC Number / First Name do not match");
+      throw Error("Verification Error!\nCCC Number / First Name do not match");
+    console.log(remotePatient);
+    if (remotePatient.f_name.toLowerCase() !== firstName.toLowerCase())
+      throw Error("Verification Error!\nCCC Number / First Name do not match");
     if (upiNo && remotePatient.upi_no !== upiNo)
       throw Error(
-        "Verification Error!UPU Number / First Name / CCC Number do not match"
+        "Verification Error!\nUPI Number / First Name / CCC Number do not match"
       );
 
     const patient = await Patient.getOrCreatePatientFromRemote(remotePatient);

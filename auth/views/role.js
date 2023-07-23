@@ -292,8 +292,6 @@ const menuOptionUpdate = async (req, res) => {
 };
 
 const userMenuOptionsList = async (req, res) => {
-  // if (req.user.isSuperUser)
-  //   return res.json({ results: await MenuOption.find() });
   const user = await User.findOne({ _id: req.user._id });
   const menuOptions = await user.getMenuOptionsIds();
   res.json({ results: await MenuOption.find({ _id: { $in: menuOptions } }) });

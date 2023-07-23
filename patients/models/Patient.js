@@ -40,7 +40,6 @@ const Patient = model(
         type: String,
         maxlength: 14,
         minlength: 9,
-        unique: true,
       },
       primaryClinic: {
         type: Number,

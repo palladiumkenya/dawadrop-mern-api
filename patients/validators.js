@@ -2,7 +2,7 @@ const Joi = require("joi");
 
 const profileShema = Joi.object({
   cccNumber: Joi.string().required().label("CCC Number"),
-  upiNo: Joi.string().label("Universal Patient Number"),
+  upiNo: Joi.string().label("Universal Patient Number").allow(""),
   firstName: Joi.string().required().label("First Name"),
 });
 
