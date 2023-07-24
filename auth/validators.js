@@ -46,6 +46,9 @@ const roleSchema = Joi.object({
   description: Joi.string().min(4).label("Description"),
   privileges: Joi.array().label("Privilege").default([]),
   menuOptions: Joi.array().label("Menu Options").default([]),
+  assignAllPatients: Joi.boolean()
+    .label("Assign Roles to all patients")
+    .default(false),
 });
 
 const rolePrivilegeAddSchema = Joi.object({

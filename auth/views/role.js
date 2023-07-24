@@ -44,7 +44,6 @@ const roleCreate = async (req, res) => {
     const value = await rolesValidator(req.body);
     let role = new Role(value);
     role = await role.save();
-
     return res.json(await role.populate("privileges", ["name", "description"]));
   } catch (ex) {
     const { error: err, status } = getValidationErrrJson(ex);
@@ -61,7 +60,7 @@ const roleUpdate = async (req, res) => {
     }
     role.name = value.name;
     role.description = value.description;
-    console.log(value);
+    role.assignAllPatients = value.assignAllPatients;
     if (!isEmpty(value.privileges)) role.privileges = value.privileges;
     if (!isEmpty(value.menuOptions)) role.menuOptions = value.menuOptions;
     await role.save();

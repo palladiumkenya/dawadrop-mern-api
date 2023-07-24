@@ -4,7 +4,7 @@ const {
   Types: { ObjectId },
 } = require("mongoose");
 const Address = require("./Address");
-const TimeSlot = require("./TimeSlot");
+const TimeSlot = require("../../deliveries/models/TimeSlot");
 
 module.exports = model(
   "Order",
