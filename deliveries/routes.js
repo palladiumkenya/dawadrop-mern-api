@@ -82,10 +82,10 @@ router.put("/timeslots/:id", async (req, res) => {
       };
     }
     const value = await timeSlotValidator(req.body);
-    timeSlot.label = value.label
-    timeSlot.startTime = value.startTime
-    timeSlot.endTime = value.endTime
-    timeSlot.capacity = value.capacity
+    timeSlot.label = value.label;
+    timeSlot.startTime = value.startTime;
+    timeSlot.endTime = value.endTime;
+    timeSlot.capacity = value.capacity;
     await timeSlot.save();
     return res.json(timeSlot);
   } catch (error) {
