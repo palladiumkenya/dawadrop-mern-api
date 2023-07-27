@@ -5,6 +5,8 @@ const {
 } = require("mongoose");
 const Address = require("./Address");
 const TimeSlot = require("../../deliveries/models/TimeSlot");
+const DeliveryMethod = require("../../deliveries/models/DeliveryMethod");
+const Mode = require("../../deliveries/models/Mode");
 
 module.exports = model(
   "Order",
@@ -29,17 +31,18 @@ module.exports = model(
       },
       deliveryTimeSlot: {
         type: TimeSlot.schema,
-        // required: true,
       },
       deliveryMode: {
-        type: Schema.Types.ObjectId,
-        ref: "Mode",
+        type: Mode.schema,
+      },
+      deliveryMethod: {
+        type: DeliveryMethod.schema,
+        required: true,
       },
       phoneNumber: {
         type: String,
         maxlength: 14,
         minlength: 9,
-        unique: true,
       },
       drug: {
         type: String,
