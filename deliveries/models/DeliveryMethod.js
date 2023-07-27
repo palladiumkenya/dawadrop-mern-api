@@ -12,6 +12,7 @@ const DeliveryMethod = model(
       description: {
         type: String,
       },
+      require
     },
     {
       virtuals: {

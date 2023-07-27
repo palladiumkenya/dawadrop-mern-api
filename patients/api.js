@@ -73,6 +73,8 @@ const sendSms = async (message, phone) => {
 
 const getRegimen = async (cccNumber) => {
   const url = `http://prod.kenyahmis.org:8002/api/patient/${cccNumber}/regimen`;
+  return "ABC + GPT + LOP";
+
   const response = await fetch(url, { method: "GET" });
   if (response.status === 200) {
     const data = await response.json();
