@@ -1,8 +1,13 @@
 const { Router } = require("express");
 const Mode = require("./models/Mode");
-const { modeValidator, timeSlotValidator } = require("./validators");
+const {
+  modeValidator,
+  timeSlotValidator,
+  deliveryMethodValidator,
+} = require("./validators");
 const { getValidationErrrJson } = require("../utils/helpers");
 const TimeSlot = require("./models/TimeSlot");
+const DeliveryMethod = require("./models/DeliveryMethod");
 
 const router = Router();
 
@@ -88,6 +93,49 @@ router.put("/timeslots/:id", async (req, res) => {
     timeSlot.capacity = value.capacity;
     await timeSlot.save();
     return res.json(timeSlot);
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
+});
+router.get("/methods", async (req, res) => {
+  const methods = await DeliveryMethod.find();
+  return res.json({ results: methods });
+});
+router.get("/methods/:id", async (req, res) => {
+  const method = await DeliveryMethod.findById(req.params.id);
+  if (!method) {
+    return res.status(404).json({ detail: "Delivery method  not found" });
+  }
+  return res.json(method);
+});
+
+router.post("/methods", async (req, res) => {
+  try {
+    const value = await deliveryMethodValidator(req.body);
+    const method = new DeliveryMethod(value);
+    await method.save();
+    return res.json(method);
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
+});
+
+router.put("/methods/:id", async (req, res) => {
+  try {
+    const method = await DeliveryMethod.findById(req.params.id);
+    if (!method) {
+      throw {
+        status: 404,
+        message: "Delivery methods Not found!",
+      };
+    }
+    const value = await deliveryMethodValidator(req.body);
+    method.name = value.name;
+    method.description = value.description;
+    await method.save();
+    return res.json(method);
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
     return res.status(status).json(err);

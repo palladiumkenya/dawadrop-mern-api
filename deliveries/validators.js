@@ -10,10 +10,17 @@ const timeSlotSchema = Joi.object({
   capacity: Joi.number().required().label("Capacity"),
   label: Joi.string().required().label("Label"),
 });
+const deliveryMethodSchema = Joi.object({
+  name: Joi.string().required().label("Name"),
+  description: Joi.string().label("Description"),
+});
 
 exports.modeValidator = async (data) => {
   return modeSchema.validateAsync(data, { abortEarly: false });
 };
 exports.timeSlotValidator = async (data) => {
   return timeSlotSchema.validateAsync(data, { abortEarly: false });
+};
+exports.deliveryMethodValidator = async (data) => {
+  return deliveryMethodSchema.validateAsync(data, { abortEarly: false });
 };
