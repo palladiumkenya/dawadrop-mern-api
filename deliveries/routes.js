@@ -134,6 +134,7 @@ router.put("/methods/:id", async (req, res) => {
     const value = await deliveryMethodValidator(req.body);
     method.name = value.name;
     method.description = value.description;
+    method.blockOnTimeSlotFull = value.blockOnTimeSlotFull;
     await method.save();
     return res.json(method);
   } catch (error) {

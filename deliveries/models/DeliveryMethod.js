@@ -12,7 +12,10 @@ const DeliveryMethod = model(
       description: {
         type: String,
       },
-      require
+      blockOnTimeSlotFull: {
+        type: Boolean,
+        default: true,
+      },
     },
     {
       virtuals: {

@@ -13,6 +13,7 @@ const timeSlotSchema = Joi.object({
 const deliveryMethodSchema = Joi.object({
   name: Joi.string().required().label("Name"),
   description: Joi.string().label("Description"),
+  blockOnTimeSlotFull: Joi.bool().label("Block when slot is full"),
 });
 
 exports.modeValidator = async (data) => {
