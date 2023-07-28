@@ -17,6 +17,9 @@ const { isEmpty } = require("lodash");
 const User = require("../auth/models/User");
 const Order = require("../orders/models/Order");
 const { patientOrderValidator } = require("../orders/validators");
+const TimeSlot = require("../deliveries/models/TimeSlot");
+const Mode = require("../deliveries/models/Mode");
+const DeliveryMethod = require("../deliveries/models/DeliveryMethod");
 const router = Router();
 
 router.get("/", auth, async (req, res) => {
@@ -33,22 +36,29 @@ router.get("/appointments", [auth, isValidPatient], async (req, res) => {
   else res.json({ results: appointments });
   // res.json(base64Decode("Mg=="));
 });
+router.get("/appointments/:id", [auth, isValidPatient], async (req, res) => {
+  const patient = await Patient.findOne({ user: req.user._id });
+  const appointments = (await getPatientAppointments(patient.cccNumber)) || [];
+  const appointment = appointments.find((apt) => `${apt.id}` === req.params.id);
+  if (!appointment) {
+    res.status(404).json({ detail: "Appointment not found" });
+  } else res.json(appointment);
+  // res.json(base64Decode("Mg=="));
+});
 router.get("/orders", [auth, isValidPatient], async (req, res) => {
   const patient = await Patient.findOne({ user: req.user._id });
   const orders = await Order.find({ patient: patient._id }).populate("patient");
   return res.json({ results: orders });
 });
+
 router.get(
   "/orders/check-eligibility",
   [auth, isValidPatient],
   async (req, res) => {
     try {
       const patient = await Patient.findOne({ user: req.user._id });
-      const orders = await Order.find({ patient: patient._id }).populate(
-        "patient"
-      );
-
       const appoinments = await getPatientAppointments(patient.cccNumber);
+
       const latest = appoinments
         .filter((apt) => apt.appointment_type === "Re-Fill")
         .sort((a, b) => {
@@ -80,7 +90,17 @@ router.get(
     }
   }
 );
-
+router.get("/orders/:id", [auth, isValidPatient], async (req, res) => {
+  const patient = await Patient.findOne({ user: req.user._id });
+  const order = await Order.findOne({
+    patient: patient._id,
+    _id: req.params.id,
+  }).populate("patient");
+  if (!order) {
+    return res.status(404).json({ detail: "Order not found" });
+  }
+  return res.json(order);
+});
 router.post("/orders", [auth, isValidPatient], async (req, res) => {
   try {
     const patient = await Patient.findOne({ user: req.user._id });
@@ -100,7 +120,7 @@ router.post("/orders", [auth, isValidPatient], async (req, res) => {
         message: "You have no appointmet",
       };
     }
-    const appointment = latest[0].id;
+    const appointment = latest[0];
     // 2. Check if user is eligible for appoinment based on last appointment refill
     // 3. Get current Regimen
     const currRegimen = await getRegimen(patient.cccNumber);
@@ -116,6 +136,9 @@ router.post("/orders", [auth, isValidPatient], async (req, res) => {
     // 5. If 3 & 4 are successfull, create local order
     const order = new Order({
       ...values,
+      deliveryTimeSlot: await TimeSlot.findById(values["deliveryTimeSlot"]),
+      deliveryMode: await Mode.findById(values["deliveryMode"]),
+      deliveryMethod: await DeliveryMethod.findById(values["deliveryMethod"]),
       patient: patient._id,
       appointment: appointment,
       drug: currRegimen[0].regimen,

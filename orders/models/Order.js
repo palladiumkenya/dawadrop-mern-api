@@ -18,8 +18,17 @@ module.exports = model(
         required: true,
       },
       appointment: {
-        type: Number,
-        required: true,
+        type: new Schema({
+          id: {
+            type: Number,
+            required: true,
+          },
+          appointment_type: {
+            type: String,
+            required: true,
+          },
+          appointment_date: String,
+        }),
       },
       updated: {
         type: Date,

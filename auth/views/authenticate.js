@@ -14,7 +14,6 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const { isEmpty, pick } = require("lodash");
 const { PROFILE_MEDIA } = require("../../utils/constants");
-const { use } = require("../routes");
 const Role = require("../models/Role");
 
 const register = async (req, res) => {

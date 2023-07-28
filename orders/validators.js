@@ -30,14 +30,14 @@ const patientOrderSchema = Joi.object({
   deliveryAddress: Joi.object({
     latitude: Joi.number().required().label("Latitude"),
     longitude: Joi.number().required().label("Longitude"),
-    address: Joi.number().label("Address"),
-  }).label("Delivery address"),
-  deliveryTimeSlot: Joi.object({
-    startTime: Joi.date().required().label("Start time"),
-    endTime: Joi.date().required().label("End time"),
-  }).label("Time between"),
+    address: Joi.string().label("Address"),
+  })
+    .label("Delivery address")
+    .required(),
+  deliveryTimeSlot: Joi.string().label("Delivery Time slot").required(),
   deliveryMode: Joi.string().required().label("Delivery mode"),
   phoneNumber: Joi.string().max(14).min(9).label("Phone number"),
+  deliveryMethod: Joi.string().label("Delivery method").required(),
 });
 
 exports.orderValidator = async (data) => {
