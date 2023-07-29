@@ -155,6 +155,38 @@ router.post("/orders", [auth, isValidPatient], async (req, res) => {
     return res.status(status).json(err);
   }
 });
+router.put("/orders/:id", [auth, isValidPatient], async (req, res) => {
+  try {
+    const patient = await Patient.findOne({ user: req.user._id });
+    const order = await Order.findOne({
+      _id: req.params.id,
+      patient: patient._id,
+    });
+    delete req.body.deliveryAddress._id
+    const values = await patientOrderValidator(req.body);
+
+    order.deliveryTimeSlot = await TimeSlot.findById(
+      values["deliveryTimeSlot"]
+    );
+    order.deliveryMode = await Mode.findById(values["deliveryMode"]);
+    order.deliveryMethod = await DeliveryMethod.findById(
+      values["deliveryMethod"]
+    );
+    order.phoneNumber = values["phoneNumber"];
+
+    order.deliveryAddress = values["deliveryAddress"];
+    await order.save();
+    // 6. Send success sms message on sucess Order
+    await sendSms(
+      `Dear dawadrop user,Your order has been received successfully.Your order id is ${order._id}`,
+      req.user.phoneNumber
+    );
+    return res.json(await order.populate("patient"));
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
+});
 router.post("/create-profile", [auth, hasNoProfile], async (req, res) => {
   try {
     const { cccNumber, firstName, upiNo } = await profileValidator(req.body);
