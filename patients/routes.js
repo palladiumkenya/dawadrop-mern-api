@@ -162,7 +162,7 @@ router.put("/orders/:id", [auth, isValidPatient], async (req, res) => {
       _id: req.params.id,
       patient: patient._id,
     });
-    delete req.body.deliveryAddress._id
+    delete req.body.deliveryAddress._id;
     const values = await patientOrderValidator(req.body);
 
     order.deliveryTimeSlot = await TimeSlot.findById(
@@ -178,7 +178,7 @@ router.put("/orders/:id", [auth, isValidPatient], async (req, res) => {
     await order.save();
     // 6. Send success sms message on sucess Order
     await sendSms(
-      `Dear dawadrop user,Your order has been received successfully.Your order id is ${order._id}`,
+      `Dear dawadrop user,Your order ( ${order._id}) update has been received successfully.`,
       req.user.phoneNumber
     );
     return res.json(await order.populate("patient"));

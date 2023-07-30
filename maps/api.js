@@ -45,6 +45,7 @@ const openRoutePlaceSearch = async (search) => {
         country: res.properties.country,
         countryCode: res.properties.country_a,
         county: res.properties.county,
+        street: res.properties.street,
         city: null,
         type: null,
       },
@@ -85,9 +86,81 @@ const openRouteReverseGeocode = async ({ lat, lng }) => {
     }));
   }
 };
+
+const mapQuestOptimizedRoute = async ({ lat, lng }) => {
+  const url = `${config.get(
+    "mapquest"
+  )}directions/v2/optimizedroute?key=${config.get("mapquest_key")}`;
+
+  const response = await fetch(url);
+  if (response.status === 200) {
+    const data = await response.json();
+    if (data.route.routeError) {
+      return;
+    }
+    return {
+      distance: data.route.distance,
+      time: data.route.time,
+      options: data.route.options,
+    };
+  }
+};
+
+const openRouteMatrix = async ({
+  profile = "driving-car",
+  src: { lat: srcLat, lng: srcLng },
+  dst: { lat: dstLat, lng: dstLng },
+}) => {
+  const url = `${config.get("openroute")}v2/matrix/${profile}`;
+  const myHeaders = new Headers();
+  myHeaders.append("Authorization", config.get("openstreat_api"));
+  myHeaders.append("Content-Type", "application/json");
+  const raw = JSON.stringify({
+    locations: [
+      [srcLat, srcLng],
+      [dstLat, dstLng],
+    ],
+  });
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow",
+  };
+  const response = await fetch(url, requestOptions);
+  if (response.status === 200) {
+    return await response.json();
+  }
+};
+
+const mapQuestMatrix = async ({
+  profile = "driving-car",
+  src: { lat: srcLat, lng: srcLng },
+  dst: { lat: dstLat, lng: dstLng },
+}) => {
+  const url = `${config.get(
+    "mapquest"
+  )}directions/v2/routematrix?key=${config.get("mapquest_key")}`;
+
+  const raw = JSON.stringify({
+    locations: [`${srcLat},${srcLng}`, `${dstLat},${dstLng}`],
+  });
+  const requestOptions = {
+    method: "POST",
+    body: raw,
+    redirect: "follow",
+  };
+  const response = await fetch(url, requestOptions);
+  if (response.status === 200) {
+    return await response.json();
+  }
+};
+
 module.exports = {
   mapQuestPlacesSearch,
   openRoutePlaceSearch,
   mapQuestReverseGeoCode,
   openRouteReverseGeocode,
+  openRouteMatrix,
+  mapQuestMatrix,
 };

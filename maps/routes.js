@@ -4,12 +4,14 @@ const {
   openRoutePlaceSearch,
   mapQuestReverseGeoCode,
   openRouteReverseGeocode,
+  openRouteMatrix,
+  mapQuestMatrix,
 } = require("./api");
 
 const router = Router();
 
 router.get("/places", async (req, res) => {
-  const results = await mapQuestPlacesSearch(req.query.q);
+  const results = await openRoutePlaceSearch(req.query.q);
   res.json({ results: results || [] });
 });
 router.get("/direction", async (req, res) => {});
@@ -21,6 +23,11 @@ router.get("/geocoding/reverse", async (req, res) => {
   const [lat, lng] = location.split(",");
   const results = await openRouteReverseGeocode({ lat, lng });
   res.json({ results: results || [] });
+});
+router.post("/matrix", async (req, res) => {
+  const profile = req.body.profile || undefined;
+  const response = await mapQuestMatrix({ ...req.body, profile });
+  return res.json(response);
 });
 
 module.exports = router;
