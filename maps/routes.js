@@ -6,6 +6,7 @@ const {
   openRouteReverseGeocode,
   openRouteMatrix,
   mapQuestMatrix,
+  mapQuestOptimizedRoute,
 } = require("./api");
 
 const router = Router();
@@ -27,6 +28,11 @@ router.get("/geocoding/reverse", async (req, res) => {
 router.post("/matrix", async (req, res) => {
   const profile = req.body.profile || undefined;
   const response = await mapQuestMatrix({ ...req.body, profile });
+  return res.json(response);
+});
+router.post("/direction", async (req, res) => {
+  const profile = req.body.profile || undefined;
+  const response = await mapQuestOptimizedRoute({ ...req.body, profile });
   return res.json(response);
 });
 

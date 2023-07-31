@@ -3,6 +3,7 @@
 // dotenv.config();
 
 const config = require("config");
+const { pick } = require("lodash");
 
 const mapQuestPlacesSearch = async (search) => {
   const url = `${config.get("mapquest")}search/v3/prediction?key=${config.get(
@@ -87,25 +88,6 @@ const openRouteReverseGeocode = async ({ lat, lng }) => {
   }
 };
 
-const mapQuestOptimizedRoute = async ({ lat, lng }) => {
-  const url = `${config.get(
-    "mapquest"
-  )}directions/v2/optimizedroute?key=${config.get("mapquest_key")}`;
-
-  const response = await fetch(url);
-  if (response.status === 200) {
-    const data = await response.json();
-    if (data.route.routeError) {
-      return;
-    }
-    return {
-      distance: data.route.distance,
-      time: data.route.time,
-      options: data.route.options,
-    };
-  }
-};
-
 const openRouteMatrix = async ({
   profile = "driving-car",
   src: { lat: srcLat, lng: srcLng },
@@ -138,6 +120,7 @@ const mapQuestMatrix = async ({
   src: { lat: srcLat, lng: srcLng },
   dst: { lat: dstLat, lng: dstLng },
 }) => {
+  // DONE AND WORKS GREATE
   const url = `${config.get(
     "mapquest"
   )}directions/v2/routematrix?key=${config.get("mapquest_key")}`;
@@ -152,7 +135,96 @@ const mapQuestMatrix = async ({
   };
   const response = await fetch(url, requestOptions);
   if (response.status === 200) {
-    return await response.json();
+    const data = await response.json();
+    if (data.info.statuscode === 0) {
+      return {
+        time: data.time,
+        distance: data.distance,
+        locations: data.locations.map((loc) => ({
+          display: loc.adminArea6,
+          coordinates: loc.latLng,
+          name: loc.adminArea6,
+          properties: {
+            countryCode: loc.adminArea1,
+            county: loc.adminArea4,
+            street: loc.street,
+            city: loc.adminArea5,
+            type: loc.type,
+          },
+        })),
+      };
+    }
+  }
+};
+
+const mapQuestOptimizedRoute = async ({
+  profile = "driving-car",
+  src: { lat: srcLat, lng: srcLng },
+  dst: { lat: dstLat, lng: dstLng },
+}) => {
+  const url = `${config.get(
+    "mapquest"
+  )}directions/v2/optimizedroute?key=${config.get("mapquest_key")}`;
+
+  const raw = JSON.stringify({
+    locations: [`${srcLat},${srcLng}`, `${dstLat},${dstLng}`],
+  });
+
+  const requestOptions = {
+    method: "POST",
+    body: raw,
+    redirect: "follow",
+  };
+
+  const response = await fetch(url, requestOptions);
+  if (response.status === 200) {
+    const data = await response.json();
+    const route = data.route;
+    return {
+      route: {
+        ...pick(route, [
+          "distance",
+          "time",
+          "legs",
+          "legs",
+          "locations",
+          "options",
+        ]),
+        locations: route.locations.map((loc) => ({
+          display: loc.adminArea6,
+          coordinates: loc.latLng,
+          name: loc.adminArea6,
+          properties: {
+            countryCode: loc.adminArea1,
+            county: loc.adminArea4,
+            street: loc.street,
+            city: loc.adminArea5,
+            type: loc.type,
+          },
+        })),
+        legs: route.legs.map((leg) => ({
+          ...pick(leg, ["distance", "time", "maneuvers"]),
+          maneuvers: leg.maneuvers.map((maneuver) => ({
+            ...pick(maneuver, [
+              "index",
+              "distance",
+              "narrative",
+              "time",
+              "direction",
+              "directionName",
+              "signs",
+              "maneuverNotes",
+              "transportMode",
+              "startPoint",
+              "turnType",
+              "attributes",
+              "iconUrl",
+              "streets",
+            ]),
+          })),
+        })),
+      },
+    };
   }
 };
 
@@ -163,4 +235,5 @@ module.exports = {
   openRouteReverseGeocode,
   openRouteMatrix,
   mapQuestMatrix,
+  mapQuestOptimizedRoute,
 };
