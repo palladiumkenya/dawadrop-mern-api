@@ -4,10 +4,12 @@ const {
   modeValidator,
   timeSlotValidator,
   deliveryMethodValidator,
+  deliveryValidator,
 } = require("./validators");
 const { getValidationErrrJson } = require("../utils/helpers");
 const TimeSlot = require("./models/TimeSlot");
 const DeliveryMethod = require("./models/DeliveryMethod");
+const Delivery = require("./models/Delivery");
 
 const router = Router();
 
@@ -143,4 +145,40 @@ router.put("/methods/:id", async (req, res) => {
   }
 });
 
+router.get("/", async (req, res) => {
+  const methods = await Delivery.find().populate(
+    // "dispencedBy",
+    // "deliveredBy",
+    [
+      "order",
+      {
+        path: "dispencedBy",
+        model: "User",
+      },
+      {
+        path: "deliveredBy",
+        model: "User",
+      },
+    ]
+  );
+  return res.json({ results: methods });
+});
+router.post("/", async (req, res) => {
+  try {
+    const value = await deliveryValidator(req.body);
+    const delivery = new Delivery(value);
+    await delivery.save();
+    return res.json(delivery);
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
+});
+router.get("/:id", async (req, res) => {
+  const delivery = await Delivery.findById(req.params.id);
+  if (!delivery) {
+    return res.status(404).json({ detail: "Delivery  not found" });
+  }
+  return res.json(delivery);
+});
 module.exports = router;

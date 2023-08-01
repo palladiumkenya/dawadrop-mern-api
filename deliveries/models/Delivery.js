@@ -1,6 +1,9 @@
-const { model, Schema } = require("mongoose");
+const { model, Schema, Types } = require("mongoose");
+const Address = require("../../orders/models/Address");
+const User = require("../../auth/models/User");
+const Order = require("../../orders/models/Order");
 
-module.exports = model(
+const Delivery = model(
   "Delivery",
   new Schema(
     {
@@ -9,14 +12,48 @@ module.exports = model(
         ref: "Order",
         required: true,
         unique: true,
+        validate: {
+          message: "Order don't exist",
+          validator: async function (v) {
+            if (v && !(await Order.findById(v)))
+              throw new Error("Order doesn't Exist");
+          },
+        },
       },
       dispencedBy: {
         type: Schema.Types.ObjectId,
         ref: "User",
+        validate: {
+          message: "Dispensor don't exist",
+          validator: async function (v) {
+            if (v && !(await User.findById(v)))
+              throw new Error("Dispensor doesn't Exist");
+          },
+        },
+      },
+      deliveredBy: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
+        required: true,
+        validate: {
+          message: "Delivery agent don't exist",
+          validator: async function (v) {
+            if (v && !(await User.findById(v)))
+              throw new Error("Delivery agent doesn't Exist");
+          },
+        },
+      },
+      location: {
+        type: Address.schema,
+        required: true,
       },
       status: {
         type: String,
-        enum: ["cancelled", "delivered", "allocated", "on_transit", "pending"],
+        enum: {
+          values: ["cancelled", "delivered", "pending"],
+          message: "Status mus be either cancelled, delivered and pending",
+        },
+        default: "pending",
       },
     },
     {
@@ -34,3 +71,5 @@ module.exports = model(
     }
   )
 );
+
+module.exports = Delivery;
