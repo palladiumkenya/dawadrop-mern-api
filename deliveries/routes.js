@@ -10,6 +10,7 @@ const { getValidationErrrJson } = require("../utils/helpers");
 const TimeSlot = require("./models/TimeSlot");
 const DeliveryMethod = require("./models/DeliveryMethod");
 const Delivery = require("./models/Delivery");
+const auth = require("./../middleware/auth");
 
 const router = Router();
 
@@ -158,6 +159,25 @@ router.get("/", async (req, res) => {
       {
         path: "deliveredBy",
         model: "User",
+      },
+    ]
+  );
+  return res.json({ results: methods });
+});
+router.get("/history", [auth], async (req, res) => {
+  const methods = await Delivery.find({ deliveredBy: req.user._id }).populate(
+    // "dispencedBy",
+    // "deliveredBy",
+    [
+      {
+        path: "order",
+        model: "Order",
+        select: "deliveryAddress deliveryTimeSlot deliveryMode phoneNumber",
+      },
+      {
+        path: "deliveredBy",
+        model: "User",
+        select: "username email phoneNumber image",
       },
     ]
   );

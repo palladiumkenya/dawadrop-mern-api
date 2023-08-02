@@ -50,8 +50,8 @@ const Delivery = model(
       status: {
         type: String,
         enum: {
-          values: ["cancelled", "delivered", "pending"],
-          message: "Status mus be either cancelled, delivered and pending",
+          values: ["canceled", "delivered", "pending"],
+          message: "Status mus be either canceled, delivered and pending",
         },
         default: "pending",
       },
