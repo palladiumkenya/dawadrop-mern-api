@@ -11,6 +11,7 @@ const TimeSlot = require("./models/TimeSlot");
 const DeliveryMethod = require("./models/DeliveryMethod");
 const Delivery = require("./models/Delivery");
 const auth = require("./../middleware/auth");
+const Order = require("../orders/models/Order");
 
 const router = Router();
 
@@ -194,8 +195,63 @@ router.post("/", async (req, res) => {
     return res.status(status).json(err);
   }
 });
+router.post("/:id/:action", async (req, res) => {
+  try {
+    const data = req.body;
+    let delivery = await Delivery.findById(req.params.id);
+    if (!delivery)
+      throw {
+        status: 404,
+        message: "Delivery not found!",
+      };
+    if (Boolean(delivery.status) && delivery.status !== "pending")
+      throw {
+        status: 403,
+        message: "Action not surported!",
+      };
+    data.order = delivery.order.toString();
+    if (delivery.dispencedBy) {
+      data.dispencedBy = delivery.dispencedBy.toString();
+    }
+    data.deliveredBy = delivery.deliveredBy.toString();
+    if (req.params.action === "start") {
+      data.status = "pending";
+    }
+    if (req.params.action === "end") {
+      data.status = "delivered";
+    }
+    const value = await deliveryValidator(data);
+    delivery = await Delivery.findByIdAndUpdate(req.params.id, value, {
+      new: true,
+    });
+    return res.json(delivery);
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
+});
 router.get("/:id", async (req, res) => {
-  const delivery = await Delivery.findById(req.params.id);
+  const delivery = await Delivery.findById(req.params.id).populate(
+    // "dispencedBy",
+    // "deliveredBy",
+    [
+      {
+        path: "order",
+        model: "Order",
+        select: "deliveryAddress deliveryTimeSlot deliveryMode phoneNumber",
+      },
+      {
+        path: "deliveredBy",
+        model: "User",
+        select: "username email phoneNumber image",
+      },
+      {
+        path: "dispencedBy",
+        model: "User",
+        select: "username email phoneNumber image",
+      },
+    ]
+  );
   if (!delivery) {
     return res.status(404).json({ detail: "Delivery  not found" });
   }

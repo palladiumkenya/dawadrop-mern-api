@@ -53,7 +53,6 @@ const Delivery = model(
           values: ["canceled", "delivered", "pending"],
           message: "Status mus be either canceled, delivered and pending",
         },
-        default: "pending",
       },
     },
     {
