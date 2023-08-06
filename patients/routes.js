@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const auth = require("../middleware/auth");
 const Patient = require("./models/Patient");
-const { profileValidator } = require("./validators");
+const { profileValidator, deliveryFeedBackValidator } = require("./validators");
 const {
   getValidationErrrJson,
   base64Decode,
@@ -20,6 +20,9 @@ const { patientOrderValidator } = require("../orders/validators");
 const TimeSlot = require("../deliveries/models/TimeSlot");
 const Mode = require("../deliveries/models/Mode");
 const DeliveryMethod = require("../deliveries/models/DeliveryMethod");
+const { Types } = require("mongoose");
+const Delivery = require("../deliveries/models/Delivery");
+const DeliveryFeedBack = require("../deliveries/models/DeliveryFeedBack");
 const router = Router();
 
 router.get("/", auth, async (req, res) => {
@@ -248,6 +251,31 @@ router.post("/verify", auth, async (req, res) => {
     res.json(
       await patient.populate("user", "_id username email phoneNumber roles")
     );
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
+});
+router.post("/delivery-feedback", [auth, isValidPatient], async (req, res) => {
+  try {
+    const value = await deliveryFeedBackValidator(req.body);
+    const delivery = await Delivery.findOne({ _id: value.delivery });
+    if (!delivery)
+      throw {
+        details: [{ path: ["delivery"], message: "Invalid Delivery" }],
+      };
+    if (delivery.status !== "pending")
+      throw {
+        details: [{ path: ["delivery"], message: "Invalid Delivery" }],
+      };
+    const isRecepient = await delivery.isRecepientUser(req.user._id);
+    if (!isRecepient)
+      throw {
+        details: [{ path: ["delivery"], message: "Invalid Delivery" }],
+      };
+    const feedBack = new DeliveryFeedBack(value);
+    await feedBack.save();
+    return res.json(feedBack);
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
     return res.status(status).json(err);

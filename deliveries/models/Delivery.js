@@ -2,6 +2,7 @@ const { model, Schema, Types } = require("mongoose");
 const Address = require("../../orders/models/Address");
 const User = require("../../auth/models/User");
 const Order = require("../../orders/models/Order");
+const Patient = require("../../patients/models/Patient");
 
 const Delivery = model(
   "Delivery",
@@ -62,6 +63,18 @@ const Delivery = model(
             const timestamp = this._id.getTimestamp();
             return timestamp;
           },
+        },
+      },
+      methods: {
+        getRecepientUser: async function () {
+          const order = await Order.findById(this.order._id);
+          const patient = await Patient.findOne({ _id: order.patient._id });
+          const user = await User.findOne({ _id: patient.user._id });
+          return user;
+        },
+        isRecepientUser: async function (userId) {
+          const user = await this.getRecepientUser();
+          return user._id.equals(userId);
         },
       },
       // Options for virtual properties

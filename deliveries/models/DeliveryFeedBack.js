@@ -4,6 +4,10 @@ module.exports = model(
   "DeliveryFeedBack",
   new Schema(
     {
+      delivery: {
+        type: Schema.Types.ObjectId,
+        ref: "Delivery",
+      },
       review: {
         type: String,
         maxlength: 255,

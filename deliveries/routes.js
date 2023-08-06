@@ -173,7 +173,8 @@ router.get("/history", [auth], async (req, res) => {
       {
         path: "order",
         model: "Order",
-        select: "deliveryAddress deliveryTimeSlot deliveryMode phoneNumber",
+        select:
+          "patient deliveryAddress deliveryTimeSlot deliveryMode phoneNumber",
       },
       {
         path: "deliveredBy",
@@ -238,7 +239,8 @@ router.get("/:id", async (req, res) => {
       {
         path: "order",
         model: "Order",
-        select: "deliveryAddress deliveryTimeSlot deliveryMode phoneNumber",
+        select:
+          "patient deliveryAddress deliveryTimeSlot deliveryMode phoneNumber",
       },
       {
         path: "deliveredBy",
