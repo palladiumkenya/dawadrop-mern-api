@@ -55,6 +55,11 @@ const Delivery = model(
           message: "Status mus be either canceled, delivered and pending",
         },
       },
+      streamUrl: {
+        type: String,
+        required: true,
+        match: /(https?:\/\/[^\s]+)/g,
+      },
     },
     {
       virtuals: {

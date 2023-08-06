@@ -27,6 +27,7 @@ const deliverySchema = Joi.object({
   dispencedBy: Joi.string().label("Dispenser"),
   deliveredBy: Joi.string().required().label("Delivery Agent"),
   status: Joi.string(),
+  streamUrl: Joi.string().required(),
 });
 
 exports.modeValidator = async (data) => {

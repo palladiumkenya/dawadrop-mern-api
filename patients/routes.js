@@ -275,6 +275,8 @@ router.post("/delivery-feedback", [auth, isValidPatient], async (req, res) => {
       };
     const feedBack = new DeliveryFeedBack(value);
     await feedBack.save();
+    delivery.status = "delivered";
+    await delivery.save();
     return res.json(feedBack);
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
