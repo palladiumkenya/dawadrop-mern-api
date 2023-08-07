@@ -8,7 +8,7 @@ const TimeSlot = require("../../deliveries/models/TimeSlot");
 const DeliveryMethod = require("../../deliveries/models/DeliveryMethod");
 const Mode = require("../../deliveries/models/Mode");
 
-module.exports = model(
+const Order = model(
   "Order",
   new Schema(
     {
@@ -73,3 +73,5 @@ module.exports = model(
     }
   )
 );
+
+module.exports = Order;

@@ -6,11 +6,33 @@ const Order = require("./models/Order");
 const { orderValidator } = require("./validators");
 const { getValidationErrrJson } = require("../utils/helpers");
 const { Schema, Types } = require("mongoose");
+const Delivery = require("../deliveries/models/Delivery");
 
 const router = Router();
 
 router.get("/", [auth], async (req, res) => {
   const orders = await Order.find();
+  return res.json({ results: orders });
+});
+router.get("/pending", [auth], async (req, res) => {
+  const orders = await Order.aggregate([
+    {
+      $lookup: {
+        from: "deliveries",
+        foreignField: "order",
+        localField: "_id",
+        as: "deliveries",
+      },
+    },
+    {
+      $match: {
+        $or: [
+          { deliveries: { $size: 0 } }, // Include orders with no deliveries
+          { "deliveries.status": "canceled" }, // Include orders with canceled deliveries
+        ],
+      },
+    },
+  ]);
   return res.json({ results: orders });
 });
 router.post("/", [auth], async (req, res) => {
