@@ -7,6 +7,7 @@ const { orderValidator } = require("./validators");
 const { getValidationErrrJson } = require("../utils/helpers");
 const { Schema, Types } = require("mongoose");
 const Delivery = require("../deliveries/models/Delivery");
+const { isEmpty } = require("lodash");
 
 const router = Router();
 
@@ -34,6 +35,44 @@ router.get("/pending", [auth], async (req, res) => {
     },
   ]);
   return res.json({ results: orders });
+});
+router.get("/dispense", [auth], async (req, res) => {
+  try {
+    const search = req.query.search;
+    if (!Types.ObjectId.isValid(search))
+      throw {
+        status: 404,
+        message: "No Order or delivery found!",
+      };
+
+    const delivery = await Delivery.findById(search);
+    const orderId = (delivery ? delivery.order.toString() : null) || search;
+    console.log("Here", orderId);
+    const order = await Order.aggregate([
+      {
+        $match: {
+          _id: new Types.ObjectId(orderId),
+        },
+      },
+      {
+        $lookup: {
+          from: "deliveries",
+          foreignField: "order",
+          localField: "_id",
+          as: "deliveries",
+        },
+      },
+    ]);
+    if (isEmpty(order))
+      throw {
+        status: 404,
+        message: "No Order or delivery found!",
+      };
+    return res.json(order[0]);
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
 });
 router.post("/", [auth], async (req, res) => {
   try {
