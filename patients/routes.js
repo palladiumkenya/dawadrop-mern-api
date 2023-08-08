@@ -50,8 +50,30 @@ router.get("/appointments/:id", [auth, isValidPatient], async (req, res) => {
 });
 router.get("/orders", [auth, isValidPatient], async (req, res) => {
   const patient = await Patient.findOne({ user: req.user._id });
-  const orders = await Order.find({ patient: patient._id }).populate("patient");
+  const orders = await Order.aggregate([
+    {
+      $match: {
+        patient: patient._id,
+      },
+    },
+    {
+      $lookup: {
+        from: "deliveries",
+        foreignField: "order",
+        localField: "_id",
+        as: "deliveries",
+      },
+    },
+  ]);
   return res.json({ results: orders });
+});
+router.get("/deliveries", [auth, isValidPatient], async (req, res) => {
+  const patient = await Patient.findOne({ user: req.user._id });
+  const orders = (await Order.find({ patient: patient._id })).map(
+    (order) => order._id
+  );
+  const deliveries = await Delivery.find({ order: { $in: orders } });
+  return res.json({ results: deliveries });
 });
 
 router.get(

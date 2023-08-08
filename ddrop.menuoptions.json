@@ -92,10 +92,10 @@
   "_id": {
     "$oid": "64bccff8e8b243d73b59f1ce"
   },
-  "label": "My deliveries",
+  "label": "Dispense Drugs",
   "description": "Patient Deliveries",
   "image": "/menu-icons/1690095608503-88ae519f-7665-4abc-933f-b60d9afefb43.png",
-  "link": "PatientDeliveries",
+  "link": "DispenseDrugs",
   "__v": 0
 },
 {
@@ -106,5 +106,34 @@
   "description": "Agent delivery tasks",
   "image": "/menu-icons/1690095861864-573d3ec3-0f0f-4580-ab74-cf321c7da1aa.png",
   "link": "CurriourDeliveryTasks",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64bfa6c419e0b28cb965390a"
+  },
+  "label": "Manage Timeslot",
+  "description": "Delivery time slot",
+  "image": "/menu-icons/1690281668448-26d900bb-3c5e-47f3-8197-2daa790916c4.png",
+  "link": "TimeSlot",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64c3fe2057f9cd165fd722cc"
+  },
+  "label": "Manage Delivery Method",
+  "image": "/menu-icons/1690450816313-1690450655445-8a4c2b3f-9a51-4c1b-8ccf-4a0b395def81.png",
+  "link": "DeliveryMethod",
+  "description": "Delivery methods"
+},
+{
+  "_id": {
+    "$oid": "64c57592bab17de5f2e2c410"
+  },
+  "label": "Agent Delivery Request",
+  "description": "Delivery requests",
+  "image": "/menu-icons/1690662290198-412f558b-0095-408f-8b65-b14ad003f095.png",
+  "link": "DeliveryRequest",
   "__v": 0
 }]

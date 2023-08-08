@@ -12,6 +12,7 @@ const DeliveryMethod = require("./models/DeliveryMethod");
 const Delivery = require("./models/Delivery");
 const auth = require("./../middleware/auth");
 const Order = require("../orders/models/Order");
+const { Types } = require("mongoose");
 
 const router = Router();
 
@@ -190,6 +191,26 @@ router.post("/", async (req, res) => {
     const value = await deliveryValidator(req.body);
     const delivery = new Delivery(value);
     await delivery.save();
+    return res.json(delivery);
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
+});
+router.put("/:id", async (req, res) => {
+  try {
+    if (
+      !Types.ObjectId.isValid(req.params.id) ||
+      !(await Delivery.findById(req.params.id))
+    )
+      throw {
+        status: 404,
+        message: "Delivery not Found!",
+      };
+    const value = await deliveryValidator(req.body);
+    const delivery = await Delivery.findByIdAndUpdate(req.params.id, value, {
+      new: true,
+    });
     return res.json(delivery);
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
