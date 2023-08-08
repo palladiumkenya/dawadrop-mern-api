@@ -47,7 +47,6 @@ router.get("/dispense", [auth], async (req, res) => {
 
     const delivery = await Delivery.findById(search);
     const orderId = (delivery ? delivery.order.toString() : null) || search;
-    console.log("Here", orderId);
     const order = await Order.aggregate([
       {
         $match: {
@@ -62,13 +61,21 @@ router.get("/dispense", [auth], async (req, res) => {
           as: "deliveries",
         },
       },
+      {
+        $lookup: {
+          from: "patients", 
+          foreignField: "_id",
+          localField: "patient",
+          as: "patient",
+        },
+      },
     ]);
     if (isEmpty(order))
       throw {
         status: 404,
         message: "No Order or delivery found!",
       };
-    return res.json(order[0]);
+    return res.json(await order[0]);
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
     return res.status(status).json(err);
