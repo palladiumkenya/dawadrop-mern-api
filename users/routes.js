@@ -6,6 +6,7 @@ const User = require("./models/User");
 const router = Router();
 const _ = require("lodash");
 const auth = require("../middleware/auth");
+const { getAssociations } = require("../patients/views/treapmentSurport");
 
 router.post("/", async (req, res) => {
   // let user = User.findOne({email})

@@ -45,12 +45,18 @@ const {
   MENU_MEDIA,
 } = require("../utils/constants");
 const upload = require("../middleware/upload");
+const {
+  getAssociations,
+  createAssociation,
+} = require("../patients/views/treatmentSurport");
 
 router.post("/register", register);
 router.post("/login", login);
 router.post("/change-password", auth, changePassword);
 router.get("/profile", auth, profile);
 router.get("/users", auth, usersList);
+router.get("/user/relations", auth, getAssociations);
+router.post("/user/relations", auth, createAssociation);
 router.get("/user/:id", auth, userAuthInfo);
 router.post(
   "/profile",
@@ -93,5 +99,4 @@ router.put(
   [auth, upload({ dest: MENU_MEDIA }).single("image")],
   menuOptionUpdate
 );
-
 module.exports = router;

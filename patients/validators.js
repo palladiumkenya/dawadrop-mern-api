@@ -10,12 +10,24 @@ const deliveryFeedBackSchema = Joi.object({
   review: Joi.string().label("Review").required(),
   rating: Joi.number().required().label("Rating").max(5).min(1),
 });
+const treatmentSurportSchema = Joi.object({
+  careGiver: Joi.string().required().label("Care giver"),
+  careReceiver: Joi.string().label("Care Receiver").required(),
+  canPickUpDrugs: Joi.bool().label("Can pick up drugs?"),
+  canOrderDrug: Joi.bool().label("Can order drugs?"),
+});
 
 module.exports.profileValidator = async (data) => {
   return await profileShema.validateAsync(data, { abortEarly: false });
 };
 module.exports.deliveryFeedBackValidator = async (data) => {
   return await deliveryFeedBackSchema.validateAsync(data, {
+    abortEarly: false,
+  });
+};
+
+module.exports.treatmentSurportValidator = async (data) => {
+  return await treatmentSurportSchema.validateAsync(data, {
     abortEarly: false,
   });
 };

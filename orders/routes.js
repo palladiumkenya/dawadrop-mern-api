@@ -101,7 +101,7 @@ router.post("/dispense", [auth], async (req, res) => {
         message: "Invalid next appointment date",
       };
     order.isDispensed = true;
-    console.log(payload.order);
+    console.log(payload.nextAppointmentDate);
     // Netx appointment date be saved in Kenya EMR APPOINTMENT
     await order.save();
     return res.json(order);
