@@ -4,7 +4,7 @@ const isValidPatient = require("../middleware/isValidPatient");
 const Patient = require("../patients/models/Patient");
 const Order = require("./models/Order");
 const { orderValidator } = require("./validators");
-const { getValidationErrrJson } = require("../utils/helpers");
+const { getValidationErrrJson, isValidDate } = require("../utils/helpers");
 const { Schema, Types } = require("mongoose");
 const Delivery = require("../deliveries/models/Delivery");
 const { isEmpty } = require("lodash");
@@ -63,7 +63,7 @@ router.get("/dispense", [auth], async (req, res) => {
       },
       {
         $lookup: {
-          from: "patients", 
+          from: "patients",
           foreignField: "_id",
           localField: "patient",
           as: "patient",
@@ -76,6 +76,35 @@ router.get("/dispense", [auth], async (req, res) => {
         message: "No Order or delivery found!",
       };
     return res.json(await order[0]);
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
+});
+router.post("/dispense", [auth], async (req, res) => {
+  try {
+    const payload = req.body;
+    if (!Types.ObjectId.isValid(payload.order))
+      throw {
+        status: 404,
+        message: "Invalid Order.couldn't depense!",
+      };
+    const order = await Order.findById(payload.order);
+    if (!order)
+      throw {
+        status: 404,
+        message: "Invalid Order.couldn't depense!",
+      };
+    if (!isValidDate(payload.nextAppointmentDate))
+      throw {
+        status: 403,
+        message: "Invalid next appointment date",
+      };
+    order.isDispensed = true;
+    console.log(payload.order);
+    // Netx appointment date be saved in Kenya EMR APPOINTMENT
+    await order.save();
+    return res.json(order);
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
     return res.status(status).json(err);

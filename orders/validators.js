@@ -25,6 +25,10 @@ const orderSchema = Joi.object({
     }),
   drug: Joi.string().label("Drug").required(),
 });
+const dispenseDrugSchema = Joi.object({
+  order: Joi.string().required().label("Order"),
+  nextAppointmentDate: Joi.date().label("Next appointment date").required(),
+});
 
 const patientOrderSchema = Joi.object({
   deliveryAddress: Joi.object({
@@ -45,4 +49,7 @@ exports.orderValidator = async (data) => {
 };
 exports.patientOrderValidator = async (data) => {
   return await patientOrderSchema.validateAsync(data, { abortEarly: false });
+};
+exports.dispenseDrugValidator = async (data) => {
+  return await dispenseDrugSchema.validateAsync(data, { abortEarly: false });
 };

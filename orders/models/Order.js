@@ -57,6 +57,10 @@ const Order = model(
         type: String,
         required: true,
       },
+      isDispensed: {
+        type: Boolean,
+        default: false,
+      },
     },
     {
       virtuals: {

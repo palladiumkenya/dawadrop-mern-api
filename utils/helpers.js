@@ -104,9 +104,15 @@ const constructMongooseFilter = (filterParamsObj, { lookup }) => {
   return filter;
 };
 
+function isValidDate(dateString) {
+  const date = new Date(dateString);
+  return !isNaN(date) && date instanceof Date && !isNaN(date.getTime());
+}
+
 module.exports.getValidationErrrJson = getValidationErrrJson;
 module.exports.base64Encode = base64Encode;
 module.exports.base64Decode = base64Decode;
 module.exports.pickX = pickX;
 module.exports.deleteUploadedFileAsyncMannual = deleteUploadedFileAsyncMannual;
 module.exports.constructMongooseFilter = constructMongooseFilter;
+module.exports.isValidDate = isValidDate;
