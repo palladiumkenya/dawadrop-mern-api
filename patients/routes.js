@@ -23,6 +23,7 @@ const DeliveryMethod = require("../deliveries/models/DeliveryMethod");
 const { Types } = require("mongoose");
 const Delivery = require("../deliveries/models/Delivery");
 const DeliveryFeedBack = require("../deliveries/models/DeliveryFeedBack");
+const { addCareGiver, updateCareGiver } = require("./views/treatmentSurport");
 const router = Router();
 
 router.get("/", auth, async (req, res) => {
@@ -305,5 +306,10 @@ router.post("/delivery-feedback", [auth, isValidPatient], async (req, res) => {
     return res.status(status).json(err);
   }
 });
-router.get('')
+router.post("/ralations/add-care-giver", [auth, isValidPatient], addCareGiver);
+router.put(
+  "/ralations/:id/update-care-giver",
+  [auth, isValidPatient],
+  updateCareGiver
+);
 module.exports = router;

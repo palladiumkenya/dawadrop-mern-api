@@ -48,6 +48,8 @@ const upload = require("../middleware/upload");
 const {
   getAssociations,
   createAssociation,
+  addCareReceiver,
+  updateCareReceiver,
 } = require("../patients/views/treatmentSurport");
 
 router.post("/register", register);
@@ -57,6 +59,8 @@ router.get("/profile", auth, profile);
 router.get("/users", auth, usersList);
 router.get("/user/relations", auth, getAssociations);
 router.post("/user/relations", auth, createAssociation);
+router.post("/user/relations/add-care-receiver", auth, addCareReceiver);
+router.put("/user/relations/:id/update-care-receiver", auth, updateCareReceiver);
 router.get("/user/:id", auth, userAuthInfo);
 router.post(
   "/profile",

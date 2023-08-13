@@ -136,4 +136,34 @@
   "image": "/menu-icons/1690662290198-412f558b-0095-408f-8b65-b14ad003f095.png",
   "link": "DeliveryRequest",
   "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64d8f1cd032ad914b9e12546"
+  },
+  "label": "Manage Treatment Surport",
+  "description": "Used to manage care givers and care receivers by admins",
+  "image": "/menu-icons/1691939276996-fd6100fd-11e5-472d-85b7-93561120217e.png",
+  "link": "ProvidorTreatmentSurport",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64d8f22c032ad914b9e1254b"
+  },
+  "label": "Care Receivers",
+  "description": "Manages care receiver in treatment surport",
+  "image": "/menu-icons/1691939372725-df8db43a-7d66-4cd8-a912-286e260b1c17.png",
+  "link": "CareReceivers",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64d8f26b032ad914b9e12550"
+  },
+  "label": "Care Givers",
+  "description": "Patients manage there care givers",
+  "image": "/menu-icons/1691939435731-b0d58ced-2708-4854-97e1-654d2323bb70.png",
+  "link": "PatientsCareGivers",
+  "__v": 0
 }]
