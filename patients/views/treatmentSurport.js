@@ -162,6 +162,31 @@ const getAssociations = async (req, res) => {
     return res.status(status).json(err);
   }
 };
+const searchAssociations = async (req, res) => {
+  // require privilges
+  try {
+    const q = req.query.q; //cccNo or patient id as receiver or user id as giver or receiver
+    const associations = await TreatmentSurport.aggregate([
+      {
+        $lookup: {
+          from: "patients",
+          foreignField: "_id",
+          localField: "careReceiver",
+          as: "patient",
+        },
+      },
+      // {
+      //   $match: {
+      //     $or: [{ careGiver: "" }, { careReceiver: "" }],
+      //   },
+      // },
+    ]);
+    return res.json({ results: associations });
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
+};
 
 module.exports = {
   getAssociations,
@@ -171,4 +196,5 @@ module.exports = {
   updateCareGiver,
   addCareReceiver,
   updateCareReceiver,
+  searchAssociations,
 };

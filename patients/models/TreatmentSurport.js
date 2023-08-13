@@ -5,13 +5,11 @@ const TreatmentSurport = model(
   new Schema({
     careGiver: {
       type: Schema.Types.ObjectId,
-      required: true,
       ref: "User",
     },
     careReceiver: {
       type: Schema.Types.ObjectId,
       ref: "Patient",
-      required: true,
     },
     canPickUpDrugs: {
       type: Boolean,

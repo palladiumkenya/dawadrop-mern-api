@@ -50,6 +50,7 @@ const {
   createAssociation,
   addCareReceiver,
   updateCareReceiver,
+  searchAssociations,
 } = require("../patients/views/treatmentSurport");
 
 router.post("/register", register);
@@ -59,8 +60,13 @@ router.get("/profile", auth, profile);
 router.get("/users", auth, usersList);
 router.get("/user/relations", auth, getAssociations);
 router.post("/user/relations", auth, createAssociation);
+router.get("/user/relations/search", auth, searchAssociations);
 router.post("/user/relations/add-care-receiver", auth, addCareReceiver);
-router.put("/user/relations/:id/update-care-receiver", auth, updateCareReceiver);
+router.put(
+  "/user/relations/:id/update-care-receiver",
+  auth,
+  updateCareReceiver
+);
 router.get("/user/:id", auth, userAuthInfo);
 router.post(
   "/profile",
