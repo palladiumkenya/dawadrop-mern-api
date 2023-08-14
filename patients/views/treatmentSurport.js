@@ -166,21 +166,59 @@ const searchAssociations = async (req, res) => {
   // require privilges
   try {
     const q = req.query.q; //cccNo or patient id as receiver or user id as giver or receiver
+    const _id = Types.ObjectId.isValid(q) ? new Types.ObjectId(q) : undefined;
     const associations = await TreatmentSurport.aggregate([
+      // Lookup patientCareReceiver details
       {
         $lookup: {
           from: "patients",
           foreignField: "_id",
           localField: "careReceiver",
-          as: "patient",
+          as: "patientCareReceiver",
         },
       },
-      // {
-      //   $match: {
-      //     $or: [{ careGiver: "" }, { careReceiver: "" }],
-      //   },
-      // },
+      // Lookup userCareReceiver details
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "patientCareReceiver.user",
+          as: "userCareReceiver",
+        },
+      },
+      // Lookup userCareGiver details
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "careGiver",
+          as: "userCareGiver",
+        },
+      },
+      // Lookup patientCareGiver details
+      {
+        $lookup: {
+          from: "patients",
+          foreignField: "user",
+          localField: "userCareGiver._id",
+          as: "patientCareGiver",
+        },
+      },
+      // Match documents based on various conditions
+      {
+        $match: {
+          $or: [
+            { "patientCareGiver.cccNumber": q }, // look by patient ccc number if caregiver is a patient (e.g., mother patient to child patient)
+            { "patientCareReceiver.cccNumber": q }, // look by patient ccc Number
+            { careGiver: _id }, // look by user id (caregiver)
+            { careReceiver: _id }, // look by patient id (care receiver)
+            { _id }, // look by treatment support id
+            { "patientCareGiver._id": _id }, // look by patient id if giver is a patient
+          ],
+        },
+      },
     ]);
+
     return res.json({ results: associations });
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
