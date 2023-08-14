@@ -6,7 +6,7 @@ const { treatmentSurportValidator } = require("../validators");
 const User = require("../../auth/models/User");
 // todo Remove code duplication
 
-const validateAsociation = async (body) => {
+const validateAsociation = async (body, update) => {
   const value = await treatmentSurportValidator(body);
   const { careGiver, careReceiver } = value;
   if (careGiver === careReceiver)
@@ -26,11 +26,13 @@ const validateAsociation = async (body) => {
     throw {
       details: [{ path: ["careReceiver"], message: "Invalid Care receiver" }],
     };
-  if (await TreatmentSurport.findOne({ careGiver, careReceiver }))
-    throw {
-      status: 403,
-      message: "Invalid Operation.Relationship already exist",
-    };
+  if (!update) {
+    if (await TreatmentSurport.findOne({ careGiver, careReceiver }))
+      throw {
+        status: 403,
+        message: "Invalid Operation.Relationship already exist",
+      };
+  }
   if ((await Patient.findOne({ _id: careReceiver })).user.equals(careGiver))
     throw {
       status: 403,
@@ -51,7 +53,7 @@ const createAssociation = async (req, res) => {
 };
 const updateAssociation = async (req, res) => {
   try {
-    const value = await validateAsociation(req.body);
+    const value = await validateAsociation(req.body, true);
     const asociation = await TreatmentSurport.findByIdAndUpdate(
       req.params.id,
       value,
