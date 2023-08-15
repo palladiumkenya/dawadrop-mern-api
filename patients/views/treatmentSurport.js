@@ -154,10 +154,53 @@ const updateCareReceiver = async (req, res) => {
 const getAssociations = async (req, res) => {
   try {
     const user = req.user._id;
-    const patient = await Patient.findOne({ user });
-    const associations = await TreatmentSurport.find()
-      .or([{ careGiver: user }, { careReceiver: patient?._id }])
-      .populate("careGiver careReceiver");
+    const associations = await TreatmentSurport.aggregate([
+      // Lookup patientCareReceiver details
+      {
+        $lookup: {
+          from: "patients",
+          foreignField: "_id",
+          localField: "careReceiver",
+          as: "patientCareReceiver",
+        },
+      },
+      // Lookup userCareReceiver details
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "patientCareReceiver.user",
+          as: "userCareReceiver",
+        },
+      },
+      // Lookup userCareGiver details
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "careGiver",
+          as: "userCareGiver",
+        },
+      },
+      // Lookup patientCareGiver details
+      {
+        $lookup: {
+          from: "patients",
+          foreignField: "user",
+          localField: "userCareGiver._id",
+          as: "patientCareGiver",
+        },
+      },
+      // Match documents based on various conditions
+      {
+        $match: {
+          $or: [
+            { "userCareReceiver._id": user }, // look by patient user id
+            { careGiver: user }, // look by user id (caregiver)
+          ],
+        },
+      },
+    ]);
     return res.json({ results: associations });
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
@@ -216,6 +259,7 @@ const searchAssociations = async (req, res) => {
             { careReceiver: _id }, // look by patient id (care receiver)
             { _id }, // look by treatment support id
             { "patientCareGiver._id": _id }, // look by patient id if giver is a patient
+            { "userCareReceiver._id": _id }, // look by patient id if giver is a patient
           ],
         },
       },
