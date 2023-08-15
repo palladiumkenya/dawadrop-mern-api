@@ -1,9 +1,14 @@
 const { Types } = require("mongoose");
-const { getValidationErrrJson } = require("../../utils/helpers");
+const {
+  getValidationErrrJson,
+  parseQueryValues,
+  constructFilter,
+} = require("../../utils/helpers");
 const Patient = require("../models/Patient");
 const TreatmentSurport = require("../models/TreatmentSurport");
 const { treatmentSurportValidator } = require("../validators");
 const User = require("../../auth/models/User");
+const { pick } = require("lodash");
 // todo Remove code duplication
 
 const validateAsociation = async (body, update) => {
@@ -152,6 +157,20 @@ const updateCareReceiver = async (req, res) => {
 };
 
 const getAssociations = async (req, res) => {
+  // const customeFilters = parseQueryValues(
+  //   pick(req.query, ["onlyCareGiver", "onlyCareReceivers"])
+  // );
+  // console.log(
+  //   Object.entries(customeFilters).map((entry) =>
+  //     entry[0] === "onlyCareGiver" ? {} : {}
+  //   )
+  // );
+  const filters = constructFilter(req.query, [
+    "careGiver",
+    "canOrderDrug",
+    "canPickUpDrugs",
+    "careReceiver",
+  ]);
   try {
     const user = req.user._id;
     const associations = await TreatmentSurport.aggregate([
@@ -164,6 +183,8 @@ const getAssociations = async (req, res) => {
           as: "patientCareReceiver",
         },
       },
+      // add filters
+      filters,
       // Lookup userCareReceiver details
       {
         $lookup: {

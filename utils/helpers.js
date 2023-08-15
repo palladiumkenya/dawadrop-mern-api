@@ -1,5 +1,6 @@
 const _ = require("lodash");
 const fs = require("fs");
+const { Types } = require("mongoose");
 const getValidationErrrJson = (err) => {
   const validationErrors = {};
   let status = 500;
@@ -91,28 +92,44 @@ const deleteUploadedFileAsyncMannual = async (filePath) => {
   });
 };
 
-const constructMongooseFilter = (filterParamsObj, { lookup }) => {
-  const filter = {};
-  for (const key in filterParamsObj) {
-    const value = filterParamsObj[key];
-    if (value instanceof Array) {
-      filter[key] = { lookup: value };
-    } else if (value) {
-      filter[key] = value;
-    }
-  }
-  return filter;
+const constructFilter = (query, filterFields = [], operator = "$and") => {
+  const q = parseQueryValues(query);
+  const f = filterFields
+    .filter((key) => q[key])
+    .map((key) => ({ [key]: q[key] }));
+  return {
+    $match: f.length > 0 ? { [operator]: f } : {},
+  };
 };
 
 function isValidDate(dateString) {
   const date = new Date(dateString);
   return !isNaN(date) && date instanceof Date && !isNaN(date.getTime());
 }
+function parseQueryValues(query) {
+  const parsedQuery = {};
 
+  for (const key in query) {
+    const value = query[key];
+    if (value === "true" || value === "false") {
+      parsedQuery[key] = value === "true";
+    } else if (!isNaN(value)) {
+      parsedQuery[key] = parseFloat(value);
+    } else if (Types.ObjectId.isValid(value)) {
+      parsedQuery[key] = new Types.ObjectId(value);
+    } else {
+      parsedQuery[key] = value;
+    }
+  }
+
+  return parsedQuery;
+}
 module.exports.getValidationErrrJson = getValidationErrrJson;
 module.exports.base64Encode = base64Encode;
 module.exports.base64Decode = base64Decode;
 module.exports.pickX = pickX;
 module.exports.deleteUploadedFileAsyncMannual = deleteUploadedFileAsyncMannual;
-module.exports.constructMongooseFilter = constructMongooseFilter;
 module.exports.isValidDate = isValidDate;
+module.exports.parseQueryValues = parseQueryValues;
+module.exports.parseQueryValues = parseQueryValues;
+module.exports.constructFilter = constructFilter;
