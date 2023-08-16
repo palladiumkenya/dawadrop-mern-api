@@ -61,6 +61,9 @@ const Order = model(
         type: Boolean,
         default: false,
       },
+      careGiver: {
+        type: Schema.Types.ObjectId,
+      },
     },
     {
       virtuals: {

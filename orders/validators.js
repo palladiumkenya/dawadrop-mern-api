@@ -24,6 +24,7 @@ const orderSchema = Joi.object({
       "string.pattern.base": "Invalid phone number format",
     }),
   drug: Joi.string().label("Drug").required(),
+  careGiver: Joi.string().label("Care giver"),
 });
 const dispenseDrugSchema = Joi.object({
   order: Joi.string().required().label("Order"),
@@ -42,6 +43,7 @@ const patientOrderSchema = Joi.object({
   deliveryMode: Joi.string().required().label("Delivery mode"),
   phoneNumber: Joi.string().max(14).min(9).label("Phone number"),
   deliveryMethod: Joi.string().label("Delivery method").required(),
+  careGiver: Joi.string().label("Care giver"),
 });
 
 exports.orderValidator = async (data) => {

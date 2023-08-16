@@ -59,6 +59,14 @@ router.get("/orders", [auth, isValidPatient], async (req, res) => {
     },
     {
       $lookup: {
+        from: "User",
+        foreignField: "_id",
+        localField: "careGiver",
+        as: "careGiver"
+      },
+    },
+    {
+      $lookup: {
         from: "deliveries",
         foreignField: "order",
         localField: "_id",
