@@ -14,31 +14,39 @@ const { pick } = require("lodash");
 const validateAsociation = async (body, update) => {
   const value = await treatmentSurportValidator(body);
   const { careGiver, careReceiver } = value;
-  if (careGiver === careReceiver)
+  if (careGiver && careReceiver && careGiver === careReceiver)
     throw {
       status: 403,
       message:
         "Invalid Operation.Care giver must not be same with carereceiver",
     };
-  if (!Types.ObjectId.isValid(careGiver) || !(await User.findById(careGiver)))
+  if (
+    careGiver &&
+    (!Types.ObjectId.isValid(careGiver) || !(await User.findById(careGiver)))
+  )
     throw {
       details: [{ path: ["careGiver"], message: "Invalid Care giver" }],
     };
   if (
-    !Types.ObjectId.isValid(careReceiver) ||
-    !(await Patient.findById(careReceiver))
+    careReceiver &&
+    (!Types.ObjectId.isValid(careReceiver) ||
+      !(await Patient.findById(careReceiver)))
   )
     throw {
       details: [{ path: ["careReceiver"], message: "Invalid Care receiver" }],
     };
-  if (!update) {
+  if (!update && careGiver && careReceiver) {
     if (await TreatmentSurport.findOne({ careGiver, careReceiver }))
       throw {
         status: 403,
         message: "Invalid Operation.Relationship already exist",
       };
   }
-  if ((await Patient.findOne({ _id: careReceiver })).user.equals(careGiver))
+  if (
+    careGiver &&
+    careReceiver &&
+    (await Patient.findOne({ _id: careReceiver })).user.equals(careGiver)
+  )
     throw {
       status: 403,
       message: "Invalid Operation.Cant care give yourself",
@@ -75,7 +83,7 @@ const addCareGiver = async (req, res) => {
   // for patients
   try {
     const value = await validateAsociation({
-      ...req.body,
+      ...pick(req.body, ["canPickUpDrugs", "canOrderDrug"]),
       careReceiver: (
         await Patient.findOne({ user: req.user._id })
       )._id.toString(),
@@ -119,7 +127,7 @@ const updateCareGiver = async (req, res) => {
 const addCareReceiver = async (req, res) => {
   try {
     const value = await validateAsociation({
-      ...req.body,
+      ...pick(req.body, ["canPickUpDrugs", "canOrderDrug"]),
       careGiver: req.user._id.toString(),
     });
     const asociation = new TreatmentSurport(value);
@@ -170,6 +178,7 @@ const getAssociations = async (req, res) => {
     "canOrderDrug",
     "canPickUpDrugs",
     "careReceiver",
+    "_id",
   ]);
   try {
     const user = req.user._id;
@@ -228,6 +237,118 @@ const getAssociations = async (req, res) => {
     return res.status(status).json(err);
   }
 };
+const getAssociationDetail = async (req, res) => {
+  try {
+    const id = req.params.id;
+    if (!Types.ObjectId.isValid(id))
+      throw {
+        status: 404,
+        message: "Treatment surporter not found!",
+      };
+    const user = req.user._id;
+    const associations = await TreatmentSurport.aggregate([
+      // Lookup patientCareReceiver details
+      {
+        $lookup: {
+          from: "patients",
+          foreignField: "_id",
+          localField: "careReceiver",
+          as: "patientCareReceiver",
+        },
+      },
+      // add filters
+      {
+        $match: {
+          _id: new Types.ObjectId(id),
+        },
+      },
+      // Lookup userCareReceiver details
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "patientCareReceiver.user",
+          as: "userCareReceiver",
+        },
+      },
+      // Lookup userCareGiver details
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "careGiver",
+          as: "userCareGiver",
+        },
+      },
+      // Lookup patientCareGiver details
+      {
+        $lookup: {
+          from: "patients",
+          foreignField: "user",
+          localField: "userCareGiver._id",
+          as: "patientCareGiver",
+        },
+      },
+    ]);
+    if (associations.length === 0)
+      throw {
+        status: 404,
+        message: "Treatment surporter not found!",
+      };
+    return res.json(associations[0]);
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
+};
+
+const acceptAssociation = async (req, res) => {
+  try {
+    const id = req.params.id;
+    if (
+      !Types.ObjectId.isValid(id) ||
+      !(await TreatmentSurport.findOne({ _id: id }))
+    )
+      throw {
+        status: 404,
+        message: "Treatment surporter not found!",
+      };
+    const asociation = await TreatmentSurport.findOne({ _id: id });
+    if (asociation.careGiver && asociation.careReceiver)
+      throw {
+        status: 403,
+        message: "Invalid operation!",
+      };
+    const care = {};
+
+    if (!asociation.careGiver) {
+      care.careGiver = req.user._id.toString();
+    } else {
+      care.careGiver = asociation.careGiver.toString();
+    }
+    if (!asociation.careReceiver) {
+      const patient = await Patient.findOne({ user: req.user._id });
+      if (!patient)
+        throw {
+          status: 403,
+          message: "Invalid Operation!",
+        };
+      care.careReceiver = patient._id.toString();
+    } else {
+      care.careReceiver = asociation.careReceiver.toString();
+    }
+    await validateAsociation(care);
+    console.log(care);
+    asociation.careGiver = care.careGiver;
+    asociation.careReceiver = care.careReceiver;
+    await asociation.save();
+    return res.json(await asociation.populate("careReceiver careGiver owner"));
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
+};
+
 const searchAssociations = async (req, res) => {
   // require privilges
   try {
@@ -302,4 +423,6 @@ module.exports = {
   addCareReceiver,
   updateCareReceiver,
   searchAssociations,
+  getAssociationDetail,
+  acceptAssociation,
 };

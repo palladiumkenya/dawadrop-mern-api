@@ -52,6 +52,8 @@ const {
   updateCareReceiver,
   searchAssociations,
   updateAssociation,
+  getAssociationDetail,
+  acceptAssociation,
 } = require("../patients/views/treatmentSurport");
 
 router.post("/register", register);
@@ -64,11 +66,13 @@ router.post("/user/relations", auth, createAssociation);
 router.get("/user/relations/search", auth, searchAssociations);
 router.post("/user/relations/add-care-receiver", auth, addCareReceiver);
 router.put("/user/relations/:id", auth, updateAssociation);
+router.get("/user/relations/:id", auth, getAssociationDetail);
 router.put(
   "/user/relations/:id/update-care-receiver",
   auth,
   updateCareReceiver
 );
+router.get("/user/relations/:id/accept", auth, acceptAssociation);
 router.get("/user/:id", auth, userAuthInfo);
 router.post(
   "/profile",

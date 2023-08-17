@@ -11,8 +11,8 @@ const deliveryFeedBackSchema = Joi.object({
   rating: Joi.number().required().label("Rating").max(5).min(1),
 });
 const treatmentSurportSchema = Joi.object({
-  careGiver: Joi.string().required().label("Care giver"),
-  careReceiver: Joi.string().label("Care Receiver").required(),
+  careGiver: Joi.string().label("Care giver"),
+  careReceiver: Joi.string().label("Care Receiver"),
   canPickUpDrugs: Joi.bool().label("Can pick up drugs?"),
   canOrderDrug: Joi.bool().label("Can order drugs?"),
 });
