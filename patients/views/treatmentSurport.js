@@ -338,7 +338,6 @@ const acceptAssociation = async (req, res) => {
       care.careReceiver = asociation.careReceiver.toString();
     }
     await validateAsociation(care);
-    console.log(care);
     asociation.careGiver = care.careGiver;
     asociation.careReceiver = care.careReceiver;
     await asociation.save();

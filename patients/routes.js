@@ -24,6 +24,7 @@ const { Types } = require("mongoose");
 const Delivery = require("../deliveries/models/Delivery");
 const DeliveryFeedBack = require("../deliveries/models/DeliveryFeedBack");
 const { addCareGiver, updateCareGiver } = require("./views/treatmentSurport");
+const TreatmentSurport = require("./models/TreatmentSurport");
 const router = Router();
 
 router.get("/", auth, async (req, res) => {
@@ -62,7 +63,7 @@ router.get("/orders", [auth, isValidPatient], async (req, res) => {
         from: "User",
         foreignField: "_id",
         localField: "careGiver",
-        as: "careGiver"
+        as: "careGiver",
       },
     },
     {
@@ -164,6 +165,41 @@ router.post("/orders", [auth, isValidPatient], async (req, res) => {
         message: "You must be subscribed to regimen",
       };
     }
+    // 4.Get the delivery method and look for caregiver if treatment surport budding
+    const method = await DeliveryMethod.findById(values["deliveryMethod"]);
+    if (!method)
+      throw {
+        details: [
+          { path: ["deliveryMethod"], message: "Invalid delivery method" },
+        ],
+      };
+    // make sure care care giver is specified if methood is treatment surport budding
+    if (method.blockOnTimeSlotFull === false) {
+      if (!values["careGiver"])
+        throw {
+          details: [
+            {
+              path: ["careGiver"],
+              message: "Caregiver is required",
+            },
+          ],
+        };
+      const tSurport = await TreatmentSurport.findOne({
+        _id: values["careGiver"],
+        canPickUpDrugs: true,
+        careReceiver: patient._id,
+      });
+      if (!tSurport)
+        throw {
+          details: [
+            {
+              path: ["careGiver"],
+              message: "Invalid care giver",
+            },
+          ],
+        };
+      console.log(tSurport);
+    }
     // 3. Create a new appointment on EMR
 
     // 4. Create Drug order in Kenya EMR
@@ -172,10 +208,20 @@ router.post("/orders", [auth, isValidPatient], async (req, res) => {
       ...values,
       deliveryTimeSlot: await TimeSlot.findById(values["deliveryTimeSlot"]),
       deliveryMode: await Mode.findById(values["deliveryMode"]),
-      deliveryMethod: await DeliveryMethod.findById(values["deliveryMethod"]),
+      deliveryMethod: method,
       patient: patient._id,
       appointment: appointment,
       drug: currRegimen[0].regimen,
+      careGiver:
+        method.blockOnTimeSlotFull === false
+          ? (
+              await TreatmentSurport.findOne({
+                _id: values["careGiver"],
+                canPickUpDrugs: true,
+                careReceiver: patient._id,
+              })
+            ).careGiver
+          : undefined,
     });
     await order.save();
     // 6. Send success sms message on sucess Order

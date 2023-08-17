@@ -63,6 +63,7 @@ const Order = model(
       },
       careGiver: {
         type: Schema.Types.ObjectId,
+        ref: "User",
       },
     },
     {
