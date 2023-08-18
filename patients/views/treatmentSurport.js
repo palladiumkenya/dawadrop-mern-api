@@ -88,7 +88,7 @@ const addCareGiver = async (req, res) => {
         await Patient.findOne({ user: req.user._id })
       )._id.toString(),
     });
-    const asociation = new TreatmentSurport(value);
+    const asociation = new TreatmentSurport({ ...value, owner: "receiver" });
     await asociation.save();
     return res.json(await asociation.populate("careGiver careReceiver"));
   } catch (error) {
@@ -130,7 +130,7 @@ const addCareReceiver = async (req, res) => {
       ...pick(req.body, ["canPickUpDrugs", "canOrderDrug"]),
       careGiver: req.user._id.toString(),
     });
-    const asociation = new TreatmentSurport(value);
+    const asociation = new TreatmentSurport({ ...value, owner: "giver" });
     await asociation.save();
     return res.json(await asociation.populate("careGiver careReceiver"));
   } catch (error) {
@@ -341,7 +341,7 @@ const acceptAssociation = async (req, res) => {
     asociation.careGiver = care.careGiver;
     asociation.careReceiver = care.careReceiver;
     await asociation.save();
-    return res.json(await asociation.populate("careReceiver careGiver owner"));
+    return res.json(await asociation.populate("careReceiver careGiver"));
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
     return res.status(status).json(err);

@@ -19,10 +19,11 @@ const TreatmentSurport = model(
       type: Boolean,
       default: false,
     },
-    owner:{
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    }
+    owner: {
+      type: String,
+      enum: ["giver", "receiver"],
+      required: true,
+    },
   })
 );
 

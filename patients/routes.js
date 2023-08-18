@@ -25,6 +25,9 @@ const Delivery = require("../deliveries/models/Delivery");
 const DeliveryFeedBack = require("../deliveries/models/DeliveryFeedBack");
 const { addCareGiver, updateCareGiver } = require("./views/treatmentSurport");
 const TreatmentSurport = require("./models/TreatmentSurport");
+const {
+  verifyPatientAndAddAsCareReceiver,
+} = require("./views/orderForAnother");
 const router = Router();
 
 router.get("/", auth, async (req, res) => {
@@ -361,9 +364,15 @@ router.post("/delivery-feedback", [auth, isValidPatient], async (req, res) => {
   }
 });
 router.post("/ralations/add-care-giver", [auth, isValidPatient], addCareGiver);
+router.post(
+  "/ralations/verify-and-add-care-receiver",
+  [auth, isValidPatient],
+  verifyPatientAndAddAsCareReceiver
+);
 router.put(
   "/ralations/:id/update-care-giver",
   [auth, isValidPatient],
   updateCareGiver
 );
+
 module.exports = router;
