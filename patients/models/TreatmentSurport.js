@@ -19,11 +19,6 @@ const TreatmentSurport = model(
       type: Boolean,
       default: false,
     },
-    owner: {
-      type: String,
-      enum: ["giver", "receiver"],
-      required: true,
-    },
   })
 );
 

@@ -27,6 +27,7 @@ const { addCareGiver, updateCareGiver } = require("./views/treatmentSurport");
 const TreatmentSurport = require("./models/TreatmentSurport");
 const {
   verifyPatientAndAddAsCareReceiver,
+  checkCareReceiverEligibility,
 } = require("./views/orderForAnother");
 const router = Router();
 
@@ -369,6 +370,12 @@ router.post(
   [auth, isValidPatient],
   verifyPatientAndAddAsCareReceiver
 );
+router.get(
+  "/relations/check-order-eligibility",
+  [auth, isValidPatient],
+  checkCareReceiverEligibility
+);
+
 router.put(
   "/ralations/:id/update-care-giver",
   [auth, isValidPatient],
