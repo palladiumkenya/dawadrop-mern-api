@@ -151,19 +151,19 @@
   "_id": {
     "$oid": "64d8f22c032ad914b9e1254b"
   },
-  "label": "Care Receivers",
+  "label": "Care Givers/Receivers",
   "description": "Manages care receiver in treatment surport",
   "image": "/menu-icons/1691939372725-df8db43a-7d66-4cd8-a912-286e260b1c17.png",
-  "link": "CareReceivers",
+  "link": "CareGiversAndReceivers",
   "__v": 0
 },
 {
   "_id": {
     "$oid": "64d8f26b032ad914b9e12550"
   },
-  "label": "Care Givers",
+  "label": "OrderForAnother",
   "description": "Patients manage there care givers",
   "image": "/menu-icons/1691939435731-b0d58ced-2708-4854-97e1-654d2323bb70.png",
-  "link": "PatientsCareGivers",
+  "link": "OrderForAnother",
   "__v": 0
 }]
