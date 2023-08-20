@@ -8,7 +8,7 @@ const Patient = require("../models/Patient");
 const TreatmentSurport = require("../models/TreatmentSurport");
 const { treatmentSurportValidator } = require("../validators");
 const User = require("../../auth/models/User");
-const { pick } = require("lodash");
+const { pick, merge } = require("lodash");
 // todo Remove code duplication
 
 const validateAsociation = async (body, update) => {
@@ -67,11 +67,9 @@ const createAssociation = async (req, res) => {
 const updateAssociation = async (req, res) => {
   try {
     const value = await validateAsociation(req.body, true);
-    const asociation = await TreatmentSurport.findByIdAndUpdate(
-      req.params.id,
-      value,
-      { new: true }
-    );
+    let asociation = await TreatmentSurport.findById(req.params.id);
+    asociation = merge(asociation, value);
+    await asociation.save();
     return res.json(await asociation.populate("careGiver careReceiver"));
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
@@ -113,11 +111,9 @@ const updateCareGiver = async (req, res) => {
         await Patient.findOne({ user: req.user._id })
       )._id.toString(),
     });
-    const asociation = await TreatmentSurport.findByIdAndUpdate(
-      req.params.id,
-      value,
-      { new: true }
-    );
+    let asociation = await TreatmentSurport.findById(req.params.id);
+    asociation = merge(asociation, value);
+    await asociation.save();
     return res.json(await asociation.populate("careGiver careReceiver"));
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
@@ -152,11 +148,9 @@ const updateCareReceiver = async (req, res) => {
       ...req.body,
       careGiver: req.user._id.toString(),
     });
-    const asociation = await TreatmentSurport.findByIdAndUpdate(
-      req.params.id,
-      value,
-      { new: true }
-    );
+    let asociation = await TreatmentSurport.findById(req.params.id);
+    asociation = merge(asociation, value);
+    await asociation.save();
     return res.json(await asociation.populate("careGiver careReceiver"));
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);

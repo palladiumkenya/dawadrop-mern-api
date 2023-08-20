@@ -13,6 +13,7 @@ const Delivery = require("./models/Delivery");
 const auth = require("./../middleware/auth");
 const Order = require("../orders/models/Order");
 const { Types } = require("mongoose");
+const { merge } = require("lodash");
 
 const router = Router();
 
@@ -199,18 +200,15 @@ router.post("/", async (req, res) => {
 });
 router.put("/:id", async (req, res) => {
   try {
-    if (
-      !Types.ObjectId.isValid(req.params.id) ||
-      !(await Delivery.findById(req.params.id))
-    )
+    let delivery = await Delivery.findById(req.params.id);
+    if (!delivery)
       throw {
         status: 404,
         message: "Delivery not Found!",
       };
     const value = await deliveryValidator(req.body);
-    const delivery = await Delivery.findByIdAndUpdate(req.params.id, value, {
-      new: true,
-    });
+    delivery = merge(delivery, value);
+    await delivery.save();
     return res.json(delivery);
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
@@ -243,9 +241,8 @@ router.post("/:id/:action", async (req, res) => {
       data.status = "delivered";
     }
     const value = await deliveryValidator(data);
-    delivery = await Delivery.findByIdAndUpdate(req.params.id, value, {
-      new: true,
-    });
+    delivery = merge(delivery, value);
+    await delivery.save();
     return res.json(delivery);
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
