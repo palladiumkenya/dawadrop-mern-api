@@ -10,6 +10,8 @@ const {
   pickX,
   constructMongooseFilter,
   getUpdateFileAsync,
+  constructFilter,
+  constructSearch,
 } = require("../../utils/helpers");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
@@ -140,11 +142,47 @@ const profile = async (req, res) => {
 
 const usersList = async (req, res) => {
   try {
-    const filters = constructMongooseFilter(
-      pick(req.query, ["roles", "privileges", "menuOptions"]),
-      { lookup: "$in" }
-    );
-    const users = await User.find(filters);
+    const search = req.query.search;
+    const searchFields = [
+      "_id",
+      "username",
+      "email",
+      "firstName",
+      "lastName",
+      "phoneNumber",
+      "isActive",
+      "roles",
+    ];
+    const users = await User.aggregate([
+      constructFilter(
+        req.query,
+        [
+          "_id",
+          "username",
+          "email",
+          "firstName",
+          "lastName",
+          "phoneNumber",
+          "isActive",
+          "roles",
+        ],
+        ["phoneNumber"]
+      ),
+      constructSearch(
+        search,
+        [
+          "_id",
+          "username",
+          "email",
+          "firstName",
+          "lastName",
+          "phoneNumber",
+          "isActive",
+          "roles",
+        ],
+        ["phoneNumber"]
+      ),
+    ]);
     return res.json({ results: users });
   } catch (error) {
     // const { error: err, status } = getValidationErrrJson(error);

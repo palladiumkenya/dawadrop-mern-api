@@ -118,8 +118,13 @@ const getUpdateFileAsync = async (req, dst, currImage) => {
   }
 };
 
-const constructFilter = (query, filterFields = [], operator = "$and") => {
-  const q = parseQueryValues(query);
+const constructFilter = (
+  query,
+  filterFields = [],
+  skipParse = [],
+  operator = "$and"
+) => {
+  const q = parseQueryValues(query, skipParse);
   const f = filterFields
     .filter((key) => q[key])
     .map((key) => ({ [key]: q[key] }));
@@ -128,21 +133,39 @@ const constructFilter = (query, filterFields = [], operator = "$and") => {
   };
 };
 
+const constructSearch = (
+  searchValue,
+  searchFields = [],
+  skipParse = [],
+) => {
+  const query = searchFields.reduce(
+    (accumulated, current) => ({
+      ...accumulated,
+      [current]: searchValue,
+    }),
+    {}
+  );
+  return constructFilter(query, searchFields, skipParse, "$or");
+};
+
 function isValidDate(dateString) {
   const date = new Date(dateString);
   return !isNaN(date) && date instanceof Date && !isNaN(date.getTime());
 }
-function parseQueryValues(query) {
+function parseQueryValues(query, skip = []) {
   const parsedQuery = {};
 
   for (const key in query) {
     const value = query[key];
     if (value === "true" || value === "false") {
-      parsedQuery[key] = value === "true";
+      if (skip.includes(key)) parsedQuery[key] = value;
+      else parsedQuery[key] = value === "true";
     } else if (!isNaN(value)) {
-      parsedQuery[key] = parseFloat(value);
+      if (skip.includes(key)) parsedQuery[key] = value;
+      else parsedQuery[key] = parseFloat(value);
     } else if (Types.ObjectId.isValid(value)) {
-      parsedQuery[key] = new Types.ObjectId(value);
+      if (skip.includes(key)) parsedQuery[key] = value;
+      else parsedQuery[key] = new Types.ObjectId(value);
     } else {
       parsedQuery[key] = value;
     }
@@ -163,5 +186,6 @@ module.exports.isValidDate = isValidDate;
 module.exports.parseQueryValues = parseQueryValues;
 module.exports.parseQueryValues = parseQueryValues;
 module.exports.constructFilter = constructFilter;
+module.exports.constructSearch = constructSearch;
 module.exports.cleanFalsyAttributes = cleanFalsyAttributes;
 module.exports.getUpdateFileAsync = getUpdateFileAsync;
