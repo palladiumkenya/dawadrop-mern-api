@@ -6,6 +6,7 @@ const Patient = require("../models/Patient");
 const TreatmentSurport = require("../models/TreatmentSurport");
 const { profileValidator } = require("../validators");
 const { isEmpty } = require("lodash");
+const { eligibityTest } = require("./utils");
 
 const verifyPatientAndAddAsCareReceiver = async (req, res) => {
   try {
@@ -60,48 +61,23 @@ const checkCareReceiverEligibility = async (req, res) => {
         status: 400,
         message: '"careReceiver" query parameter is required',
       };
-    if (
-      !Types.ObjectId.isValid(asocialtionId) ||
-      !(await TreatmentSurport.findOne({
-        _id: asocialtionId,
-        canOrderDrug: true,
-        careGiver: req.user._id,
-        careReceiver: { $exists: true, $ne: null },
-      }))
-    )
+    const asociation = await TreatmentSurport.findOne({
+      _id: asocialtionId,
+      canOrderDrug: true,
+      careGiver: req.user._id,
+      careReceiver: { $exists: true, $ne: null },
+    });
+    if (!asociation)
       throw {
         status: 400,
         message: "Invalid Care receiver",
       };
-    const asociation = await TreatmentSurport.findById(asocialtionId);
-    const patient = await Patient.findById(asociation.careReceiver);
-    const appoinments = await getPatientAppointments(patient.cccNumber);
 
-    const latest = appoinments
-      .filter((apt) => apt.appointment_type === "Re-Fill")
-      .sort((a, b) => {
-        const dateA = new Date(a.appointment.split("-").reverse().join("-"));
-        const dateB = new Date(b.appointment.split("-").reverse().join("-"));
-        return dateB - dateA;
-      });
-    if (isEmpty(latest)) {
-      throw {
-        status: 404,
-        message: "The patient have no appointmet",
-      };
-    }
-    const appointment = latest[0];
-    // 2. Check if user is eligible for appoinment based on last appointment refill
-    // 3. Get current Regimen
-    const currRegimen = await getRegimen(patient.cccNumber);
-    if (isEmpty(currRegimen)) {
-      throw {
-        status: 404,
-        message: "You must be subscribed to regimen",
-      };
-    }
+    const { appointment, currentRegimen } = await eligibityTest(
+      asociation.careReceiver
+    );
 
-    return res.json({ appointment, currentRegimen: currRegimen[0] });
+    return res.json({ appointment, currentRegimen });
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
     return res.status(status).json(err);

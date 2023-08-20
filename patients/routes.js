@@ -29,6 +29,7 @@ const {
   verifyPatientAndAddAsCareReceiver,
   checkCareReceiverEligibility,
 } = require("./views/orderForAnother");
+const { validateOrder, eligibityTest } = require("./views/utils");
 const router = Router();
 
 router.get("/", auth, async (req, res) => {
@@ -96,33 +97,9 @@ router.get(
   async (req, res) => {
     try {
       const patient = await Patient.findOne({ user: req.user._id });
-      const appoinments = await getPatientAppointments(patient.cccNumber);
+      const { appointment, currentRegimen } = await eligibityTest(patient._id);
 
-      const latest = appoinments
-        .filter((apt) => apt.appointment_type === "Re-Fill")
-        .sort((a, b) => {
-          const dateA = new Date(a.appointment.split("-").reverse().join("-"));
-          const dateB = new Date(b.appointment.split("-").reverse().join("-"));
-          return dateB - dateA;
-        });
-      if (isEmpty(latest)) {
-        throw {
-          status: 404,
-          message: "You have no appointmet",
-        };
-      }
-      const appointment = latest[0];
-      // 2. Check if user is eligible for appoinment based on last appointment refill
-      // 3. Get current Regimen
-      const currRegimen = await getRegimen(patient.cccNumber);
-      if (isEmpty(currRegimen)) {
-        throw {
-          status: 404,
-          message: "You must be subscribed to regimen",
-        };
-      }
-
-      return res.json({ appointment, currentRegimen: currRegimen[0] });
+      return res.json({ appointment, currentRegimen });
     } catch (error) {
       const { error: err, status } = getValidationErrrJson(error);
       return res.status(status).json(err);
@@ -143,69 +120,11 @@ router.get("/orders/:id", [auth, isValidPatient], async (req, res) => {
 router.post("/orders", [auth, isValidPatient], async (req, res) => {
   try {
     const patient = await Patient.findOne({ user: req.user._id });
-    const values = await patientOrderValidator(req.body);
-    // 1. Get patient refill appointments
-    const appoinments = await getPatientAppointments(patient.cccNumber);
-    const latest = appoinments
-      .filter((apt) => apt.appointment_type === "Re-Fill")
-      .sort((a, b) => {
-        const dateA = new Date(a.appointment.split("-").reverse().join("-"));
-        const dateB = new Date(b.appointment.split("-").reverse().join("-"));
-        return dateB - dateA;
-      });
-    if (isEmpty(latest)) {
-      throw {
-        status: 404,
-        message: "You have no appointmet",
-      };
-    }
-    const appointment = latest[0];
-    // 2. Check if user is eligible for appoinment based on last appointment refill
-    // 3. Get current Regimen
-    const currRegimen = await getRegimen(patient.cccNumber);
-    if (isEmpty(currRegimen)) {
-      throw {
-        status: 404,
-        message: "You must be subscribed to regimen",
-      };
-    }
-    // 4.Get the delivery method and look for caregiver if treatment surport budding
-    const method = await DeliveryMethod.findById(values["deliveryMethod"]);
-    if (!method)
-      throw {
-        details: [
-          { path: ["deliveryMethod"], message: "Invalid delivery method" },
-        ],
-      };
-    // make sure care care giver is specified if methood is treatment surport budding
-    if (method.blockOnTimeSlotFull === false) {
-      if (!values["careGiver"])
-        throw {
-          details: [
-            {
-              path: ["careGiver"],
-              message: "Caregiver is required",
-            },
-          ],
-        };
-      const tSurport = await TreatmentSurport.findOne({
-        _id: values["careGiver"],
-        canPickUpDrugs: true,
-        careReceiver: patient._id,
-      });
-      if (!tSurport)
-        throw {
-          details: [
-            {
-              path: ["careGiver"],
-              message: "Invalid care giver",
-            },
-          ],
-        };
-      console.log(tSurport);
-    }
+    const { values, method, regimen, treatmentSupport } = await validateOrder(
+      patient._id,
+      req.body
+    );
     // 3. Create a new appointment on EMR
-
     // 4. Create Drug order in Kenya EMR
     // 5. If 3 & 4 are successfull, create local order
     const order = new Order({
@@ -215,16 +134,10 @@ router.post("/orders", [auth, isValidPatient], async (req, res) => {
       deliveryMethod: method,
       patient: patient._id,
       appointment: appointment,
-      drug: currRegimen[0].regimen,
+      drug: regimen,
       careGiver:
         method.blockOnTimeSlotFull === false
-          ? (
-              await TreatmentSurport.findOne({
-                _id: values["careGiver"],
-                canPickUpDrugs: true,
-                careReceiver: patient._id,
-              })
-            ).careGiver
+          ? treatmentSupport.careGiver
           : undefined,
     });
     await order.save();
