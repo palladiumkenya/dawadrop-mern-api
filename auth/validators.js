@@ -45,21 +45,59 @@ const privilegeSchema = Joi.object({
 const roleSchema = Joi.object({
   name: Joi.string().required().min(4).max(30).label("Name"),
   description: Joi.string().min(4).label("Description"),
-  privileges: Joi.array().label("Privilege").default([]),
-  menuOptions: Joi.array().label("Menu Options").default([]),
+  privileges: Joi.array()
+    .items(Joi.string().hex().length(24))
+    .label("Privilege")
+    .default([])
+    .messages({
+      "string.base": "{{#label}} invalid",
+      "string.hex": "{{#label}} invalid",
+      "string.length": "{{#label}} invalid",
+    }),
+  menuOptions: Joi.array()
+    .items(Joi.string().hex().length(24))
+    .label("Menu Options")
+    .default([])
+    .messages({
+      "string.base": "{{#label}} invalid",
+      "string.hex": "{{#label}} invalid",
+      "string.length": "{{#label}} invalid",
+    }),
   assignAllPatients: Joi.boolean()
     .label("Assign Roles to all patients")
     .default(false),
 });
 
 const rolePrivilegeAddSchema = Joi.object({
-  privileges: Joi.array().required().min(1),
+  privileges: Joi.array()
+    .items(Joi.string().hex().length(24))
+    .required()
+    .min(1)
+    .label("Privileges")
+    .messages({
+      "string.base": "{{#label}} invalid",
+      "string.hex": "{{#label}} invalid",
+      "string.length": "{{#label}} invalid",
+    }),
 });
 const roleMenuOptionsAddSchema = Joi.object({
-  menuOptions: Joi.array().required().min(1).label("Menu Options"),
+  menuOptions: Joi.array()
+    .items(Joi.string().hex().length(24))
+    .required()
+    .min(1)
+    .label("Menu Options")
+    .messages({
+      "string.base": "{{#label}} invalid",
+      "string.hex": "{{#label}} invalid",
+      "string.length": "{{#label}} invalid",
+    }),
 });
 const userRolesSchema = Joi.object({
-  roles: Joi.array().required(),
+  roles: Joi.array().items(Joi.string().hex().length(24)).required().messages({
+    "string.base": "{{#label}} invalid",
+    "string.hex": "{{#label}} invalid",
+    "string.length": "{{#label}} invalid",
+  }),
 });
 
 const menuOptionSchema = Joi.object({

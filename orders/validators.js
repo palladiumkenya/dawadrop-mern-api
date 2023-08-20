@@ -2,7 +2,11 @@ const Joi = require("joi");
 const { cleanFalsyAttributes } = require("../utils/helpers");
 
 const orderSchema = Joi.object({
-  patient: Joi.string().required().label("Patient"),
+  patient: Joi.string().required().label("Patient").hex().length(24).messages({
+    "string.base": "{{#label}} invalid",
+    "string.hex": "{{#label}} invalid",
+    "string.length": "{{#label}} invalid",
+  }),
   appointment: Joi.string().required().label("Appointment"),
   deliveryAddress: Joi.object({
     latitude: Joi.number().required().label("Latitude"),
@@ -17,7 +21,16 @@ const orderSchema = Joi.object({
   })
     .label("Time between")
     .required(),
-  deliveryMode: Joi.string().required().label("Delivery mode"),
+  deliveryMode: Joi.string()
+    .required()
+    .label("Delivery mode")
+    .hex()
+    .length(24)
+    .messages({
+      "string.base": "{{#label}} invalid",
+      "string.hex": "{{#label}} invalid",
+      "string.length": "{{#label}} invalid",
+    }),
   phoneNumber: Joi.string()
     .pattern(/^[0-9]{9,14}$/)
     .label("Phone number")
@@ -25,10 +38,18 @@ const orderSchema = Joi.object({
       "string.pattern.base": "Invalid phone number format",
     }),
   drug: Joi.string().label("Drug").required(),
-  careGiver: Joi.string().label("Care giver"),
+  careGiver: Joi.string().label("Care giver").hex().length(24).messages({
+    "string.base": "{{#label}} invalid",
+    "string.hex": "{{#label}} invalid",
+    "string.length": "{{#label}} invalid",
+  }),
 });
 const dispenseDrugSchema = Joi.object({
-  order: Joi.string().required().label("Order"),
+  order: Joi.string().required().label("Order").hex().length(24).messages({
+    "string.base": "{{#label}} invalid",
+    "string.hex": "{{#label}} invalid",
+    "string.length": "{{#label}} invalid",
+  }),
   nextAppointmentDate: Joi.date().label("Next appointment date").required(),
 });
 
@@ -40,11 +61,42 @@ const patientOrderSchema = Joi.object({
   })
     .label("Delivery address")
     .required(),
-  deliveryTimeSlot: Joi.string().label("Delivery Time slot").required(),
-  deliveryMode: Joi.string().required().label("Delivery mode"),
+  deliveryTimeSlot: Joi.string()
+    .label("Delivery Time slot")
+    .required()
+    .hex()
+    .length(24)
+    .messages({
+      "string.base": "{{#label}} invalid",
+      "string.hex": "{{#label}} invalid",
+      "string.length": "{{#label}} invalid",
+    }),
+  deliveryMode: Joi.string()
+    .required()
+    .label("Delivery mode")
+    .hex()
+    .length(24)
+    .messages({
+      "string.base": "{{#label}} invalid",
+      "string.hex": "{{#label}} invalid",
+      "string.length": "{{#label}} invalid",
+    }),
   phoneNumber: Joi.string().max(14).min(9).label("Phone number"),
-  deliveryMethod: Joi.string().label("Delivery method").required(),
-  careGiver: Joi.string().label("Care giver"),
+  deliveryMethod: Joi.string()
+    .label("Delivery method")
+    .required()
+    .hex()
+    .length(24)
+    .messages({
+      "string.base": "{{#label}} invalid",
+      "string.hex": "{{#label}} invalid",
+      "string.length": "{{#label}} invalid",
+    }),
+  careGiver: Joi.string().label("Care giver").hex().length(24).messages({
+    "string.base": "{{#label}} invalid",
+    "string.hex": "{{#label}} invalid",
+    "string.length": "{{#label}} invalid",
+  }),
 });
 
 exports.orderValidator = async (data) => {
