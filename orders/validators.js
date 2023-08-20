@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const { cleanFalsyAttributes } = require("../utils/helpers");
 
 const orderSchema = Joi.object({
   patient: Joi.string().required().label("Patient"),
@@ -47,11 +48,17 @@ const patientOrderSchema = Joi.object({
 });
 
 exports.orderValidator = async (data) => {
-  return await orderSchema.validateAsync(data, { abortEarly: false });
+  return await orderSchema.validateAsync(cleanFalsyAttributes(data), {
+    abortEarly: false,
+  });
 };
 exports.patientOrderValidator = async (data) => {
-  return await patientOrderSchema.validateAsync(data, { abortEarly: false });
+  return await patientOrderSchema.validateAsync(cleanFalsyAttributes(data), {
+    abortEarly: false,
+  });
 };
 exports.dispenseDrugValidator = async (data) => {
-  return await dispenseDrugSchema.validateAsync(data, { abortEarly: false });
+  return await dispenseDrugSchema.validateAsync(cleanFalsyAttributes(data), {
+    abortEarly: false,
+  });
 };

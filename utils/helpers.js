@@ -124,6 +124,10 @@ function parseQueryValues(query) {
 
   return parsedQuery;
 }
+
+const cleanFalsyAttributes = (obj) => {
+  return _.pickBy(obj, (value) => !!value || value === false);
+};
 module.exports.getValidationErrrJson = getValidationErrrJson;
 module.exports.base64Encode = base64Encode;
 module.exports.base64Decode = base64Decode;
@@ -133,3 +137,4 @@ module.exports.isValidDate = isValidDate;
 module.exports.parseQueryValues = parseQueryValues;
 module.exports.parseQueryValues = parseQueryValues;
 module.exports.constructFilter = constructFilter;
+module.exports.cleanFalsyAttributes = cleanFalsyAttributes;

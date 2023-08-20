@@ -1,5 +1,6 @@
 const Joi = require("joi");
 const { surpotedPermisionAction } = require("../utils/constants");
+const { cleanFalsyAttributes } = require("../utils/helpers");
 
 const userSchema = Joi.object({
   username: Joi.string().required().max(30).min(4).label("Username"),
@@ -68,36 +69,58 @@ const menuOptionSchema = Joi.object({
   link: Joi.string().required().label("Menu Image"),
 });
 exports.userValidator = async (data) => {
-  return await userSchema.validateAsync(data, { abortEarly: false });
+  return await userSchema.validateAsync(cleanFalsyAttributes(data), {
+    abortEarly: false,
+  });
 };
 exports.loginValidator = async (data) => {
-  return await loginSchema.validateAsync(data, { abortEarly: false });
+  return await loginSchema.validateAsync(cleanFalsyAttributes(data), {
+    abortEarly: false,
+  });
 };
 exports.changePaswordValidator = async (data) => {
-  return await changePaswordSchema.validateAsync(data, { abortEarly: false });
+  return await changePaswordSchema.validateAsync(cleanFalsyAttributes(data), {
+    abortEarly: false,
+  });
 };
 exports.privilegesValidator = async (data) => {
-  return await privilegeSchema.validateAsync(data, { abortEarly: false });
+  return await privilegeSchema.validateAsync(cleanFalsyAttributes(data), {
+    abortEarly: false,
+  });
 };
 exports.rolesValidator = async (data) => {
-  return await roleSchema.validateAsync(data, { abortEarly: false });
+  return await roleSchema.validateAsync(cleanFalsyAttributes(data), {
+    abortEarly: false,
+  });
 };
 exports.rolePrivilegeAddValidator = async (data) => {
-  return await rolePrivilegeAddSchema.validateAsync(data, {
-    abortEarly: false,
-  });
+  return await rolePrivilegeAddSchema.validateAsync(
+    cleanFalsyAttributes(data),
+    {
+      abortEarly: false,
+    }
+  );
 };
 exports.roleMenuOptionsAddValidator = async (data) => {
-  return await roleMenuOptionsAddSchema.validateAsync(data, {
+  return await roleMenuOptionsAddSchema.validateAsync(
+    cleanFalsyAttributes(data),
+    {
+      abortEarly: false,
+    }
+  );
+};
+exports.userRolesValidator = async (data) => {
+  return await userRolesSchema.validateAsync(cleanFalsyAttributes(data), {
     abortEarly: false,
   });
 };
-exports.userRolesValidator = async (data) => {
-  return await userRolesSchema.validateAsync(data, { abortEarly: false });
-};
 exports.profileValidator = async (data) => {
-  return await profileSchema.validateAsync(data, { abortEarly: false });
+  return await profileSchema.validateAsync(cleanFalsyAttributes(data), {
+    abortEarly: false,
+  });
 };
 exports.menuOptionValidator = async (data) => {
-  return await menuOptionSchema.validateAsync(data, { abortEarly: false });
+  return await menuOptionSchema.validateAsync(cleanFalsyAttributes(data), {
+    abortEarly: false,
+  });
 };

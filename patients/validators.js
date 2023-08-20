@@ -1,4 +1,5 @@
 const Joi = require("joi");
+const { cleanFalsyAttributes } = require("../utils/helpers");
 
 const profileShema = Joi.object({
   cccNumber: Joi.string().required().label("CCC Number"),
@@ -18,16 +19,24 @@ const treatmentSurportSchema = Joi.object({
 });
 
 module.exports.profileValidator = async (data) => {
-  return await profileShema.validateAsync(data, { abortEarly: false });
-};
-module.exports.deliveryFeedBackValidator = async (data) => {
-  return await deliveryFeedBackSchema.validateAsync(data, {
+  return await profileShema.validateAsync(cleanFalsyAttributes(data), {
     abortEarly: false,
   });
+};
+module.exports.deliveryFeedBackValidator = async (data) => {
+  return await deliveryFeedBackSchema.validateAsync(
+    cleanFalsyAttributes(data),
+    {
+      abortEarly: false,
+    }
+  );
 };
 
 module.exports.treatmentSurportValidator = async (data) => {
-  return await treatmentSurportSchema.validateAsync(data, {
-    abortEarly: false,
-  });
+  return await treatmentSurportSchema.validateAsync(
+    cleanFalsyAttributes(data),
+    {
+      abortEarly: false,
+    }
+  );
 };
