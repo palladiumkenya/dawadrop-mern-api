@@ -9,10 +9,11 @@ const {
   getValidationErrrJson,
   pickX,
   constructMongooseFilter,
+  getUpdateFileAsync,
 } = require("../../utils/helpers");
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
-const { isEmpty, pick } = require("lodash");
+const { isEmpty, pick, merge } = require("lodash");
 const { PROFILE_MEDIA } = require("../../utils/constants");
 const Role = require("../models/Role");
 
@@ -153,15 +154,14 @@ const usersList = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const values = await profileValidator(req.body);
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      {
-        ...values,
-        image: req.file ? "/" + PROFILE_MEDIA + req.file.filename : null,
-      },
-      { new: true }
-    );
+    const values = await profileValidator({
+      ...req.body,
+      image: await getUpdateFileAsync(req, PROFILE_MEDIA, req.user.image),
+    });
+
+    let user = await User.findById(req.user._id);
+    user = merge(user, values);
+    await user.save();
     return res.json(
       pickX(user, [
         "_id",

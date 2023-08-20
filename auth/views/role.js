@@ -1,7 +1,8 @@
-const { isEmpty } = require("lodash");
+const { isEmpty, merge } = require("lodash");
 const {
   getValidationErrrJson,
   deleteUploadedFileAsyncMannual,
+  getUpdateFileAsync,
 } = require("../../utils/helpers");
 const {
   privilegesValidator,
@@ -15,7 +16,7 @@ const Role = require("./../models/Role");
 const Privilege = require("../models/Privilege");
 const User = require("../models/User");
 const MenuOption = require("../models/MenuOption");
-const { MENU_MEDIA } = require("../../utils/constants");
+const { MENU_MEDIA, MEDIA_ROOT } = require("../../utils/constants");
 
 const rolesListing = async (req, res) => {
   const roles = await Role.find()
@@ -273,15 +274,18 @@ const menuOptionDetail = async (req, res) => {
 };
 const menuOptionUpdate = async (req, res) => {
   try {
+    let menuOption = await MenuOption.findById(req.params.id);
+    if (!menuOption)
+      throw {
+        status: 404,
+        message: "Menu Option not found",
+      };
     const value = await menuOptionValidator({
       ...req.body,
-      image: req.file ? `/${MENU_MEDIA}${req.file.filename}` : undefined,
+      image: await getUpdateFileAsync(req, MENU_MEDIA, menuOption.image),
     });
-    const menuOption = await MenuOption.findByIdAndUpdate(
-      req.params.id,
-      value,
-      { new: true }
-    );
+    menuOption = merge(menuOption, value);
+    await menuOption.save();
     res.json(menuOption);
   } catch (ex) {
     if (req.file) await deleteUploadedFileAsyncMannual(req.file.path);

@@ -92,6 +92,32 @@ const deleteUploadedFileAsyncMannual = async (filePath) => {
   });
 };
 
+const getUpdateFileAsync = async (req, dst, currImage) => {
+  /**{
+      fieldname: 'image',
+      originalname: '1692383725664-ontransit.png',
+      encoding: '7bit',
+      mimetype: 'image/png',
+      destination: 'E:\\DawaDrop\\dawa-drop-express/media/menu-icons/',
+      filename: '1692520360223-1692383725664-ontransit.png',
+      path: 'E:\\DawaDrop\\dawa-drop-express\\media\\menu-icons\\1692520360223-1692383725664-ontransit.png',
+      size: 47705
+} */
+  // used in multipart form data updates to check if file is same as previous
+  //returns file to save on db or undefined
+  if (req.file) {
+    const originalImage = `/${dst}${req.file.originalname}`;
+    // if file is not updated then return original else return new
+    if (originalImage === currImage) {
+      // Delete new upload and return the old
+      await deleteUploadedFileAsyncMannual(req.file.path);
+      return originalImage;
+    }
+    // In future you can delete old
+    return `/${dst}${req.file.filename}`;
+  }
+};
+
 const constructFilter = (query, filterFields = [], operator = "$and") => {
   const q = parseQueryValues(query);
   const f = filterFields
@@ -138,3 +164,4 @@ module.exports.parseQueryValues = parseQueryValues;
 module.exports.parseQueryValues = parseQueryValues;
 module.exports.constructFilter = constructFilter;
 module.exports.cleanFalsyAttributes = cleanFalsyAttributes;
+module.exports.getUpdateFileAsync = getUpdateFileAsync;
