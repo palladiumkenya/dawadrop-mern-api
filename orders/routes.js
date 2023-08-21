@@ -26,11 +26,42 @@ router.get("/pending", [auth], async (req, res) => {
       },
     },
     {
+      $addFields: {
+        priority: {
+          $cond: {
+            if: {
+              $and: [
+                { $eq: ["$deliveryMethod.blockOnTimeSlotFull", false] },
+                { $eq: ["$careGiver", req.user._id] },
+              ],
+            },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
       $match: {
         $or: [
           { deliveries: { $size: 0 } }, // Include orders with no deliveries
           { "deliveries.status": "canceled" }, // Include orders with canceled deliveries
         ],
+        $and: [
+          { priority: true }, //include orders with tsb and for current user as careGiver
+        ],
+      },
+    },
+    {
+      $match: {
+        $and: [
+          { "deliveryMethod.blockOnTimeSlotFull": false }, // Exclude those with community ART}
+        ],
+      },
+    },
+    {
+      $project: {
+        blockOnTimeSlotFull: 0,
       },
     },
   ]);

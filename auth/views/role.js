@@ -40,7 +40,7 @@ const rolesListing = async (req, res) => {
     },
     {
       $lookup: {
-        from: "menuOptions",
+        from: "menuoptions",
         foreignField: "_id",
         localField: "menuOptions",
         as: "menuOptions",
@@ -58,7 +58,7 @@ const rolesListing = async (req, res) => {
       },
     },
   ]);
-  res.json({ results: roles });
+  res.json({ results: _roles });
 };
 const roleDetail = async (req, res) => {
   try {
