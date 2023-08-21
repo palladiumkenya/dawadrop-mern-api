@@ -110,11 +110,8 @@ const makeOrder = async (req, res) => {
     const delegatePatient = await Patient.findOne({
       user: req.user._id,
     });
-    const { values, method, regimen, treatmentSupport, appointment, } = await validateOrder(
-      patient,
-      req.body,
-      delegatePatient
-    );
+    const { values, method, regimen, treatmentSupport, appointment } =
+      await validateOrder(patient, req.body, delegatePatient);
     // 3. Create a new appointment on EMR
     // 4. Create Drug order in Kenya EMR
     // 5. If 3 & 4 are successfull, create local order
@@ -130,6 +127,7 @@ const makeOrder = async (req, res) => {
         method.blockOnTimeSlotFull === false
           ? treatmentSupport.careGiver
           : undefined,
+      orderedBy: req.user._id,
     });
     await order.save();
     // 6. Send success sms message on sucess Order
@@ -144,8 +142,37 @@ const makeOrder = async (req, res) => {
   }
 };
 
+const careReceiverOrders = async (req, res) => {
+  const patient = await Patient.findOne({ user: req.user._id });
+  const orders = await Order.aggregate([
+    {
+      $match: {
+        patient: { $ne: patient._id },
+        orderedBy: req.user._id,
+      },
+    },
+    {
+      $lookup: {
+        from: "User",
+        foreignField: "_id",
+        localField: "careGiver",
+        as: "careGiver",
+      },
+    },
+    {
+      $lookup: {
+        from: "deliveries",
+        foreignField: "order",
+        localField: "_id",
+        as: "deliveries",
+      },
+    },
+  ]);
+  return res.json({ results: orders });
+};
 module.exports = {
   verifyPatientAndAddAsCareReceiver,
   checkCareReceiverEligibility,
   makeOrder,
+  careReceiverOrders,
 };

@@ -65,6 +65,10 @@ const Order = model(
         type: Schema.Types.ObjectId,
         ref: "User",
       },
+      orderedBy:{
+        type: Schema.Types.ObjectId,
+        ref: "User",
+      }
     },
     {
       virtuals: {

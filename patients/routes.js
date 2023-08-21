@@ -29,6 +29,7 @@ const {
   verifyPatientAndAddAsCareReceiver,
   checkCareReceiverEligibility,
   makeOrder,
+  careReceiverOrders,
 } = require("./views/orderForAnother");
 const { validateOrder, eligibityTest } = require("./views/utils");
 const router = Router();
@@ -138,6 +139,7 @@ router.post("/orders", [auth, isValidPatient], async (req, res) => {
         method.blockOnTimeSlotFull === false
           ? treatmentSupport.careGiver
           : undefined,
+      orderedBy: req.user._id,
     });
     await order.save();
     // 6. Send success sms message on sucess Order
@@ -288,7 +290,7 @@ router.get(
   checkCareReceiverEligibility
 );
 router.post("/relations/order", [auth, isValidPatient], makeOrder);
-
+router.get("/relations/order", [auth, isValidPatient], careReceiverOrders);
 router.put(
   "/ralations/:id/update-care-giver",
   [auth, isValidPatient],
