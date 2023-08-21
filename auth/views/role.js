@@ -3,6 +3,7 @@ const {
   getValidationErrrJson,
   deleteUploadedFileAsyncMannual,
   getUpdateFileAsync,
+  constructFilter,
 } = require("../../utils/helpers");
 const {
   privilegesValidator,
@@ -22,6 +23,41 @@ const rolesListing = async (req, res) => {
   const roles = await Role.find()
     .populate("privileges", "_id name description action")
     .populate("menuOptions");
+  const _roles = await Role.aggregate([
+    constructFilter(req.query, [
+      "name",
+      "description",
+      "privileges",
+      "menuOptions",
+    ]),
+    {
+      $lookup: {
+        from: "privileges",
+        foreignField: "_id",
+        localField: "privileges",
+        as: "privileges",
+      },
+    },
+    {
+      $lookup: {
+        from: "menuOptions",
+        foreignField: "_id",
+        localField: "menuOptions",
+        as: "menuOptions",
+      },
+    },
+    {
+      $project: {
+        __v: 0,
+        menuOptions: {
+          __v: 0,
+        },
+        privileges: {
+          __v: 0,
+        },
+      },
+    },
+  ]);
   res.json({ results: roles });
 };
 const roleDetail = async (req, res) => {

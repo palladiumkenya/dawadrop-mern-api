@@ -153,7 +153,7 @@ const careReceiverOrders = async (req, res) => {
     },
     {
       $lookup: {
-        from: "User",
+        from: "users",
         foreignField: "_id",
         localField: "careGiver",
         as: "careGiver",
@@ -165,6 +165,14 @@ const careReceiverOrders = async (req, res) => {
         foreignField: "order",
         localField: "_id",
         as: "deliveries",
+      },
+    },
+    {
+      $lookup: {
+        from: "patients",
+        foreignField: "_id",
+        localField: "patient",
+        as: "patient",
       },
     },
   ]);
