@@ -97,6 +97,11 @@ const patientOrderSchema = Joi.object({
     "string.hex": "{{#label}} invalid",
     "string.length": "{{#label}} invalid",
   }),
+  careReceiver: Joi.string().label("Care giver").hex().length(24).messages({
+    "string.base": "{{#label}} invalid",
+    "string.hex": "{{#label}} invalid",
+    "string.length": "{{#label}} invalid",
+  }),
 });
 
 exports.orderValidator = async (data) => {

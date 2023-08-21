@@ -6,8 +6,7 @@ const Patient = require("../models/Patient");
 const { isEmpty } = require("lodash");
 const TreatmentSurport = require("../models/TreatmentSurport");
 
-const validateOrder = async (patientId, data) => {
-  const patient = await Patient.findOne({ _id: patientId });
+const validateOrder = async (patient, data, delegatePatient) => {
   const values = await patientOrderValidator(data);
   // 1. Get patient refill appointments
   const appoinments = await getPatientAppointments(patient.cccNumber);
@@ -58,7 +57,7 @@ const validateOrder = async (patientId, data) => {
     treatmentSupport = await TreatmentSurport.findOne({
       _id: values["careGiver"],
       canPickUpDrugs: true,
-      careReceiver: patient._id,
+      careReceiver: delegatePatient._id,
     });
     if (!treatmentSupport)
       throw {

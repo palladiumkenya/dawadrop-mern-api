@@ -28,6 +28,7 @@ const TreatmentSurport = require("./models/TreatmentSurport");
 const {
   verifyPatientAndAddAsCareReceiver,
   checkCareReceiverEligibility,
+  makeOrder,
 } = require("./views/orderForAnother");
 const { validateOrder, eligibityTest } = require("./views/utils");
 const router = Router();
@@ -120,10 +121,8 @@ router.get("/orders/:id", [auth, isValidPatient], async (req, res) => {
 router.post("/orders", [auth, isValidPatient], async (req, res) => {
   try {
     const patient = await Patient.findOne({ user: req.user._id });
-    const { values, method, regimen, treatmentSupport } = await validateOrder(
-      patient._id,
-      req.body
-    );
+    const { values, method, regimen, treatmentSupport, appointment } =
+      await validateOrder(patient, req.body, patient);
     // 3. Create a new appointment on EMR
     // 4. Create Drug order in Kenya EMR
     // 5. If 3 & 4 are successfull, create local order
@@ -288,6 +287,7 @@ router.get(
   [auth, isValidPatient],
   checkCareReceiverEligibility
 );
+router.post("/relations/order", [auth, isValidPatient], makeOrder);
 
 router.put(
   "/ralations/:id/update-care-giver",

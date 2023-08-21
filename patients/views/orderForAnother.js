@@ -1,12 +1,15 @@
 const { Types } = require("mongoose");
 const { getPatientAppointments } = require("../../appointments/api");
 const { getValidationErrrJson } = require("../../utils/helpers");
-const { searchPatient, getRegimen } = require("../api");
+const { searchPatient, getRegimen, sendSms } = require("../api");
 const Patient = require("../models/Patient");
 const TreatmentSurport = require("../models/TreatmentSurport");
 const { profileValidator } = require("../validators");
 const { isEmpty } = require("lodash");
-const { eligibityTest } = require("./utils");
+const { eligibityTest, validateOrder } = require("./utils");
+const Order = require("../../orders/models/Order");
+const TimeSlot = require("../../deliveries/models/TimeSlot");
+const Mode = require("../../deliveries/models/Mode");
 
 const verifyPatientAndAddAsCareReceiver = async (req, res) => {
   try {
@@ -84,7 +87,65 @@ const checkCareReceiverEligibility = async (req, res) => {
   }
 };
 
+const makeOrder = async (req, res) => {
+  try {
+    if (!req.body.careReceiver)
+      throw {
+        details: [
+          { path: ["careReceiver"], message: "Care receiver is required" },
+        ],
+      };
+    const careReceiverAsociation = await TreatmentSurport.findOne({
+      _id: req.body.careReceiver,
+      canOrderDrug: true,
+      careGiver: req.user._id,
+    });
+    if (!careReceiverAsociation)
+      throw {
+        details: [{ path: ["careReceiver"], message: "Invalid Care receiver" }],
+      };
+    const patient = await Patient.findOne({
+      _id: careReceiverAsociation.careReceiver,
+    });
+    const delegatePatient = await Patient.findOne({
+      user: req.user._id,
+    });
+    const { values, method, regimen, treatmentSupport, appointment, } = await validateOrder(
+      patient,
+      req.body,
+      delegatePatient
+    );
+    // 3. Create a new appointment on EMR
+    // 4. Create Drug order in Kenya EMR
+    // 5. If 3 & 4 are successfull, create local order
+    const order = new Order({
+      ...values,
+      deliveryTimeSlot: await TimeSlot.findById(values["deliveryTimeSlot"]),
+      deliveryMode: await Mode.findById(values["deliveryMode"]),
+      deliveryMethod: method,
+      patient: patient._id,
+      appointment: appointment,
+      drug: regimen,
+      careGiver:
+        method.blockOnTimeSlotFull === false
+          ? treatmentSupport.careGiver
+          : undefined,
+    });
+    await order.save();
+    // 6. Send success sms message on sucess Order
+    await sendSms(
+      `Dear dawadrop user,Your order has been received successfully.Your order id is ${order._id}`,
+      req.user.phoneNumber
+    );
+    return res.json(await order.populate("patient"));
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
+};
+
 module.exports = {
   verifyPatientAndAddAsCareReceiver,
   checkCareReceiverEligibility,
+  makeOrder,
 };
