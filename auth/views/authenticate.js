@@ -133,7 +133,47 @@ const profile = async (req, res) => {
     // for(true){
     //   if(user.roles.findIndex() === -1)
     // }
-    return res.json(user);
+    const users = await User.aggregate([
+      {
+        $match: {
+          _id: req.user._id,
+        },
+      },
+      {
+        $lookup: {
+          from: "roles",
+          foreignField: "_id",
+          localField: "roles",
+          as: "roles",
+        },
+      },
+      {
+        $lookup: {
+          from: "patients",
+          foreignField: "user",
+          localField: "_id",
+          as: "patient",
+        },
+      },
+      {
+        $addFields: {
+          domantUser: {
+            $cond: {
+              if: {
+                $and: [
+                  { $eq: ["$patient", []] }, //user is not patient
+                  { $eq: ["$roles", []] }, //has no roles
+                  { $eq: ["$isSuperUser", false] }, //is not user
+                ],
+              },
+              then: true,
+              else: false,
+            },
+          },
+        },
+      },
+    ]);
+    return res.json(users[0]);
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
     return res.status(status).json(err);

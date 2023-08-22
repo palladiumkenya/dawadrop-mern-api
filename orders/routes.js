@@ -27,6 +27,7 @@ router.get("/pending", [auth], async (req, res) => {
     },
     {
       $addFields: {
+        //TSB and currUser===careGiver
         priority: {
           $cond: {
             if: {
@@ -41,29 +42,71 @@ router.get("/pending", [auth], async (req, res) => {
         },
       },
     },
+    // flag when there already exist deliveries
     {
-      $match: {
-        $or: [
-          { deliveries: { $size: 0 } }, // Include orders with no deliveries
-          { "deliveries.status": "canceled" }, // Include orders with canceled deliveries
-        ],
-        $and: [
-          { priority: true }, //include orders with tsb and for current user as careGiver
-        ],
+      $addFields: {
+        hasDeliveryAndAllCanceled: {
+          $cond: {
+            if: {
+              $and: [
+                { $ne: [{ $size: "$deliveries" }, 0] }, // Check if deliveries array is not empty
+                {
+                  $eq: [
+                    {
+                      $size: {
+                        $setIntersection: ["$deliveries.status", ["canceled"]],
+                      },
+                    },
+                    { $size: "$deliveries" },
+                  ],
+                }, // Check if all deliveries have "canceled" status
+              ],
+            },
+            then: true,
+            else: false,
+          },
+        },
       },
     },
     {
-      $match: {
-        $and: [
-          { "deliveryMethod.blockOnTimeSlotFull": false }, // Exclude those with community ART}
-        ],
+      $addFields: {
+        asignedToCurrentUserOrNoneTSB: {
+          $cond: {
+            if: {
+              $or: [
+                { $eq: ["$deliveryMethod.blockOnTimeSlotFull", true] }, //None TSB
+                { $eq: ["$priority", true] }, // assigned to current user
+              ],
+            },
+            then: true,
+            else: false,
+          },
+        },
       },
     },
+    // handle when no deliveries yet
     {
-      $project: {
-        blockOnTimeSlotFull: 0,
+      $addFields: {
+        noAsociatedDeliveryANDasignedToCurrentUserOrNoneTSB: {
+          $cond: {
+            if: {
+              $and: [
+                { $eq: [{ $size: "$deliveries" }, 0] }, // No asociated delivery
+                { $eq: ["$asignedToCurrentUserOrNoneTSB", true] }, // nONE tsb or assighrned to current user
+              ],
+            },
+            then: true,
+            else: false,
+          },
+        },
       },
     },
+    {$match: {
+      $or: [
+        {hasDeliveryAndAllCanceled: true},
+        {noAsociatedDeliveryANDasignedToCurrentUserOrNoneTSB: true},
+      ]
+    }}
   ]);
   return res.json({ results: orders });
 });

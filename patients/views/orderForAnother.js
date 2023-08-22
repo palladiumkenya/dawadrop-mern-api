@@ -47,6 +47,7 @@ const verifyPatientAndAddAsCareReceiver = async (req, res) => {
       canOrderDrug: true,
       careGiver: req.user._id,
       careReceiver: patient._id,
+      canPickUpDrugs: true,
     });
     await tSupport.save();
     return res.json(await tSupport.populate("careGiver careReceiver"));
