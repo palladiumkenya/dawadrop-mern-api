@@ -1,6 +1,6 @@
 const { model, Schema } = require("mongoose");
 
-module.exports = model(
+const Address = model(
   "Address",
   new Schema({
     latitude: {
@@ -17,3 +17,5 @@ module.exports = model(
     },
   })
 );
+
+module.exports = Address;
