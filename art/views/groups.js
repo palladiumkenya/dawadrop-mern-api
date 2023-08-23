@@ -4,7 +4,6 @@ const { merge } = require("lodash");
 const { eventsValidator } = require("../validators");
 const ARTDistributionEvent = require("../models/ARTDistributionEvent");
 const ARTDistributionGroupLead = require("../models/ARTDistributionGroupLead");
-const ARTDistributionGroup = require("../models/ARTDistributionGroup");
 
 const getARTDistributionEvents = async (req, res) => {
   const event = await ARTDistributionEvent.find();
@@ -47,13 +46,13 @@ const updateARTDistributionEvent = async (req, res) => {
         message: "ART Distribution Event not found",
       };
     const values = await eventsValidator(req.body);
-    const { group } = values;
-    const _group = await ARTDistributionGroup.findById(group);
-    if (!_group)
+    const { lead } = values;
+    const _lead = await ARTDistributionGroupLead.findById(lead);
+    if (!_lead)
       throw {
-        details: [{ path: ["group"], message: "Invalid ART Community group" }],
+        details: [{ path: ["lead"], message: "Invalid ART Community lead" }],
       };
-    event = merge(event, { ...values, group: _group });
+    event = merge(event, { ...values, lead: _lead });
     await event.save();
     return res.json(event);
   } catch (ex) {
@@ -64,13 +63,13 @@ const updateARTDistributionEvent = async (req, res) => {
 const createARTDistributionEvent = async (req, res) => {
   try {
     const values = await eventsValidator(req.body);
-    const { group } = values;
-    const _group = await ARTDistributionGroup.findById(group);
-    if (!_group)
+    const { lead } = values;
+    const _lead = await ARTDistributionGroupLead.findById(lead);
+    if (!_lead)
       throw {
-        details: [{ path: ["group"], message: "Invalid ART Community group" }],
+        details: [{ path: ["lead"], message: "Invalid ART Community lead" }],
       };
-    const event = new ARTDistributionEvent({ ...values, group: _group });
+    const event = new ARTDistributionEvent({ ...values, lead: _lead });
     await event.save();
     return res.json(event);
   } catch (ex) {

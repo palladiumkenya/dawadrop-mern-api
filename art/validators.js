@@ -25,8 +25,8 @@ const leadSchema = Joi.object({
 });
 const eventSchema = Joi.object({
   title: Joi.string().required().label("Event Title"),
-  lead: Joi.string()
-    .label("Community Lead")
+  group: Joi.string()
+    .label("ART Group Community")
     .required()
     .hex()
     .length(24)

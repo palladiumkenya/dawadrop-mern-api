@@ -1,8 +1,8 @@
 const { model, Schema } = require("mongoose");
 const { ORDER_MODELS } = require("../../utils/constants");
 
-const ARTModel = model(
-  "ARTModel",
+const ARTDistributionModel = model(
+  "ARTDistributionModel",
   new Schema({
     name: {
       type: String,
@@ -25,4 +25,4 @@ const ARTModel = model(
   })
 );
 
-module.exports = ARTModel;
+module.exports = ARTDistributionModel;

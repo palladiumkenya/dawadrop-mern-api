@@ -1,11 +1,11 @@
 const { Types } = require("mongoose");
 const { getValidationErrrJson } = require("../../utils/helpers");
-const ARTModel = require("../models/ARTModel");
+const ARTDistributionModel = require("../models/ARTDistributionModel");
 const { merge } = require("lodash");
 const { artModelValidator } = require("../validators");
 
 const getArtModels = async (req, res) => {
-  const models = await ARTModel.find();
+  const models = await ARTDistributionModel.find();
   return res.json({ results: models });
 };
 
@@ -17,7 +17,7 @@ const getARTModelDetail = async (req, res) => {
         status: 404,
         message: "ART Model not found",
       };
-    const model = await ARTModel.findById(modelId);
+    const model = await ARTDistributionModel.findById(modelId);
     if (!model)
       throw {
         status: 404,
@@ -38,7 +38,7 @@ const updateARTModel = async (req, res) => {
         status: 404,
         message: "ART Model not found",
       };
-    let model = await ARTModel.findById(modelId);
+    let model = await ARTDistributionModel.findById(modelId);
     if (!model)
       throw {
         status: 404,
@@ -56,7 +56,7 @@ const updateARTModel = async (req, res) => {
 const createARTModel = async (req, res) => {
   try {
     const values = await artModelValidator(req.body);
-    const model = new ARTModel(values);
+    const model = new ARTDistributionModel(values);
     await model.save();
     return res.json(model);
   } catch (ex) {

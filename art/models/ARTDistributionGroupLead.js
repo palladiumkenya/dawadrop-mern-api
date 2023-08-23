@@ -1,7 +1,7 @@
 const { model, Schema, Types } = require("mongoose");
 
-const ARTCommunityLead = model(
-  "ARTCommunityLead",
+const ARTDistributionGroupLead = model(
+  "ARTDistributionGroupLead",
   new Schema({
     user: {
       type: Types.ObjectId,
@@ -10,7 +10,7 @@ const ARTCommunityLead = model(
     },
     artModel: {
       type: Types.ObjectId,
-      ref: "ARTModel",
+      ref: "ARTDistributionModel",
       required: true,
     },
     registeredBy: {
@@ -21,4 +21,4 @@ const ARTCommunityLead = model(
   })
 );
 
-module.exports = ARTCommunityLead;
+module.exports = ARTDistributionGroupLead;

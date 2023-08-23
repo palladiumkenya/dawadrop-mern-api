@@ -26,10 +26,10 @@ router.post("/models", [auth], createARTModel);
 router.put("/models/:id", [auth], updateARTModel);
 router.get("/models/:id", [auth], getARTModelDetail);
 
-router.get("/community-leads", [auth], getARTCommunityLeads);
-router.post("/community-leads", [auth], createARTCommunityLead);
-router.get("/community-leads/:id", [auth], getARTCommunityLeadDetail);
-router.put("/community-leads/:id", [auth], updateARTCommunityLead);
+router.get("/group-leads", [auth], getARTCommunityLeads);
+router.post("/group-leads", [auth], createARTCommunityLead);
+router.get("/group-leads/:id", [auth], getARTCommunityLeadDetail);
+router.put("/group-leads/:id", [auth], updateARTCommunityLead);
 
 router.get("/distribution-events", [auth], getARTDistributionEvents);
 router.get("/distribution-events/:id", [auth], getARTDistributionEventDetail);

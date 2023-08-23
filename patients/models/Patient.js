@@ -1,5 +1,5 @@
 const { model, Schema } = require("mongoose");
-const ARTModel = require("../../art/models/ARTModel");
+const ARTDistributionModel = require("../../art/models/ARTDistributionModel");
 
 const Patient = model(
   "Patient",
@@ -47,7 +47,7 @@ const Patient = model(
         type: Number,
       },
       artModel: {
-        type: ARTModel.schema,
+        type: ARTDistributionModel.schema,
       },
       stable: {
         type: Boolean,

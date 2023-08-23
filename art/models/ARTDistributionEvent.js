@@ -1,9 +1,9 @@
 const { model, Schema } = require("mongoose");
 const Address = require("../../orders/models/Address");
-const ARTCommunityLead = require("./ARTCommunityLead");
+const ARTDistributionGroup = require("./ARTDistributionGroup");
 
-const DistributionEvent = model(
-  "DistributionEvent",
+const ARTDistributionEvent = model(
+  "ARTDistributionEvent",
   new Schema({
     title: {
       type: String,
@@ -17,8 +17,8 @@ const DistributionEvent = model(
       type: Address.schema,
       required: true,
     },
-    lead: {
-      type: ARTCommunityLead.schema,
+    group: {
+      type: ARTDistributionGroup.schema,
       required: true,
     },
     remarks: {
@@ -27,4 +27,4 @@ const DistributionEvent = model(
   })
 );
 
-module.exports = DistributionEvent;
+module.exports = ARTDistributionEvent;

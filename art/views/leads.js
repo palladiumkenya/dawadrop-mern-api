@@ -1,14 +1,14 @@
 const { Types } = require("mongoose");
 const { getValidationErrrJson } = require("../../utils/helpers");
-const ARTModel = require("../models/ARTModel");
+const ARTDistributionModel = require("../models/ARTDistributionModel");
 const { merge } = require("lodash");
 const { leadsValidator } = require("../validators");
-const DistributionEvent = require("../models/DistributionEvent");
+const ARTDistributionEvent = require("../models/ARTDistributionEvent");
 const User = require("../../auth/models/User");
-const ARTCommunityLead = require("../models/ARTCommunityLead");
+const ARTDistributionGroupLead = require("../models/ARTDistributionGroupLead");
 
 const getARTCommunityLeads = async (req, res) => {
-  const leads = await ARTCommunityLead.find();
+  const leads = await ARTDistributionGroupLead.find();
   return res.json({ results: leads });
 };
 
@@ -20,7 +20,7 @@ const getARTCommunityLeadDetail = async (req, res) => {
         status: 404,
         message: "ART Community Lead Not found",
       };
-    const lead = await ARTCommunityLead.findById(leadId);
+    const lead = await ARTDistributionGroupLead.findById(leadId);
     if (!lead)
       throw {
         status: 404,
@@ -41,7 +41,7 @@ const updateARTCommunityLead = async (req, res) => {
         status: 404,
         message: "ART Community Lead Not found",
       };
-    let lead = await ARTCommunityLead.findById(leadId);
+    let lead = await ARTDistributionGroupLead.findById(leadId);
     if (!lead)
       throw {
         status: 404,
@@ -50,7 +50,7 @@ const updateARTCommunityLead = async (req, res) => {
     const values = await leadsValidator(req.body);
     const { user, artModel } = values;
     const _user = await User.findById(user);
-    const _artModel = await ARTModel.findById(artModel);
+    const _artModel = await ARTDistributionModel.findById(artModel);
     const errors = [];
     if (!_user) errors.push({ path: ["user"], message: "Invalid User" });
     if (!_artModel)
@@ -72,7 +72,7 @@ const createARTCommunityLead = async (req, res) => {
     const values = await leadsValidator(req.body);
     const { user, artModel } = values;
     const _user = await User.findById(user);
-    const _artModel = await ARTModel.findById(artModel);
+    const _artModel = await ARTDistributionModel.findById(artModel);
     const errors = [];
     if (!_user) errors.push({ path: ["user"], message: "Invalid User" });
     if (!_artModel)
@@ -81,7 +81,7 @@ const createARTCommunityLead = async (req, res) => {
       throw {
         details: errors,
       };
-    const lead = new ARTCommunityLead({
+    const lead = new ARTDistributionGroupLead({
       ...values,
       registeredBy: req.user._id,
     });
