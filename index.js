@@ -8,6 +8,7 @@ const providorAppointmentRoute = require("./appointments/routes");
 const deliveryRoutes = require("./deliveries/routes");
 const ordersRoutes = require("./orders/routes");
 const mapsRoute = require("./maps/routes");
+const artRoute = require("./art/routes");
 const { createServer } = require("http");
 dotenv.config();
 const config = require("config");
@@ -41,6 +42,7 @@ app.use("/appointments", providorAppointmentRoute);
 app.use("/deliveries", deliveryRoutes);
 app.use("/orders", ordersRoutes);
 app.use("/maps", mapsRoute);
+app.use("/art", artRoute);
 const port = process.env.PORT || 3000;
 httpServer.listen(port, () => {
   console.log("[-]Server running on port " + port + " ....");

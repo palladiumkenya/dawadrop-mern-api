@@ -1,4 +1,5 @@
 const { model, Schema } = require("mongoose");
+const { ORDER_MODELS } = require("../../utils/constants");
 
 const ARTModel = model(
   "ARTModel",
@@ -15,9 +16,10 @@ const ARTModel = model(
       required: true,
       unique: true,
       enum: {
-        values: ["first_line", "community_art"],
-        message:
-          "code {VALUE} not supported.Must be first_line or community_art",
+        values: ORDER_MODELS,
+        message: `code {VALUE} not supported.Must be ${ORDER_MODELS.join(
+          ", "
+        )}`,
       },
     },
   })

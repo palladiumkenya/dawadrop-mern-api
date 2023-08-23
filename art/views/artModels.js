@@ -1,6 +1,6 @@
 const { Types } = require("mongoose");
 const { getValidationErrrJson } = require("../../utils/helpers");
-const ARTModel = require("../models/ArtModel");
+const ARTModel = require("../models/ARTModel");
 const { merge } = require("lodash");
 const { artModelValidator } = require("../validators");
 

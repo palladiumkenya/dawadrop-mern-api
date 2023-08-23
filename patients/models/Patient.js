@@ -1,5 +1,6 @@
 const { model, Schema } = require("mongoose");
-const ARTModel = require("./ArtModel");
+const ARTModel = require("../../art/models/ARTModel");
+
 const Patient = model(
   "Patient",
   new Schema(
@@ -47,6 +48,10 @@ const Patient = model(
       },
       artModel: {
         type: ARTModel.schema,
+      },
+      stable: {
+        type: Boolean,
+        default: false,
       },
     },
     {

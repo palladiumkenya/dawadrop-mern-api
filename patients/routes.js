@@ -2,12 +2,8 @@ const { Router } = require("express");
 const auth = require("../middleware/auth");
 const Patient = require("./models/Patient");
 const { profileValidator, deliveryFeedBackValidator } = require("./validators");
-const {
-  getValidationErrrJson,
-  base64Decode,
-  base64Encode,
-} = require("../utils/helpers");
-const { searchPatient, sendOtp, getRegimen, sendSms } = require("./api");
+const { getValidationErrrJson } = require("../utils/helpers");
+const { searchPatient, sendOtp, sendSms } = require("./api");
 const AccountVerification = require("./models/AccountVerification");
 const moment = require("moment/moment");
 const hasNoProfile = require("../middleware/hasNoProfile");
@@ -20,11 +16,9 @@ const { patientOrderValidator } = require("../orders/validators");
 const TimeSlot = require("../deliveries/models/TimeSlot");
 const Mode = require("../deliveries/models/Mode");
 const DeliveryMethod = require("../deliveries/models/DeliveryMethod");
-const { Types } = require("mongoose");
 const Delivery = require("../deliveries/models/Delivery");
 const DeliveryFeedBack = require("../deliveries/models/DeliveryFeedBack");
 const { addCareGiver, updateCareGiver } = require("./views/treatmentSurport");
-const TreatmentSurport = require("./models/TreatmentSurport");
 const {
   verifyPatientAndAddAsCareReceiver,
   checkCareReceiverEligibility,
@@ -32,12 +26,6 @@ const {
   careReceiverOrders,
 } = require("./views/orderForAnother");
 const { validateOrder, eligibityTest } = require("./views/utils");
-const {
-  getARTModelDetail,
-  getArtModels,
-  createARTModel,
-  updateARTModel,
-} = require("./views/artModels");
 const router = Router();
 
 router.get("/", auth, async (req, res) => {
@@ -302,9 +290,5 @@ router.put(
   [auth, isValidPatient],
   updateCareGiver
 );
-router.get("/art-models", [auth], getArtModels);
-router.post("/art-models", [auth], createARTModel);
-router.put("/art-models/:id", [auth], updateARTModel);
-router.get("/art-models/:id", [auth], getARTModelDetail);
 
 module.exports = router;
