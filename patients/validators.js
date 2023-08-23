@@ -35,6 +35,12 @@ const treatmentSurportSchema = Joi.object({
   canOrderDrug: Joi.bool().label("Can order drugs?"),
 });
 
+const artModelSchema = Joi.object({
+  name: Joi.string().required().label("Model Name"),
+  description: Joi.string().label("Model Description"),
+  modelCode: Joi.string().required().label("Model code"),
+});
+
 module.exports.profileValidator = async (data) => {
   return await profileShema.validateAsync(cleanFalsyAttributes(data), {
     abortEarly: false,
@@ -56,4 +62,9 @@ module.exports.treatmentSurportValidator = async (data) => {
       abortEarly: false,
     }
   );
+};
+module.exports.artModelValidator = async (data) => {
+  return await artModelSchema.validateAsync(cleanFalsyAttributes(data), {
+    abortEarly: false,
+  });
 };

@@ -32,6 +32,12 @@ const {
   careReceiverOrders,
 } = require("./views/orderForAnother");
 const { validateOrder, eligibityTest } = require("./views/utils");
+const {
+  getARTModelDetail,
+  getArtModels,
+  createARTModel,
+  updateARTModel,
+} = require("./views/artModels");
 const router = Router();
 
 router.get("/", auth, async (req, res) => {
@@ -296,5 +302,9 @@ router.put(
   [auth, isValidPatient],
   updateCareGiver
 );
+router.get("/art-models", [auth], getArtModels);
+router.post("/art-models", [auth], createARTModel);
+router.put("/art-models/:id", [auth], updateARTModel);
+router.get("/art-models/:id", [auth], getARTModelDetail);
 
 module.exports = router;
