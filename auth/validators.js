@@ -66,6 +66,9 @@ const roleSchema = Joi.object({
   assignAllPatients: Joi.boolean()
     .label("Assign Roles to all patients")
     .default(false),
+  assignPickupCareGivers: Joi.boolean()
+    .label("Assign Roles to pickup care givers")
+    .default(false),
 });
 
 const rolePrivilegeAddSchema = Joi.object({

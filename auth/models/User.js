@@ -7,6 +7,8 @@ const Role = require("./Role");
 const Patient = require("../../patients/models/Patient");
 const MenuOption = require("./MenuOption");
 const Privilege = require("./Privilege");
+const TreatmentSurport = require("../../patients/models/TreatmentSurport");
+const { isEmpty } = require("lodash");
 
 const User = model(
   "User",
@@ -169,6 +171,13 @@ const User = model(
             if (commit) await this.save();
           }
         },
+        async isPickupCareGiver() {
+          const treatmentSurport = await TreatmentSurport.find({
+            careGiver: this._id,
+            canPickUpDrugs: true,
+          });
+          return !isEmpty(treatmentSurport);
+        },
         async isPatient() {
           return Boolean(await Patient.findOne({ user: this._id }));
         },
@@ -176,14 +185,22 @@ const User = model(
           if (this.isSuperUser) {
             return await Role.find().select("_id");
           }
-          let roles;
+          let roles = await Role.find({ _id: { $in: this.roles } }).select(
+            "_id"
+          );
           if (await this.isPatient()) {
-            roles = await Role.find()
-              .or([{ _id: { $in: this.roles } }, { assignAllPatients: true }])
-              .select("_id");
-          } else {
-            roles = await Role.find({ _id: { $in: this.roles } }).select("_id");
+            const patientRoles = await Role.find({
+              assignAllPatients: true,
+            }).select("_id");
+            roles = [...roles, ...patientRoles];
           }
+          if (await this.isPickupCareGiver()) {
+            const piCkupRoles = await Role.find({
+              assignPickupCareGivers: true,
+            }).select("_id");
+            roles = [...roles, ...piCkupRoles];
+          }
+
           return roles;
         },
       },

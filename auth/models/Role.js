@@ -34,6 +34,10 @@ const Role = model(
         type: Boolean,
         default: false,
       },
+      assignPickupCareGivers: {
+        type: Boolean,
+        default: false,
+      },
     },
     {
       methods: {
