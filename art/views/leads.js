@@ -4,9 +4,11 @@ const ARTModel = require("../models/ARTModel");
 const { merge } = require("lodash");
 const { leadsValidator } = require("../validators");
 const DistributionEvent = require("../models/DistributionEvent");
+const User = require("../../auth/models/User");
+const ARTCommunityLead = require("../models/ARTCommunityLead");
 
 const getARTCommunityLeads = async (req, res) => {
-  const leads = await DistributionEvent.find();
+  const leads = await ARTCommunityLead.find();
   return res.json({ results: leads });
 };
 
@@ -18,7 +20,7 @@ const getARTCommunityLeadDetail = async (req, res) => {
         status: 404,
         message: "ART Community Lead Not found",
       };
-    const lead = await DistributionEvent.findById(leadId);
+    const lead = await ARTCommunityLead.findById(leadId);
     if (!lead)
       throw {
         status: 404,
@@ -39,13 +41,24 @@ const updateARTCommunityLead = async (req, res) => {
         status: 404,
         message: "ART Community Lead Not found",
       };
-    let lead = await DistributionEvent.findById(leadId);
+    let lead = await ARTCommunityLead.findById(leadId);
     if (!lead)
       throw {
         status: 404,
         message: "ART Community Lead Not found",
       };
     const values = await leadsValidator(req.body);
+    const { user, artModel } = values;
+    const _user = await User.findById(user);
+    const _artModel = await ARTModel.findById(artModel);
+    const errors = [];
+    if (!_user) errors.push({ path: ["user"], message: "Invalid User" });
+    if (!_artModel)
+      errors.push({ path: ["artModel"], message: "Invalid ART Model" });
+    if (errors.length > 0)
+      throw {
+        details: errors,
+      };
     lead = merge(lead, values);
     await lead.save();
     return res.json(lead);
@@ -57,7 +70,21 @@ const updateARTCommunityLead = async (req, res) => {
 const createARTCommunityLead = async (req, res) => {
   try {
     const values = await leadsValidator(req.body);
-    const lead = new DistributionEvent(values);
+    const { user, artModel } = values;
+    const _user = await User.findById(user);
+    const _artModel = await ARTModel.findById(artModel);
+    const errors = [];
+    if (!_user) errors.push({ path: ["user"], message: "Invalid User" });
+    if (!_artModel)
+      errors.push({ path: ["artModel"], message: "Invalid ART Model" });
+    if (errors.length > 0)
+      throw {
+        details: errors,
+      };
+    const lead = new ARTCommunityLead({
+      ...values,
+      registeredBy: req.user._id,
+    });
     await lead.save();
     return res.json(lead);
   } catch (ex) {
