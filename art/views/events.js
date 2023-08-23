@@ -1,8 +1,9 @@
 const { Types } = require("mongoose");
 const { getValidationErrrJson } = require("../../utils/helpers");
 const { merge } = require("lodash");
-const {  eventsValidator } = require("../validators");
+const { eventsValidator } = require("../validators");
 const DistributionEvent = require("../models/DistributionEvent");
+const ARTCommunityLead = require("../models/ARTCommunityLead");
 
 const getARTDistributionEvents = async (req, res) => {
   const event = await DistributionEvent.find();
@@ -45,7 +46,13 @@ const updateARTDistributionEvent = async (req, res) => {
         message: "ART Distribution Event not found",
       };
     const values = await eventsValidator(req.body);
-    event = merge(event, values);
+    const { lead } = values;
+    const _lead = await ARTCommunityLead.findById(lead);
+    if (!_lead)
+      throw {
+        details: [{ path: ["lead"], message: "Invalid ART Community lead" }],
+      };
+    event = merge(event, { ...values, lead: _lead });
     await event.save();
     return res.json(event);
   } catch (ex) {
@@ -56,7 +63,13 @@ const updateARTDistributionEvent = async (req, res) => {
 const createARTDistributionEvent = async (req, res) => {
   try {
     const values = await eventsValidator(req.body);
-    const event = new DistributionEvent(values);
+    const { lead } = values;
+    const _lead = await ARTCommunityLead.findById(lead);
+    if (!_lead)
+      throw {
+        details: [{ path: ["lead"], message: "Invalid ART Community lead" }],
+      };
+    const event = new DistributionEvent({ ...values, lead: _lead });
     await event.save();
     return res.json(event);
   } catch (ex) {
