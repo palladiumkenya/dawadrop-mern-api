@@ -1,77 +1,78 @@
 const { Types } = require("mongoose");
 const { getValidationErrrJson } = require("../../utils/helpers");
 const { merge } = require("lodash");
-const { eventsValidator } = require("../validators");
+const { eventsValidator, groupsValidator } = require("../validators");
 const ARTDistributionEvent = require("../models/ARTDistributionEvent");
 const ARTDistributionGroupLead = require("../models/ARTDistributionGroupLead");
+const ARTDistributionGroup = require("../models/ARTDistributionGroup");
 
-const getARTDistributionEvents = async (req, res) => {
-  const event = await ARTDistributionEvent.find();
-  return res.json({ results: event });
+const getARTDistributionGroups = async (req, res) => {
+  const group = await ARTDistributionGroup.find();
+  return res.json({ results: group });
 };
 
-const getARTDistributionEventDetail = async (req, res) => {
-  const eventId = req.params.id;
+const getARTDistributionGruopDetail = async (req, res) => {
+  const groupId = req.params.id;
   try {
-    if (!Types.ObjectId.isValid(eventId))
+    if (!Types.ObjectId.isValid(groupId))
       throw {
         status: 404,
-        message: "ART Distribution Event not found",
+        message: "ART Distribution Group not found",
       };
-    const event = await ARTDistributionEvent.findById(eventId);
-    if (!event)
+    const group = await ARTDistributionGroup.findById(groupId);
+    if (!group)
       throw {
         status: 404,
-        message: "ART Distribution Event not found",
+        message: "ART Distribution Group not found",
       };
-    return res.json(event);
+    return res.json(group);
   } catch (ex) {
     const { error: err, status } = getValidationErrrJson(ex);
     return res.status(status).json(err);
   }
 };
 
-const updateARTDistributionEvent = async (req, res) => {
-  const eventId = req.params.id;
+const updateARTDistributionGroup = async (req, res) => {
+  const groupId = req.params.id;
   try {
-    if (!Types.ObjectId.isValid(eventId))
+    if (!Types.ObjectId.isValid(groupId))
       throw {
         status: 404,
-        message: "ART Distribution Event not found",
+        message: "ART Distribution Group not found",
       };
-    let event = await ARTDistributionEvent.findById(eventId);
-    if (!event)
+    let group = await ARTDistributionGroup.findById(groupId);
+    if (!group)
       throw {
         status: 404,
-        message: "ART Distribution Event not found",
+        message: "ART Distribution Group not found",
       };
-    const values = await eventsValidator(req.body);
+    const values = await groupsValidator(req.body);
     const { lead } = values;
     const _lead = await ARTDistributionGroupLead.findById(lead);
     if (!_lead)
       throw {
         details: [{ path: ["lead"], message: "Invalid ART Community lead" }],
       };
-    event = merge(event, { ...values, lead: _lead });
-    await event.save();
-    return res.json(event);
+    group = merge(group, { ...values, lead: _lead });
+    await group.save();
+    return res.json(group);
   } catch (ex) {
     const { error: err, status } = getValidationErrrJson(ex);
     return res.status(status).json(err);
   }
 };
-const createARTDistributionEvent = async (req, res) => {
+const createARTDistributionGroup = async (req, res) => {
   try {
-    const values = await eventsValidator(req.body);
+    const values = await groupsValidator(req.body);
     const { lead } = values;
     const _lead = await ARTDistributionGroupLead.findById(lead);
     if (!_lead)
       throw {
         details: [{ path: ["lead"], message: "Invalid ART Community lead" }],
       };
-    const event = new ARTDistributionEvent({ ...values, lead: _lead });
-    await event.save();
-    return res.json(event);
+    const group = new ARTDistributionGroup({ ...values, lead: _lead });
+    await group.save();
+    return res.json(group);
   } catch (ex) {
     const { error: err, status } = getValidationErrrJson(ex);
     return res.status(status).json(err);
@@ -79,8 +80,8 @@ const createARTDistributionEvent = async (req, res) => {
 };
 
 module.exports = {
-  getARTDistributionEventDetail,
-  getARTDistributionEvents,
-  updateARTDistributionEvent,
-  createARTDistributionEvent,
+  getARTDistributionGruopDetail,
+  getARTDistributionGroups,
+  updateARTDistributionGroup,
+  createARTDistributionGroup,
 };

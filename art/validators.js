@@ -26,7 +26,7 @@ const leadSchema = Joi.object({
 const eventSchema = Joi.object({
   title: Joi.string().required().label("Event Title"),
   group: Joi.string()
-    .label("ART Group Community")
+    .label("ART Distribtion Group")
     .required()
     .hex()
     .length(24)
@@ -45,6 +45,20 @@ const eventSchema = Joi.object({
     .required(),
   remarks: Joi.string().label("Remarks"),
 });
+const groupSchema = Joi.object({
+  title: Joi.string().required().label("Art Group Name"),
+  lead: Joi.string()
+    .label("ART Group Lead")
+    .required()
+    .hex()
+    .length(24)
+    .messages({
+      "string.base": "{{#label}} invalid",
+      "string.hex": "{{#label}} invalid",
+      "string.length": "{{#label}} invalid",
+    }),
+  description: Joi.string().label("Group Description"),
+});
 
 module.exports.artModelValidator = async (data) => {
   return await artModelSchema.validateAsync(cleanFalsyAttributes(data), {
@@ -58,6 +72,11 @@ module.exports.leadsValidator = async (data) => {
 };
 module.exports.eventsValidator = async (data) => {
   return await eventSchema.validateAsync(cleanFalsyAttributes(data), {
+    abortEarly: false,
+  });
+};
+module.exports.groupsValidator = async (data) => {
+  return await groupSchema.validateAsync(cleanFalsyAttributes(data), {
     abortEarly: false,
   });
 };

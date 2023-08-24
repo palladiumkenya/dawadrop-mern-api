@@ -18,6 +18,12 @@ const {
   updateARTDistributionEvent,
   getARTDistributionEventDetail,
 } = require("./views/events");
+const {
+  getARTDistributionGroups,
+  getARTDistributionGruopDetail,
+  createARTDistributionGroup,
+  updateARTDistributionGroup,
+} = require("./views/groups");
 
 const router = Router();
 
@@ -32,8 +38,13 @@ router.get("/group-leads/:id", [auth], getARTCommunityLeadDetail);
 router.put("/group-leads/:id", [auth], updateARTCommunityLead);
 
 router.get("/distribution-events", [auth], getARTDistributionEvents);
-router.get("/distribution-events/:id", [auth], getARTDistributionEventDetail);
 router.post("/distribution-events", [auth], createARTDistributionEvent);
+router.get("/distribution-events/:id", [auth], getARTDistributionEventDetail);
 router.put("/distribution-events/:id", [auth], updateARTDistributionEvent);
+
+router.get("/distribution-groups", [auth], getARTDistributionGroups);
+router.get("/distribution-groups/:id", [auth], getARTDistributionGruopDetail);
+router.post("/distribution-groups", [auth], createARTDistributionGroup);
+router.put("/distribution-groups/:id", [auth], updateARTDistributionGroup);
 
 module.exports = router;

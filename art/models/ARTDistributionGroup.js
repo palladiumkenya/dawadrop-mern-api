@@ -8,6 +8,14 @@ const ARTDistributionGroup = model(
       type: ARTDistributionGroupLead.schema,
       required: true,
     },
+    title: {
+      type: String,
+      require: true,
+      unique: true,
+    },
+    description: {
+      type: String,
+    },
   })
 );
 
