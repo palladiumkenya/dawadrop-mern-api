@@ -34,6 +34,22 @@ const getARTCommunityLeads = async (req, res) => {
       },
     },
     {
+      $lookup: {
+        from: "artdistributiongroups",
+        foreignField: "lead._id",
+        localField: "_id",
+        as: "groups",
+      },
+    },
+    {
+      $lookup: {
+        from: "artdistributiongroupenrollments",
+        foreignField: "group.lead._id",
+        localField: "_id",
+        as: "members",
+      },
+    },
+    {
       $project: {
         user: {
           password: 0,

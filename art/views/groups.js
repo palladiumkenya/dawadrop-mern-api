@@ -30,6 +30,14 @@ const getARTDistributionGroups = async (req, res) => {
         as: "artModel",
       },
     },
+    {
+      $lookup: {
+        from: "artdistributiongroupenrollments",
+        foreignField: "group._id",
+        localField: "_id",
+        as: "enrollments",
+      },
+    },
   ]);
   return res.json({ results: group });
 };
