@@ -49,9 +49,6 @@ const Patient = model(
       artModel: {
         type: ARTDistributionModel.schema,
       },
-      // groups: {
-      //   ty
-      // },
       stable: {
         type: Boolean,
         default: false,
@@ -69,8 +66,15 @@ const Patient = model(
             national_id: nationalId,
             upi_no: upiNumber,
             mfl_code: primaryClinic,
+            stable,
+            dispensing_model,
           } = remotePatient;
           let patient = await this.findOne({ cccNumber });
+          const _model = await ARTDistributionModel.findOne({
+            modelCode: dispensing_model,
+          });
+          if (!_model)
+            throw new Error("Dispensing model not surpotered in dawa drop");
           if (!patient) {
             patient = new this({
               cccNumber,
@@ -81,6 +85,8 @@ const Patient = model(
               nationalId,
               upiNumber,
               primaryClinic,
+              stable,
+              artModel: _model,
             });
             await patient.save();
           }

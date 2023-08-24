@@ -26,7 +26,7 @@ const verifyPatientAndAddAsCareReceiver = async (req, res) => {
       );
 
     const patient = await Patient.getOrCreatePatientFromRemote(remotePatient);
-    if (patient.user.equals(req.user._id)) {
+    if (patient.user?.equals(req.user._id)) {
       throw {
         status: 403,
         message: "Invalid Operation.Cant add yourself as careReceiver",

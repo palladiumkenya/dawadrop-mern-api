@@ -48,6 +48,8 @@ const BASE_DIR = process.cwd();
 const MEDIA_ROOT = `media/`;
 const PROFILE_MEDIA = `uploads/`;
 const MENU_MEDIA = `menu-icons/`;
+
+const ALLOWED_ORDER_PERIOD = ""
 exports.surpotedPermisionAction = actions;
 exports.patientActions = patientActions;
 exports.roleActions = roleActions;

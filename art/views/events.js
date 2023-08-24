@@ -7,7 +7,32 @@ const ARTDistributionGroupLead = require("../models/ARTDistributionGroupLead");
 const ARTDistributionGroup = require("../models/ARTDistributionGroup");
 
 const getARTDistributionEvents = async (req, res) => {
-  const event = await ARTDistributionEvent.find();
+  const event = await ARTDistributionEvent.aggregate([
+    {
+      $lookup: {
+        from: "users",
+        foreignField: "_id",
+        localField: "group.lead.user",
+        as: "leadUser",
+      },
+    },
+    {
+      $lookup: {
+        from: "artdistributionmodels",
+        foreignField: "_id",
+        localField: "group.lead.artModel",
+        as: "artModel",
+      },
+    },
+    {
+      $lookup: {
+        from: "artdistributiongroupenrollments",
+        foreignField: "group._id",
+        localField: "group._id",
+        as: "subscribers",
+      },
+    },
+  ]);
   return res.json({ results: event });
 };
 

@@ -36,10 +36,38 @@ router.get("/", auth, async (req, res) => {
   res.json({ results: patients });
 });
 router.get("/appointments", [auth, isValidPatient], async (req, res) => {
+  const query = req.params;
   const patient = await Patient.findOne({ user: req.user._id });
   const appointments = await getPatientAppointments(patient.cccNumber);
   if (isEmpty(appointments)) return res.json({ results: [] });
-  else res.json({ results: appointments });
+  else
+    res.json({
+      results: appointments
+        .sort((a, b) => {
+          const nextAppointmentDateA = moment(a.next_appointment_date);
+          const nextAppointmentDateB = moment(b.next_appointment_date);
+          return nextAppointmentDateA - nextAppointmentDateB;
+        })
+        .filter(({ next_appointment_date }) => {
+          const daysDiff = moment(next_appointment_date).diff(
+            new Date(),
+            "days"
+          );
+          const upComing = query.upComing === "true";
+
+          if (!upComing) {
+            return daysDiff >= 0 && daysDiff <= 7;
+          } else {
+            return true;
+          }
+        }),
+
+      // .sort(
+      //   (a, b) =>
+      //     moment(a.next_appointment_date).diff(new Date()) -
+      //     moment(b.next_appointment_date).diff(new Date())
+      // ),
+    });
   // res.json(base64Decode("Mg=="));
 });
 router.get("/appointments/:id", [auth, isValidPatient], async (req, res) => {

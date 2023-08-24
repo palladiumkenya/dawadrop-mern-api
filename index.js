@@ -14,8 +14,10 @@ dotenv.config();
 const config = require("config");
 const { MEDIA_ROOT, BASE_DIR } = require("./utils/constants");
 const { createSocketServer } = require("./socket/socket");
+const { generateRandomNumberInRange } = require("./utils/helpers");
 console.log(`[-]App name: ${config.get("name")}`);
 console.log(`[-]Database: ${config.get("db")}`);
+const moment = require("moment/moment");
 
 mongoose
   .connect(config.get("db"))
@@ -43,6 +45,41 @@ app.use("/deliveries", deliveryRoutes);
 app.use("/orders", ordersRoutes);
 app.use("/maps", mapsRoute);
 app.use("/art", artRoute);
+app.get("/data", (req, res) => {
+  const appointmentType = [
+    "Re-Fill",
+    "Clinical Review",
+    "PCR",
+    "Lab Investigation",
+  ];
+
+  const data = [];
+  for (let index = 0; index < 1000; index++) {
+    const aptTyp = appointmentType[generateRandomNumberInRange(0, 4)];
+    const apt = new Date(
+      `${2023}-${generateRandomNumberInRange(
+        5,
+        9
+      )}-${generateRandomNumberInRange(1, 30)}`
+    ).toISOString();
+
+    data.push({
+      id: Number(`207235${index}`),
+      cccNumber: ["1234500001", "1234500068"][
+        generateRandomNumberInRange(0, 2)
+      ],
+      appointment_type: aptTyp,
+      appointment_date: apt,
+      date_attended: null,
+      appointment: apt,
+      next_appointment_date: moment(apt)
+        // .add(10, "days")
+        .add([30, 90, 120][generateRandomNumberInRange(0, 3)], "days")
+        .toISOString(),
+    });
+  }
+  return res.json(data);
+});
 const port = process.env.PORT || 3000;
 httpServer.listen(port, () => {
   console.log("[-]Server running on port " + port + " ....");
