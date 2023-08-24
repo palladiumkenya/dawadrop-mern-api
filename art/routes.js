@@ -23,7 +23,9 @@ const {
   getARTDistributionGruopDetail,
   createARTDistributionGroup,
   updateARTDistributionGroup,
+  addNewMemberToARTDistributionGroup,
 } = require("./views/groups");
+const isGroupLead = require("../middleware/isGroupLead");
 
 const router = Router();
 
@@ -44,7 +46,20 @@ router.put("/distribution-events/:id", [auth], updateARTDistributionEvent);
 
 router.get("/distribution-groups", [auth], getARTDistributionGroups);
 router.get("/distribution-groups/:id", [auth], getARTDistributionGruopDetail);
-router.post("/distribution-groups", [auth], createARTDistributionGroup);
-router.put("/distribution-groups/:id", [auth], updateARTDistributionGroup);
+router.post(
+  "/distribution-groups",
+  [auth, isGroupLead],
+  createARTDistributionGroup
+);
+router.post(
+  "/distribution-groups/:id/add-member",
+  [auth, isGroupLead],
+  addNewMemberToARTDistributionGroup
+);
+router.put(
+  "/distribution-groups/:id",
+  [auth, isGroupLead],
+  updateARTDistributionGroup
+);
 
 module.exports = router;

@@ -8,7 +8,42 @@ const User = require("../../auth/models/User");
 const ARTDistributionGroupLead = require("../models/ARTDistributionGroupLead");
 
 const getARTCommunityLeads = async (req, res) => {
-  const leads = await ARTDistributionGroupLead.find();
+  const leads = await ARTDistributionGroupLead.aggregate([
+    {
+      $lookup: {
+        from: "users",
+        foreignField: "_id",
+        localField: "user",
+        as: "user",
+      },
+    },
+    {
+      $lookup: {
+        from: "artdistributionmodels",
+        foreignField: "_id",
+        localField: "artModel",
+        as: "artModel",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        foreignField: "_id",
+        localField: "registeredBy",
+        as: "registeredBy",
+      },
+    },
+    {
+      $project: {
+        user: {
+          password: 0,
+        },
+        registeredBy: {
+          password: 0,
+        },
+      },
+    },
+  ]);
   return res.json({ results: leads });
 };
 

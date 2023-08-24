@@ -47,9 +47,12 @@ const eventSchema = Joi.object({
 });
 const groupSchema = Joi.object({
   title: Joi.string().required().label("Art Group Name"),
-  lead: Joi.string()
-    .label("ART Group Lead")
+  description: Joi.string().label("Group Description"),
+});
+const groupMemberShipSchema = Joi.object({
+  paticipant: Joi.string()
     .required()
+    .label("Paticipant")
     .hex()
     .length(24)
     .messages({
@@ -57,7 +60,6 @@ const groupSchema = Joi.object({
       "string.hex": "{{#label}} invalid",
       "string.length": "{{#label}} invalid",
     }),
-  description: Joi.string().label("Group Description"),
 });
 
 module.exports.artModelValidator = async (data) => {
@@ -77,6 +79,11 @@ module.exports.eventsValidator = async (data) => {
 };
 module.exports.groupsValidator = async (data) => {
   return await groupSchema.validateAsync(cleanFalsyAttributes(data), {
+    abortEarly: false,
+  });
+};
+module.exports.groupsMemberShipValidator = async (data) => {
+  return await groupMemberShipSchema.validateAsync(cleanFalsyAttributes(data), {
     abortEarly: false,
   });
 };

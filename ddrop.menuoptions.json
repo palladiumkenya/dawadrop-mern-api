@@ -184,4 +184,34 @@
   "image": "/menu-icons/1692782429622-niche.png",
   "link": "ARTModels",
   "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64e6c58f3b7877e1a0ff26bc"
+  },
+  "label": "Manage ART Group Leads",
+  "description": "Art group leads",
+  "image": "/menu-icons/1692845455407-a03841b1-bc7c-46bd-8396-210cb0c2691b.png",
+  "link": "ARTGroupLeads",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64e6c6423b7877e1a0ff26c1"
+  },
+  "label": "Manage Distribution Groups",
+  "description": "Distribution Group",
+  "image": "/menu-icons/1692845634927-d07fc674-9935-4b6d-9d76-5b481186917c.png",
+  "link": "ARTDistributionGroups",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64e6c7123b7877e1a0ff26c6"
+  },
+  "label": "Manage DistributionEvents",
+  "description": "Distribution Event",
+  "image": "/menu-icons/1692845842807-8ee864ef-b8d7-4920-9173-f5cffc3acd62.png",
+  "link": "ARTDistributionEvents",
+  "__v": 0
 }]

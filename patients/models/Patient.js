@@ -49,6 +49,9 @@ const Patient = model(
       artModel: {
         type: ARTDistributionModel.schema,
       },
+      // groups: {
+      //   ty
+      // },
       stable: {
         type: Boolean,
         default: false,
