@@ -11,7 +11,7 @@ const getPatientAppointments = async (cccNumber) => {
     ];
 
     const data = [];
-    for (let index = 0; index < 100; index++) {
+    for (let index = 0; index < 500; index++) {
       const aptTyp = appointmentType[generateRandomNumberInRange(0, 3)];
       const apt = new Date(
         `${2023}-${generateRandomNumberInRange(

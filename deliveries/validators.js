@@ -11,6 +11,9 @@ const timeSlotSchema = Joi.object({
   capacity: Joi.number().required().label("Capacity"),
   label: Joi.string().required().label("Label"),
 });
+const serviceSchema = Joi.object({
+  name: Joi.string().required().label("Curriour Service name"),
+});
 const deliveryMethodSchema = Joi.object({
   name: Joi.string().required().label("Name"),
   description: Joi.string().label("Description"),
@@ -70,6 +73,11 @@ exports.agentDeliveryValidator = async (data) => {
 };
 exports.deliveryValidator = async (data) => {
   return deliverySchema.validateAsync(cleanFalsyAttributes(data), {
+    abortEarly: false,
+  });
+};
+exports.courrierServicesValidator = async (data) => {
+  return serviceSchema.validateAsync(cleanFalsyAttributes(data), {
     abortEarly: false,
   });
 };
