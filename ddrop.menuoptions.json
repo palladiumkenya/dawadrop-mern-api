@@ -61,7 +61,7 @@
   "_id": {
     "$oid": "64b74f6d98a59970e5d99284"
   },
-  "label": "Orders",
+  "label": "Request Delivery",
   "description": "Orders",
   "image": "/menu-icons/1689735021332-2834c660-7a56-4272-a5a9-d119ac938c73.png",
   "link": "PatientOrders",
