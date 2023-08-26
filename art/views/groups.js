@@ -13,6 +13,7 @@ const User = require("../../auth/models/User");
 const ARTDistributionGroupEnrollment = require("../models/ARTDistributionGroupEnrollment");
 
 const getARTDistributionGroups = async (req, res) => {
+  const user = req.user._id;
   const group = await ARTDistributionGroup.aggregate([
     {
       $lookup: {
@@ -36,6 +37,14 @@ const getARTDistributionGroups = async (req, res) => {
         foreignField: "group._id",
         localField: "_id",
         as: "enrollments",
+      },
+    },
+    {
+      $match: {
+        $or: [
+          { "lead.user": user }, // curr user is the lead to curr group
+          { "enrollments.user": user, "enrollments.isCurrent": true }, // curr user is the lead to curr group
+        ],
       },
     },
   ]);
