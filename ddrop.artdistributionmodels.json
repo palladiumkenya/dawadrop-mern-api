@@ -1,0 +1,54 @@
+[{
+  "_id": {
+    "$oid": "64e8d4892e77a51f810f120c"
+  },
+  "name": "Fast Track",
+  "description": "Fast track",
+  "modelCode": "fast_track",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64e8d4cf2e77a51f810f1211"
+  },
+  "name": "Community ART Distribution Group (Peer led)",
+  "description": "Community group lead by peer",
+  "modelCode": "community_art_peer",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64e8d50c2e77a51f810f1216"
+  },
+  "name": "Community ART Distribution Group (HCW led)",
+  "description": "Lead by health care worker",
+  "modelCode": "community_art_hcw",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64e8d5692e77a51f810f1233"
+  },
+  "name": "Facility ART Distribution Group (peer led)",
+  "description": "Led by peer",
+  "modelCode": "facility_art_peer",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64e8d5be2e77a51f810f1238"
+  },
+  "name": "Facility ART Distribution group(HCW led)",
+  "description": "HCW led",
+  "modelCode": "facility_art_hcw",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64e8d6cb2e77a51f810f123f"
+  },
+  "name": "Treatment Surpoter",
+  "description": "Treat.ent supporter",
+  "modelCode": "treatment_supporter",
+  "__v": 0
+}]

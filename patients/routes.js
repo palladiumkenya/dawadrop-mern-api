@@ -143,6 +143,7 @@ router.get("/orders/:id", [auth, isValidPatient], async (req, res) => {
 });
 router.post("/orders", [auth, isValidPatient], async (req, res) => {
   try {
+    console.log(req.body);
     const patient = await Patient.findOne({ user: req.user._id });
     const { values, method, regimen, treatmentSupport, appointment } =
       await validateOrder(patient, req.body, patient);

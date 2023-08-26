@@ -7,6 +7,7 @@ const ARTDistributionGroupLead = require("../models/ARTDistributionGroupLead");
 const ARTDistributionGroup = require("../models/ARTDistributionGroup");
 
 const getARTDistributionEvents = async (req, res) => {
+  const user = req.user._id;
   const event = await ARTDistributionEvent.aggregate([
     {
       $lookup: {
@@ -30,6 +31,14 @@ const getARTDistributionEvents = async (req, res) => {
         foreignField: "group._id",
         localField: "group._id",
         as: "subscribers",
+      },
+    },
+    {
+      $match: {
+        $or: [
+          { "subscribers.user": user, "subscribers.isCurrent": true }, //currentlyEnrolledInCurrentGroup
+          { "group.lead.user": user }, // isLeaderOfCurrentGroup
+        ],
       },
     },
   ]);
