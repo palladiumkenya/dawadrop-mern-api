@@ -30,15 +30,34 @@ const getARTDistributionEvents = async (req, res) => {
         from: "artdistributiongroupenrollments",
         foreignField: "group._id",
         localField: "group._id",
+        as: "subscriptions",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        foreignField: "_id",
+        localField: "subscriptions.user",
         as: "subscribers",
       },
     },
     {
       $match: {
         $or: [
-          { "subscribers.user": user, "subscribers.isCurrent": true }, //currentlyEnrolledInCurrentGroup
+          { "subscriptions.user": user, "subscriptions.isCurrent": true }, //currentlyEnrolledInCurrentGroup
           { "group.lead.user": user }, // isLeaderOfCurrentGroup
         ],
+      },
+    },
+    {
+      $project: {
+        subscriptions: 0,
+        subscribers: {
+          __v: 0,
+          password: 0,
+          roles: 0,
+          lastLogin: 0,
+        },
       },
     },
   ]);

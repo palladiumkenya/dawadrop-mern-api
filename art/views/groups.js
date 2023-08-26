@@ -40,6 +40,14 @@ const getARTDistributionGroups = async (req, res) => {
       },
     },
     {
+      $lookup: {
+        from: "users",
+        foreignField: "_id",
+        localField: "enrollments.user",
+        as: "enrolledUsers",
+      },
+    },
+    {
       $match: {
         $or: [
           { "lead.user": user }, // curr user is the lead to curr group
@@ -47,6 +55,15 @@ const getARTDistributionGroups = async (req, res) => {
         ],
       },
     },
+    {$project: {
+      enrolledUsers: {
+        __v:0,
+        password: 0,
+        roles: 0,
+        lastLogin: 0
+      },
+      enrollments: 0
+    }}
   ]);
   return res.json({ results: group });
 };

@@ -10,12 +10,16 @@ const ARTDistributionEvent = model(
       required: true,
     },
     distributionTime: {
-      type: String,
+      type: Schema.Types.Date,
       required: true,
     },
     distributionLocation: {
       type: Address.schema,
       required: true,
+    },
+    remiderNortificationDates: {
+      type: [Schema.Types.Date],
+      default: [],
     },
     group: {
       type: ARTDistributionGroup.schema,

@@ -44,6 +44,10 @@ const eventSchema = Joi.object({
     .label("Distribution Location")
     .required(),
   remarks: Joi.string().label("Remarks"),
+  remiderNortificationDates: Joi.array()
+    .items(Joi.date())
+    .label("Reminder dates")
+    .default([])
 });
 const groupSchema = Joi.object({
   title: Joi.string().required().label("Art Group Name"),
