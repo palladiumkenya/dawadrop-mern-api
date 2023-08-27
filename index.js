@@ -18,6 +18,7 @@ const { generateRandomNumberInRange } = require("./utils/helpers");
 console.log(`[-]App name: ${config.get("name")}`);
 console.log(`[-]Database: ${config.get("db")}`);
 const moment = require("moment/moment");
+const fetchAndScheduleEventsNortification = require("./art/fetchAndScheduleEventsNortification");
 
 mongoose
   .connect(config.get("db"))
@@ -80,6 +81,7 @@ app.get("/data", (req, res) => {
   }
   return res.json(data);
 });
+fetchAndScheduleEventsNortification();
 const port = process.env.PORT || 3000;
 httpServer.listen(port, () => {
   console.log("[-]Server running on port " + port + " ....");
