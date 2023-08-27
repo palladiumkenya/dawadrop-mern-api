@@ -11,7 +11,20 @@ const ARTDistributionGroup = model(
     title: {
       type: String,
       require: true,
-      unique: true,
+      validate: {
+        validator: async function (v) {
+          const currGroup = this; // Reference to the current user document
+          // Check if another user exists with the same phone number
+          const existingGroup = await ARTDistributionGroup.findOne({
+            title: v,
+          });
+          if (existingGroup && !existingGroup._id.equals(currGroup._id)) {
+            throw new Error("Group with name " + v + " already exists!");
+          }
+          return true;
+        },
+        message: "Group with name {VALUE} already exist!",
+      },
     },
     description: {
       type: String,

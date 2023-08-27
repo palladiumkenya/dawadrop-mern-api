@@ -12,12 +12,13 @@ const Delivery = model(
         type: Schema.Types.ObjectId,
         ref: "Order",
         required: true,
-        unique: true,
         validate: {
           message: "Order don't exist",
           validator: async function (v) {
+            // Check if valid order
             if (v && !(await Order.findById(v)))
               throw new Error("Order doesn't Exist");
+
           },
         },
       },

@@ -7,7 +7,18 @@ const Mode = model(
       name: {
         type: String,
         required: true,
-        unique: true,
+        validate: {
+          validator: async function (v) {
+            const currMode = this; // Reference to the current user document
+            // Check if another user exists with the same phone number
+            const existingMode = await Mode.findOne({ name: v });
+            if (existingMode && !existingMode._id.equals(currMode._id)) {
+              throw new Error("Mode with name " + v + " already exists!");
+            }
+            return true;
+          },
+          message: "Mode with name {VALUE} already exist!",
+        },
       },
     },
     {

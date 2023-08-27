@@ -7,7 +7,20 @@ const DeliveryMethod = model(
       name: {
         type: String,
         required: true,
-        unique: true,
+        validate: {
+          validator: async function (v) {
+            const currMethod = this; // Reference to the current user document
+            // Check if another user exists with the same phone number
+            const existingMethod = await DeliveryMethod.findOne({ name: v });
+            if (existingMethod && !existingMethod._id.equals(currMethod._id)) {
+              throw new Error(
+                "Delivery method with name " + v + " already exists!"
+              );
+            }
+            return true;
+          },
+          message: "Delivery method with name {VALUE} already exist!",
+        },
       },
       description: {
         type: String,
