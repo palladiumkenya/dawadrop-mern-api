@@ -7,9 +7,10 @@ const Address = require("./Address");
 const TimeSlot = require("../../deliveries/models/TimeSlot");
 const DeliveryMethod = require("../../deliveries/models/DeliveryMethod");
 const Mode = require("../../deliveries/models/Mode");
+const CourrierService = require("../../deliveries/models/CourrierService");
 
-const Order = model(
-  "Order",
+const DeliveryRequest = model(
+  "DeliveryRequest",
   new Schema(
     {
       patient: {
@@ -28,7 +29,15 @@ const Order = model(
             required: true,
           },
           appointment_date: String,
+          next_appointment_date: {
+            type: Date,
+            required: true,
+          },
         }),
+      },
+      event: {
+        type: Schema.Types.ObjectId,
+        ref: "ARTDistributionEvent",
       },
       updated: {
         type: Date,
@@ -38,37 +47,42 @@ const Order = model(
         type: Address.schema,
         required: true,
       },
-      deliveryTimeSlot: {
-        type: TimeSlot.schema,
-      },
-      deliveryMode: {
-        type: Mode.schema,
-      },
       deliveryMethod: {
         type: DeliveryMethod.schema,
         required: true,
+      },
+      courrierService: {
+        type: CourrierService.schema,
+      },
+      deliveryPerson: {
+        type: new Schema({
+          fullName: {
+            type: String,
+            required: true,
+          },
+          nationalId: {
+            type: Schema.Types.Number,
+            required: true,
+          },
+          phoneNumber: {
+            type: Schema.Types.String,
+            required: true,
+          },
+          pickUpTime: {
+            type: Schema.Types.Date,
+            required: true,
+          },
+        }),
       },
       phoneNumber: {
         type: String,
         maxlength: 14,
         minlength: 9,
       },
-      drug: {
-        type: String,
-        required: true,
-      },
-      isDispensed: {
-        type: Boolean,
-        default: false,
-      },
-      careGiver: {
+      orderedBy: {
         type: Schema.Types.ObjectId,
         ref: "User",
       },
-      orderedBy:{
-        type: Schema.Types.ObjectId,
-        ref: "User",
-      }
     },
     {
       virtuals: {
@@ -86,4 +100,4 @@ const Order = model(
   )
 );
 
-module.exports = Order;
+module.exports = DeliveryRequest;

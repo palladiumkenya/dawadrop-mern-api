@@ -45,11 +45,16 @@ const orderSchema = Joi.object({
   }),
 });
 const dispenseDrugSchema = Joi.object({
-  order: Joi.string().required().label("Order").hex().length(24).messages({
-    "string.base": "{{#label}} invalid",
-    "string.hex": "{{#label}} invalid",
-    "string.length": "{{#label}} invalid",
-  }),
+  order: Joi.string()
+    .required()
+    .label("DeliveryRequest")
+    .hex()
+    .length(24)
+    .messages({
+      "string.base": "{{#label}} invalid",
+      "string.hex": "{{#label}} invalid",
+      "string.length": "{{#label}} invalid",
+    }),
   nextAppointmentDate: Joi.date().label("Next appointment date").required(),
 });
 

@@ -7,7 +7,7 @@ const TreatmentSurport = require("../models/TreatmentSurport");
 const { profileValidator } = require("../validators");
 const { isEmpty } = require("lodash");
 const { eligibityTest, validateOrder } = require("./utils");
-const Order = require("../../orders/models/Order");
+const DeliveryRequest = require("../../orders/models/DeliveryRequest");
 const TimeSlot = require("../../deliveries/models/TimeSlot");
 const Mode = require("../../deliveries/models/Mode");
 
@@ -116,7 +116,7 @@ const makeOrder = async (req, res) => {
     // 3. Create a new appointment on EMR
     // 4. Create Drug order in Kenya EMR
     // 5. If 3 & 4 are successfull, create local order
-    const order = new Order({
+    const order = new DeliveryRequest({
       ...values,
       deliveryTimeSlot: await TimeSlot.findById(values["deliveryTimeSlot"]),
       deliveryMode: await Mode.findById(values["deliveryMode"]),
@@ -131,7 +131,7 @@ const makeOrder = async (req, res) => {
       orderedBy: req.user._id,
     });
     await order.save();
-    // 6. Send success sms message on sucess Order
+    // 6. Send success sms message on sucess DeliveryRequest
     await sendSms(
       `Dear dawadrop user,Your order has been received successfully.Your order id is ${order._id}`,
       req.user.phoneNumber
@@ -145,7 +145,7 @@ const makeOrder = async (req, res) => {
 
 const careReceiverOrders = async (req, res) => {
   const patient = await Patient.findOne({ user: req.user._id });
-  const orders = await Order.aggregate([
+  const orders = await DeliveryRequest.aggregate([
     {
       $match: {
         patient: { $ne: patient._id },

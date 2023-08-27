@@ -11,7 +11,7 @@ const isValidPatient = require("../middleware/isValidPatient");
 const { getPatientAppointments } = require("../appointments/api");
 const { isEmpty } = require("lodash");
 const User = require("../auth/models/User");
-const Order = require("../orders/models/Order");
+const DeliveryRequest = require("../orders/models/DeliveryRequest");
 const { patientOrderValidator } = require("../orders/validators");
 const TimeSlot = require("../deliveries/models/TimeSlot");
 const Mode = require("../deliveries/models/Mode");
@@ -81,7 +81,7 @@ router.get("/appointments/:id", [auth, isValidPatient], async (req, res) => {
 });
 router.get("/orders", [auth, isValidPatient], async (req, res) => {
   const patient = await Patient.findOne({ user: req.user._id });
-  const orders = await Order.aggregate([
+  const orders = await DeliveryRequest.aggregate([
     {
       $match: {
         patient: patient._id,
@@ -108,7 +108,7 @@ router.get("/orders", [auth, isValidPatient], async (req, res) => {
 });
 router.get("/deliveries", [auth, isValidPatient], async (req, res) => {
   const patient = await Patient.findOne({ user: req.user._id });
-  const orders = (await Order.find({ patient: patient._id })).map(
+  const orders = (await DeliveryRequest.find({ patient: patient._id })).map(
     (order) => order._id
   );
   const deliveries = await Delivery.find({ order: { $in: orders } });
@@ -132,12 +132,12 @@ router.get(
 );
 router.get("/orders/:id", [auth, isValidPatient], async (req, res) => {
   const patient = await Patient.findOne({ user: req.user._id });
-  const order = await Order.findOne({
+  const order = await DeliveryRequest.findOne({
     patient: patient._id,
     _id: req.params.id,
   }).populate("patient");
   if (!order) {
-    return res.status(404).json({ detail: "Order not found" });
+    return res.status(404).json({ detail: "DeliveryRequest not found" });
   }
   return res.json(order);
 });
@@ -150,7 +150,7 @@ router.post("/orders", [auth, isValidPatient], async (req, res) => {
     // 3. Create a new appointment on EMR
     // 4. Create Drug order in Kenya EMR
     // 5. If 3 & 4 are successfull, create local order
-    const order = new Order({
+    const order = new DeliveryRequest({
       ...values,
       deliveryTimeSlot: await TimeSlot.findById(values["deliveryTimeSlot"]),
       deliveryMode: await Mode.findById(values["deliveryMode"]),
@@ -165,7 +165,7 @@ router.post("/orders", [auth, isValidPatient], async (req, res) => {
       orderedBy: req.user._id,
     });
     await order.save();
-    // 6. Send success sms message on sucess Order
+    // 6. Send success sms message on sucess DeliveryRequest
     await sendSms(
       `Dear dawadrop user,Your order has been received successfully.Your order id is ${order._id}`,
       req.user.phoneNumber
@@ -179,7 +179,7 @@ router.post("/orders", [auth, isValidPatient], async (req, res) => {
 router.put("/orders/:id", [auth, isValidPatient], async (req, res) => {
   try {
     const patient = await Patient.findOne({ user: req.user._id });
-    const order = await Order.findOne({
+    const order = await DeliveryRequest.findOne({
       _id: req.params.id,
       patient: patient._id,
     });
@@ -197,7 +197,7 @@ router.put("/orders/:id", [auth, isValidPatient], async (req, res) => {
 
     order.deliveryAddress = values["deliveryAddress"];
     await order.save();
-    // 6. Send success sms message on sucess Order
+    // 6. Send success sms message on sucess DeliveryRequest
     await sendSms(
       `Dear dawadrop user,Your order ( ${order._id}) update has been received successfully.`,
       req.user.phoneNumber

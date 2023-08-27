@@ -20,11 +20,16 @@ const deliveryMethodSchema = Joi.object({
   blockOnTimeSlotFull: Joi.bool().label("Block when slot is full"),
 });
 const deliverySchema = Joi.object({
-  order: Joi.string().required().label("Order").hex().length(24).messages({
-    "string.base": "{{#label}} invalid",
-    "string.hex": "{{#label}} invalid",
-    "string.length": "{{#label}} invalid",
-  }),
+  order: Joi.string()
+    .required()
+    .label("DeliveryRequest")
+    .hex()
+    .length(24)
+    .messages({
+      "string.base": "{{#label}} invalid",
+      "string.hex": "{{#label}} invalid",
+      "string.length": "{{#label}} invalid",
+    }),
   location: Joi.object({
     latitude: Joi.number().required(),
     longitude: Joi.number().required(),
