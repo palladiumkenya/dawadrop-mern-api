@@ -43,7 +43,7 @@ async function fetchAndScheduleEventsNortification() {
       },
     ]); // Fetch events from the database
 
-    console.log(events);
+    // console.log(events);
 
     events.forEach((event) => {
       event.remiderNortificationDates.forEach((date) => {

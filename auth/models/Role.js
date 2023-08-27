@@ -38,6 +38,10 @@ const Role = model(
         type: Boolean,
         default: false,
       },
+      assignGroupLeads: {
+        type: Boolean,
+        default: false,
+      },
     },
     {
       methods: {

@@ -9,6 +9,7 @@ const MenuOption = require("./MenuOption");
 const Privilege = require("./Privilege");
 const TreatmentSurport = require("../../patients/models/TreatmentSurport");
 const { isEmpty } = require("lodash");
+const ARTDistributionGroupLead = require("../../art/models/ARTDistributionGroupLead");
 
 const User = model(
   "User",
@@ -181,6 +182,11 @@ const User = model(
         async isPatient() {
           return Boolean(await Patient.findOne({ user: this._id }));
         },
+        async isGroupLead() {
+          return Boolean(
+            await ARTDistributionGroupLead.findOne({ user: this._id })
+          );
+        },
         async getAllRoleIds() {
           if (this.isSuperUser) {
             return await Role.find().select("_id");
@@ -189,16 +195,25 @@ const User = model(
             "_id"
           );
           if (await this.isPatient()) {
+            // Include all pateint roles
             const patientRoles = await Role.find({
               assignAllPatients: true,
             }).select("_id");
             roles = [...roles, ...patientRoles];
           }
           if (await this.isPickupCareGiver()) {
+            // include all delivery agent roles
             const piCkupRoles = await Role.find({
               assignPickupCareGivers: true,
             }).select("_id");
             roles = [...roles, ...piCkupRoles];
+          }
+          if (await this.isGroupLead()) {
+            // Give Lead roles
+            const leadRoles = await Role.find({
+              assignGroupLeads: true,
+            }).select("_id");
+            roles = [...roles, ...leadRoles];
           }
 
           return roles;

@@ -69,6 +69,9 @@ const roleSchema = Joi.object({
   assignPickupCareGivers: Joi.boolean()
     .label("Assign Roles to pickup care givers")
     .default(false),
+  assignGroupLeads: Joi.boolean()
+    .label("Assign Roles to group leads")
+    .default(false),
 });
 
 const rolePrivilegeAddSchema = Joi.object({

@@ -5,6 +5,7 @@ const { eventsValidator } = require("../validators");
 const ARTDistributionEvent = require("../models/ARTDistributionEvent");
 const ARTDistributionGroupLead = require("../models/ARTDistributionGroupLead");
 const ARTDistributionGroup = require("../models/ARTDistributionGroup");
+const fetchAndScheduleEventsNortification = require("../fetchAndScheduleEventsNortification");
 
 const getARTDistributionEvents = async (req, res) => {
   const user = req.user._id;
@@ -108,6 +109,7 @@ const updateARTDistributionEvent = async (req, res) => {
       };
     event = merge(event, { ...values, group: _group });
     await event.save();
+    fetchAndScheduleEventsNortification()
     return res.json(event);
   } catch (ex) {
     const { error: err, status } = getValidationErrrJson(ex);
@@ -125,6 +127,7 @@ const createARTDistributionEvent = async (req, res) => {
       };
     const event = new ARTDistributionEvent({ ...values, group: _group });
     await event.save();
+    fetchAndScheduleEventsNortification()
     return res.json(event);
   } catch (ex) {
     const { error: err, status } = getValidationErrrJson(ex);
