@@ -17,7 +17,7 @@ const ARTDistributionEvent = model(
       type: Address.schema,
       required: true,
     },
-    noneSmartPhoneMembers: {
+    extraSubscribers: {
       type: [
         new Schema({
           name: {
@@ -25,10 +25,8 @@ const ARTDistributionEvent = model(
             require: true,
           },
           phoneNumber: {
-            type: {
-              type: String,
-              required: true,
-            },
+            type: String,
+            required: true,
           },
         }),
       ],
