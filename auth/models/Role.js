@@ -42,6 +42,10 @@ const Role = model(
         type: Boolean,
         default: false,
       },
+      assignGroupMembers: { //patients in grouped model
+        type: Boolean,
+        default: false,
+      },
     },
     {
       methods: {

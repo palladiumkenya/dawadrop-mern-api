@@ -160,7 +160,7 @@
   "_id": {
     "$oid": "64d8f22c032ad914b9e1254b"
   },
-  "label": "Care Givers/Receivers",
+  "label": "Treatment Support",
   "description": "Manages care receiver in treatment surport",
   "image": "/menu-icons/1691939372725-df8db43a-7d66-4cd8-a912-286e260b1c17.png",
   "link": "CareGiversAndReceivers",
@@ -199,7 +199,7 @@
   "_id": {
     "$oid": "64e6c6423b7877e1a0ff26c1"
   },
-  "label": "Manage Distribution Groups",
+  "label": "Distribution Groups",
   "description": "Distribution Group",
   "image": "/menu-icons/1692845634927-d07fc674-9935-4b6d-9d76-5b481186917c.png",
   "link": "ARTDistributionGroups",
@@ -209,7 +209,7 @@
   "_id": {
     "$oid": "64e6c7123b7877e1a0ff26c6"
   },
-  "label": "Manage DistributionEvents",
+  "label": "Distribution Events",
   "description": "Distribution Event",
   "image": "/menu-icons/1692845842807-8ee864ef-b8d7-4920-9173-f5cffc3acd62.png",
   "link": "ARTDistributionEvents",

@@ -12,10 +12,26 @@ const getARTDistributionEvents = async (req, res) => {
   const event = await ARTDistributionEvent.aggregate([
     {
       $lookup: {
-        from: "users",
-        foreignField: "_id",
-        localField: "group.lead.user",
-        as: "leadUser",
+        from: "artdistributiongroupenrollments",
+        foreignField: "group._id",
+        localField: "group._id",
+        as: "subscriptions",
+      },
+    },
+    {
+      $match: {
+        $or: [
+          { "subscriptions.user": user, "subscriptions.isCurrent": true }, //currentlyEnrolledInCurrentGroup
+          { "group.lead.user": user }, // isLeaderOfCurrentGroup
+        ],
+      },
+    },
+    {
+      $lookup: {
+        from: "artdistributioneventfeedbacks",
+        foreignField: "event",
+        localField: "_id",
+        as: "feedBacks",
       },
     },
     {
@@ -28,10 +44,10 @@ const getARTDistributionEvents = async (req, res) => {
     },
     {
       $lookup: {
-        from: "artdistributiongroupenrollments",
-        foreignField: "group._id",
-        localField: "group._id",
-        as: "subscriptions",
+        from: "users",
+        foreignField: "_id",
+        localField: "group.lead.user",
+        as: "leadUser",
       },
     },
     {
@@ -40,14 +56,6 @@ const getARTDistributionEvents = async (req, res) => {
         foreignField: "_id",
         localField: "subscriptions.user",
         as: "subscribers",
-      },
-    },
-    {
-      $match: {
-        $or: [
-          { "subscriptions.user": user, "subscriptions.isCurrent": true }, //currentlyEnrolledInCurrentGroup
-          { "group.lead.user": user }, // isLeaderOfCurrentGroup
-        ],
       },
     },
     {

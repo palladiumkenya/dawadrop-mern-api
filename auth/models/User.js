@@ -200,6 +200,24 @@ const User = model(
               assignAllPatients: true,
             }).select("_id");
             roles = [...roles, ...patientRoles];
+            // Inclide patients in grouped model
+            const patient = await Patient.findOne({
+              user: this._id,
+              "artModel.modelCode": {
+                $in: [
+                  "community_art_peer",
+                  "community_art_hcw",
+                  "facility_art_peer",
+                  "facility_art_hcw",
+                ],
+              },
+            });
+            if (patient) {
+              const groupedModelRoles = await Role.find({
+                assignGroupMembers: true,
+              }).select("_id");
+              roles = [...roles, ...groupedModelRoles];
+            }
           }
           if (await this.isPickupCareGiver()) {
             // include all delivery agent roles
