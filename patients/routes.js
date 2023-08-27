@@ -11,7 +11,7 @@ const isValidPatient = require("../middleware/isValidPatient");
 const { getPatientAppointments } = require("../appointments/api");
 const { isEmpty } = require("lodash");
 const User = require("../auth/models/User");
-const DeliveryRequest = require("../orders/models/DeliveryRequest");
+const DeliveryServiceRequest = require("../orders/models/DeliveryServiceRequest");
 const { patientOrderValidator } = require("../orders/validators");
 const TimeSlot = require("../deliveries/models/TimeSlot");
 const Mode = require("../deliveries/models/Mode");
@@ -26,6 +26,9 @@ const {
   careReceiverOrders,
 } = require("./views/orderForAnother");
 const { validateOrder, eligibityTest } = require("./views/utils");
+const {
+  createDeliveryServiceRequest,
+} = require("../orders/views/deliveryRequest");
 const router = Router();
 
 router.get("/", auth, async (req, res) => {
@@ -81,7 +84,7 @@ router.get("/appointments/:id", [auth, isValidPatient], async (req, res) => {
 });
 router.get("/orders", [auth, isValidPatient], async (req, res) => {
   const patient = await Patient.findOne({ user: req.user._id });
-  const orders = await DeliveryRequest.aggregate([
+  const orders = await DeliveryServiceRequest.aggregate([
     {
       $match: {
         patient: patient._id,
@@ -108,9 +111,9 @@ router.get("/orders", [auth, isValidPatient], async (req, res) => {
 });
 router.get("/deliveries", [auth, isValidPatient], async (req, res) => {
   const patient = await Patient.findOne({ user: req.user._id });
-  const orders = (await DeliveryRequest.find({ patient: patient._id })).map(
-    (order) => order._id
-  );
+  const orders = (
+    await DeliveryServiceRequest.find({ patient: patient._id })
+  ).map((order) => order._id);
   const deliveries = await Delivery.find({ order: { $in: orders } });
   return res.json({ results: deliveries });
 });
@@ -132,54 +135,55 @@ router.get(
 );
 router.get("/orders/:id", [auth, isValidPatient], async (req, res) => {
   const patient = await Patient.findOne({ user: req.user._id });
-  const order = await DeliveryRequest.findOne({
+  const order = await DeliveryServiceRequest.findOne({
     patient: patient._id,
     _id: req.params.id,
   }).populate("patient");
   if (!order) {
-    return res.status(404).json({ detail: "DeliveryRequest not found" });
+    return res.status(404).json({ detail: "DeliveryServiceRequest not found" });
   }
   return res.json(order);
 });
-router.post("/orders", [auth, isValidPatient], async (req, res) => {
-  try {
-    console.log(req.body);
-    const patient = await Patient.findOne({ user: req.user._id });
-    const { values, method, regimen, treatmentSupport, appointment } =
-      await validateOrder(patient, req.body, patient);
-    // 3. Create a new appointment on EMR
-    // 4. Create Drug order in Kenya EMR
-    // 5. If 3 & 4 are successfull, create local order
-    const order = new DeliveryRequest({
-      ...values,
-      deliveryTimeSlot: await TimeSlot.findById(values["deliveryTimeSlot"]),
-      deliveryMode: await Mode.findById(values["deliveryMode"]),
-      deliveryMethod: method,
-      patient: patient._id,
-      appointment: appointment,
-      drug: regimen,
-      careGiver:
-        method.blockOnTimeSlotFull === false
-          ? treatmentSupport.careGiver
-          : undefined,
-      orderedBy: req.user._id,
-    });
-    await order.save();
-    // 6. Send success sms message on sucess DeliveryRequest
-    await sendSms(
-      `Dear dawadrop user,Your order has been received successfully.Your order id is ${order._id}`,
-      req.user.phoneNumber
-    );
-    return res.json(await order.populate("patient"));
-  } catch (error) {
-    const { error: err, status } = getValidationErrrJson(error);
-    return res.status(status).json(err);
-  }
-});
+// router.post("/orders", [auth, isValidPatient], async (req, res) => {
+//   try {
+//     console.log(req.body);
+//     const patient = await Patient.findOne({ user: req.user._id });
+//     const { values, method, regimen, treatmentSupport, appointment } =
+//       await validateOrder(patient, req.body, patient);
+//     // 3. Create a new appointment on EMR
+//     // 4. Create Drug order in Kenya EMR
+//     // 5. If 3 & 4 are successfull, create local order
+//     const order = new DeliveryServiceRequest({
+//       ...values,
+//       deliveryTimeSlot: await TimeSlot.findById(values["deliveryTimeSlot"]),
+//       deliveryMode: await Mode.findById(values["deliveryMode"]),
+//       deliveryMethod: method,
+//       patient: patient._id,
+//       appointment: appointment,
+//       drug: regimen,
+//       careGiver:
+//         method.blockOnTimeSlotFull === false
+//           ? treatmentSupport.careGiver
+//           : undefined,
+//       orderedBy: req.user._id,
+//     });
+//     await order.save();
+//     // 6. Send success sms message on sucess DeliveryServiceRequest
+//     await sendSms(
+//       `Dear dawadrop user,Your order has been received successfully.Your order id is ${order._id}`,
+//       req.user.phoneNumber
+//     );
+//     return res.json(await order.populate("patient"));
+//   } catch (error) {
+//     const { error: err, status } = getValidationErrrJson(error);
+//     return res.status(status).json(err);
+//   }
+// });
+router.post("/orders", [auth, isValidPatient], createDeliveryServiceRequest);
 router.put("/orders/:id", [auth, isValidPatient], async (req, res) => {
   try {
     const patient = await Patient.findOne({ user: req.user._id });
-    const order = await DeliveryRequest.findOne({
+    const order = await DeliveryServiceRequest.findOne({
       _id: req.params.id,
       patient: patient._id,
     });
@@ -197,7 +201,7 @@ router.put("/orders/:id", [auth, isValidPatient], async (req, res) => {
 
     order.deliveryAddress = values["deliveryAddress"];
     await order.save();
-    // 6. Send success sms message on sucess DeliveryRequest
+    // 6. Send success sms message on sucess DeliveryServiceRequest
     await sendSms(
       `Dear dawadrop user,Your order ( ${order._id}) update has been received successfully.`,
       req.user.phoneNumber

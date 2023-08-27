@@ -22,7 +22,7 @@ const deliveryMethodSchema = Joi.object({
 const deliverySchema = Joi.object({
   order: Joi.string()
     .required()
-    .label("DeliveryRequest")
+    .label("DeliveryServiceRequest")
     .hex()
     .length(24)
     .messages({

@@ -1,6 +1,19 @@
 const config = require("config");
 const moment = require("moment/moment");
 const { generateRandomNumberInRange } = require("../utils/helpers");
+
+const getAppointment = async (ccNumber, appointmenId) => {
+  return {
+    id: appointmenId,
+    cccNumber: ccNumber,
+    appointment_type: "Re-Fill",
+    appointment_date: moment().subtract(87, "days").toISOString(),
+    date_attended: null,
+    appointment: moment().subtract(87, "days").toISOString(),
+    next_appointment_date: moment().add(3, "days").toISOString(),
+  };
+};
+
 const getPatientAppointments = async (cccNumber) => {
   try {
     const appointmentType = [
@@ -56,4 +69,5 @@ const getPatientAppointments = async (cccNumber) => {
 
 module.exports = {
   getPatientAppointments,
+  getAppointment,
 };

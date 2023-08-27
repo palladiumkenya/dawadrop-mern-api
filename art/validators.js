@@ -47,7 +47,20 @@ const eventSchema = Joi.object({
   remiderNortificationDates: Joi.array()
     .items(Joi.date())
     .label("Reminder dates")
+    .default([]),
+  noneSmartPhoneMembers: Joi.array()
+    .items(
+      Joi.object({
+        name: Joi.string().required().label("Name"),
+        phoneNumber: Joi.string()
+          .max(14)
+          .min(9)
+          .label("Phone number")
+          .required(),
+      })
+    )
     .default([])
+    .label("None Smartphone members"),
 });
 const groupSchema = Joi.object({
   title: Joi.string().required().label("Art Group Name"),

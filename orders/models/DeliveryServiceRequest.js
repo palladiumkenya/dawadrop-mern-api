@@ -8,9 +8,10 @@ const TimeSlot = require("../../deliveries/models/TimeSlot");
 const DeliveryMethod = require("../../deliveries/models/DeliveryMethod");
 const Mode = require("../../deliveries/models/Mode");
 const CourrierService = require("../../deliveries/models/CourrierService");
+const ARTDistributionEvent = require("../../art/models/ARTDistributionEvent");
 
-const DeliveryRequest = model(
-  "DeliveryRequest",
+const DeliveryServiceRequest = model(
+  "DeliveryServiceRequest",
   new Schema(
     {
       patient: {
@@ -36,8 +37,7 @@ const DeliveryRequest = model(
         }),
       },
       event: {
-        type: Schema.Types.ObjectId,
-        ref: "ARTDistributionEvent",
+        type: ARTDistributionEvent.schema,
       },
       updated: {
         type: Date,
@@ -79,6 +79,14 @@ const DeliveryRequest = model(
         maxlength: 14,
         minlength: 9,
       },
+      type: {
+        type: String,
+        required: true,
+        enum: {
+          values: ["self", "other"],
+          message: "Request type not supported.Must be self, other",
+        },
+      },
       orderedBy: {
         type: Schema.Types.ObjectId,
         ref: "User",
@@ -100,4 +108,4 @@ const DeliveryRequest = model(
   )
 );
 
-module.exports = DeliveryRequest;
+module.exports = DeliveryServiceRequest;

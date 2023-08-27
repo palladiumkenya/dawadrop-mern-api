@@ -2,7 +2,7 @@ const { Router } = require("express");
 const auth = require("../middleware/auth");
 const isValidPatient = require("../middleware/isValidPatient");
 const Patient = require("../patients/models/Patient");
-const DeliveryRequest = require("./models/DeliveryRequest");
+const DeliveryServiceRequest = require("./models/DeliveryServiceRequest");
 const { orderValidator } = require("./validators");
 const { getValidationErrrJson, isValidDate } = require("../utils/helpers");
 const { Schema, Types } = require("mongoose");
@@ -12,11 +12,11 @@ const { isEmpty } = require("lodash");
 const router = Router();
 
 router.get("/", [auth], async (req, res) => {
-  const orders = await DeliveryRequest.find();
+  const orders = await DeliveryServiceRequest.find();
   return res.json({ results: orders });
 });
 router.get("/pending", [auth], async (req, res) => {
-  const orders = await DeliveryRequest.aggregate([
+  const orders = await DeliveryServiceRequest.aggregate([
     {
       $lookup: {
         from: "deliveries",
@@ -118,12 +118,12 @@ router.get("/dispense", [auth], async (req, res) => {
     if (!Types.ObjectId.isValid(search))
       throw {
         status: 404,
-        message: "No DeliveryRequest or delivery found!",
+        message: "No DeliveryServiceRequest or delivery found!",
       };
 
     const delivery = await Delivery.findById(search);
     const orderId = (delivery ? delivery.order.toString() : null) || search;
-    const order = await DeliveryRequest.aggregate([
+    const order = await DeliveryServiceRequest.aggregate([
       {
         $match: {
           _id: new Types.ObjectId(orderId),
@@ -149,7 +149,7 @@ router.get("/dispense", [auth], async (req, res) => {
     if (isEmpty(order))
       throw {
         status: 404,
-        message: "No DeliveryRequest or delivery found!",
+        message: "No DeliveryServiceRequest or delivery found!",
       };
     return res.json(await order[0]);
   } catch (error) {
@@ -163,13 +163,13 @@ router.post("/dispense", [auth], async (req, res) => {
     if (!Types.ObjectId.isValid(payload.order))
       throw {
         status: 404,
-        message: "Invalid DeliveryRequest.couldn't depense!",
+        message: "Invalid DeliveryServiceRequest.couldn't depense!",
       };
-    const order = await DeliveryRequest.findById(payload.order);
+    const order = await DeliveryServiceRequest.findById(payload.order);
     if (!order)
       throw {
         status: 404,
-        message: "Invalid DeliveryRequest.couldn't depense!",
+        message: "Invalid DeliveryServiceRequest.couldn't depense!",
       };
     if (!isValidDate(payload.nextAppointmentDate))
       throw {
@@ -202,7 +202,7 @@ router.post("/", [auth], async (req, res) => {
         message: "Patient Not Found",
       };
     }
-    const order = new DeliveryRequest(valid);
+    const order = new DeliveryServiceRequest(valid);
     await order.save();
     return res.json(await order.populate("patient"));
   } catch (error) {
@@ -211,9 +211,9 @@ router.post("/", [auth], async (req, res) => {
   }
 });
 router.get("/:id", [auth, isValidPatient], async (req, res) => {
-  const order = await DeliveryRequest.findById(req.params.id);
+  const order = await DeliveryServiceRequest.findById(req.params.id);
   if (!order)
-    return res.status(404).json({ detail: "DeliveryRequest not found" });
+    return res.status(404).json({ detail: "DeliveryServiceRequest not found" });
   return res.json({ results: await order.populate("patient") });
 });
 

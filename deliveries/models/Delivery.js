@@ -1,7 +1,7 @@
 const { model, Schema, Types } = require("mongoose");
 const Address = require("../../orders/models/Address");
 const User = require("../../auth/models/User");
-const DeliveryRequest = require("../../orders/models/DeliveryRequest");
+const DeliveryServiceRequest = require("../../orders/models/DeliveryServiceRequest");
 const Patient = require("../../patients/models/Patient");
 
 const Delivery = model(
@@ -10,14 +10,14 @@ const Delivery = model(
     {
       order: {
         type: Schema.Types.ObjectId,
-        ref: "DeliveryRequest",
+        ref: "DeliveryServiceRequest",
         required: true,
         validate: {
-          message: "DeliveryRequest don't exist",
+          message: "DeliveryServiceRequest don't exist",
           validator: async function (v) {
             // Check if valid order
-            if (v && !(await DeliveryRequest.findById(v)))
-              throw new Error("DeliveryRequest doesn't Exist");
+            if (v && !(await DeliveryServiceRequest.findById(v)))
+              throw new Error("DeliveryServiceRequest doesn't Exist");
           },
         },
       },
@@ -72,7 +72,7 @@ const Delivery = model(
       },
       methods: {
         getRecepientUser: async function () {
-          const order = await DeliveryRequest.findById(this.order._id);
+          const order = await DeliveryServiceRequest.findById(this.order._id);
           const patient = await Patient.findOne({ _id: order.patient._id });
           const user = await User.findOne({ _id: patient.user._id });
           return user;

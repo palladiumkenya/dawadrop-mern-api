@@ -1,6 +1,6 @@
 const { model, Schema } = require("mongoose");
 const ARTDistributionEvent = require("./ARTDistributionEvent");
-const DeliveryRequest = require("../../orders/models/DeliveryRequest");
+const DeliveryServiceRequest = require("../../orders/models/DeliveryServiceRequest");
 
 const ARTDistributionEventFeedBack = model(
   "ARTDistributionEventFeedBack",
@@ -19,7 +19,7 @@ const ARTDistributionEventFeedBack = model(
     },
     deliveryRequest: {
       type: Schema.Types.ObjectId,
-      ref: "DeliveryRequest",
+      ref: "DeliveryServiceRequest",
     },
     note: {
       type: String,

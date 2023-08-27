@@ -11,7 +11,7 @@ const TimeSlot = require("./models/TimeSlot");
 const DeliveryMethod = require("./models/DeliveryMethod");
 const Delivery = require("./models/Delivery");
 const auth = require("./../middleware/auth");
-const DeliveryRequest = require("../orders/models/DeliveryRequest");
+const DeliveryServiceRequest = require("../orders/models/DeliveryServiceRequest");
 const { Types } = require("mongoose");
 const { merge } = require("lodash");
 const {
@@ -180,7 +180,7 @@ router.get("/history", [auth], async (req, res) => {
     [
       {
         path: "order",
-        model: "DeliveryRequest",
+        model: "DeliveryServiceRequest",
         select:
           "patient deliveryAddress deliveryTimeSlot deliveryMode phoneNumber",
       },
@@ -268,7 +268,7 @@ router.get("/:id", async (req, res) => {
     [
       {
         path: "order",
-        model: "DeliveryRequest",
+        model: "DeliveryServiceRequest",
         select:
           "patient deliveryAddress deliveryTimeSlot deliveryMode phoneNumber",
       },
