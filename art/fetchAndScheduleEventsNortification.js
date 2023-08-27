@@ -63,6 +63,14 @@ async function fetchAndScheduleEventsNortification() {
                 phoneNumber
               );
             }
+            // send nortification to extra subscribers
+            for (const subscriber of event.extraSubscribers) {
+              const { name, phoneNumber } = subscriber;
+              await sendSms(
+                `Dear ${name}, this message is to remind you of the forth comming event ${event.title} scheduled for ${event.distributionTime} at ${event.distributionLocation.address}`,
+                phoneNumber
+              );
+            }
           } catch (error) {
             console.error("Error sending notification:", error);
           }
