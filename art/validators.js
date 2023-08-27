@@ -37,8 +37,8 @@ const eventSchema = Joi.object({
     }),
   distributionTime: Joi.date().label("Distribution time").required(),
   distributionLocation: Joi.object({
-    latitude: Joi.number().required().label("Latitude"),
-    longitude: Joi.number().required().label("Longitude"),
+    latitude: Joi.number().label("Latitude"),
+    longitude: Joi.number().label("Longitude"),
     address: Joi.string().label("Address"),
   })
     .label("Distribution Location")

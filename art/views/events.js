@@ -101,15 +101,25 @@ const updateARTDistributionEvent = async (req, res) => {
         message: "ART Distribution Event not found",
       };
     const values = await eventsValidator(req.body);
-    const { group } = values;
+    const { group, distributionLocation } = values;
+    const { latitude, longitude, address } = distributionLocation;
+
     const _group = await ARTDistributionGroup.findById(group);
+    const errors = [];
     if (!_group)
+      errors.push({ path: ["group"], message: "Invalid ART Community group" });
+    if (!address && !(longitude && latitude))
+      errors.push({
+        path: ["distributionLocation"],
+        message: "Distribution venue is required",
+      });
+    if (errors.length > 0)
       throw {
-        details: [{ path: ["group"], message: "Invalid ART Community group" }],
+        details: errors,
       };
     event = merge(event, { ...values, group: _group });
     await event.save();
-    fetchAndScheduleEventsNortification()
+    fetchAndScheduleEventsNortification();
     return res.json(event);
   } catch (ex) {
     const { error: err, status } = getValidationErrrJson(ex);
@@ -119,15 +129,25 @@ const updateARTDistributionEvent = async (req, res) => {
 const createARTDistributionEvent = async (req, res) => {
   try {
     const values = await eventsValidator(req.body);
-    const { group } = values;
+    const { group, distributionLocation } = values;
+    const { latitude, longitude, address } = distributionLocation;
+
     const _group = await ARTDistributionGroup.findById(group);
+    const errors = [];
     if (!_group)
+      errors.push({ path: ["group"], message: "Invalid ART Community group" });
+    if (!address && !(longitude && latitude))
+      errors.push({
+        path: ["distributionLocation"],
+        message: "Distribution venue is required",
+      });
+    if (errors.length > 0)
       throw {
-        details: [{ path: ["group"], message: "Invalid ART Community group" }],
+        details: errors,
       };
     const event = new ARTDistributionEvent({ ...values, group: _group });
     await event.save();
-    fetchAndScheduleEventsNortification()
+    fetchAndScheduleEventsNortification();
     return res.json(event);
   } catch (ex) {
     const { error: err, status } = getValidationErrrJson(ex);
