@@ -156,19 +156,50 @@ const profile = async (req, res) => {
         },
       },
       {
-        $addFields: {
-          domantUser: {
-            $cond: {
-              if: {
-                $and: [
-                  { $eq: ["$patient", []] }, //user is not patient
-                  { $eq: ["$roles", []] }, //has no roles
-                  { $eq: ["$isSuperUser", false] }, //is not user
-                ],
-              },
-              then: true,
-              else: false,
-            },
+        $lookup: {
+          from: "treatmentsurports",
+          foreignField: "careGiver",
+          localField: "_id",
+          as: "receiverAsociation",
+        },
+      },
+      {
+        $lookup: {
+          from: "treatmentsurports",
+          foreignField: "careReceiver",
+          localField: "patient._id",
+          as: "giverAsociation",
+        },
+      },
+      {
+        $lookup: {
+          from: "patients",
+          foreignField: "_id",
+          localField: "receiverAsociation.careReceiver",
+          as: "careReceivers",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "giverAsociation.careGiver",
+          as: "careGivers",
+        },
+      },
+      {
+        $project: {
+          receiverAsociation: 0,
+          giverAsociation: 0,
+          password: 0,
+          __v: 0,
+          careGivers: {
+            password: 0,
+            roles: 0,
+            isActive: 0,
+            lastLogin: 0,
+            isSuperUser: 0,
+            __v: 0,
           },
         },
       },
