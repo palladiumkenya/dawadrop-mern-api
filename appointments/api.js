@@ -1,6 +1,16 @@
 const config = require("config");
 const moment = require("moment/moment");
 const { generateRandomNumberInRange } = require("../utils/helpers");
+import("node-fetch")
+  .then((fetchModule) => {
+    // You can use fetchModule here
+    const fetch = fetchModule.default; // Assuming 'node-fetch' exports a default object
+    // Rest of your code using fetch
+  })
+  .catch((error) => {
+    // Handle error if import fails
+    console.error('Error importing "node-fetch":', error);
+  });
 
 const getAppointment = async (ccNumber, appointmenId) => {
   return {

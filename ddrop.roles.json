@@ -1,34 +1,290 @@
 [{
   "_id": {
-    "$oid": "64abbc439e2b96e638fda8f6"
+    "$oid": "64a96c9e880e725f6dc6abf1"
   },
-  "name": "Dispensor",
-  "description": "Dispens medicin to patients",
+  "name": "Patients",
+  "description": "Description",
   "privileges": [
     {
-      "$oid": "64abb0fe49b9434e9f6c8308"
+      "$oid": "64a9490064e3db145d2976ec"
+    },
+    {
+      "$oid": "64a9492764e3db145d2976ef"
+    },
+    {
+      "$oid": "64b2c00206fc5c3b27e5f48b"
     }
   ],
-  "__v": 2,
+  "__v": 8,
   "menuOptions": [
     {
-      "$oid": "64b4e97fc9a227215ea75988"
+      "$oid": "64d8f22c032ad914b9e1254b"
     }
-  ]
+  ],
+  "assignAllPatients": true,
+  "assignAllProvidors": false,
+  "assignGroupLeads": false,
+  "assignGroupMembers": false,
+  "assignPickupCareGivers": false
 },
 {
   "_id": {
-    "$oid": "64abe0d2749bb8b412ddcf26"
+    "$oid": "64a96cd2880e725f6dc6abf6"
   },
-  "name": "Doctors",
-  "description": "Doctor  roles",
+  "name": "Super Adminstrator",
+  "description": "Super admin with all privileges",
   "privileges": [
     {
-      "$oid": "64abd4af50b6ebee9d5dff17"
+      "$oid": "64a9492764e3db145d2976ef"
     },
     {
-      "$oid": "64abde3aa750c7c16fb0322a"
+      "$oid": "64a9490064e3db145d2976ec"
     }
   ],
-  "__v": 12
+  "menuOptions": [
+    {
+      "$oid": "64b4e97fc9a227215ea75988"
+    },
+    {
+      "$oid": "64b4ea37c9a227215ea75993"
+    },
+    {
+      "$oid": "64b7701578b2c6d3997a222f"
+    },
+    {
+      "$oid": "64c3fe2057f9cd165fd722cc"
+    },
+    {
+      "$oid": "64e5cf5dd807fa0d9e613197"
+    },
+    {
+      "$oid": "64e6c58f3b7877e1a0ff26bc"
+    },
+    {
+      "$oid": "64e6c6423b7877e1a0ff26c1"
+    },
+    {
+      "$oid": "64e6c7123b7877e1a0ff26c6"
+    },
+    {
+      "$oid": "64d8f1cd032ad914b9e12546"
+    }
+  ],
+  "__v": 3,
+  "assignAllPatients": false,
+  "assignAllProvidors": false,
+  "assignGroupLeads": false,
+  "assignGroupMembers": false,
+  "assignPickupCareGivers": false
+},
+{
+  "_id": {
+    "$oid": "64a96d2d6971646546b0e926"
+  },
+  "name": "Delivery Agent",
+  "description": "Super admin with all privileges",
+  "privileges": [
+    {
+      "$oid": "64a9490064e3db145d2976ec"
+    },
+    {
+      "$oid": "64a9492764e3db145d2976ef"
+    }
+  ],
+  "menuOptions": [
+    {
+      "$oid": "64bcd0f5e8b243d73b59f1d5"
+    },
+    {
+      "$oid": "64c57592bab17de5f2e2c410"
+    },
+    {
+      "$oid": "64d8f22c032ad914b9e1254b"
+    }
+  ],
+  "__v": 4,
+  "assignAllPatients": false,
+  "assignAllProvidors": false
+},
+{
+  "_id": {
+    "$oid": "64b2aba7ad18028ee050fae2"
+  },
+  "name": "Dispensors",
+  "description": "Dispense ARV for delivery",
+  "privileges": [
+    {
+      "$oid": "64a9492764e3db145d2976ef"
+    },
+    {
+      "$oid": "64a9490064e3db145d2976ec"
+    }
+  ],
+  "__v": 3,
+  "menuOptions": [
+    {
+      "$oid": "64b7701578b2c6d3997a222f"
+    },
+    {
+      "$oid": "64b7514198a59970e5d992d1"
+    }
+  ],
+  "assignAllPatients": true,
+  "assignAllProvidors": false
+},
+{
+  "_id": {
+    "$oid": "64b3bd2a65e72e42ceb31fe2"
+  },
+  "name": "Guest User",
+  "description": "Some description here",
+  "privileges": [
+    {
+      "$oid": "64a9492764e3db145d2976ef"
+    },
+    {
+      "$oid": "64b2c00206fc5c3b27e5f48b"
+    },
+    {
+      "$oid": "64a9490064e3db145d2976ec"
+    }
+  ],
+  "menuOptions": [
+    {
+      "$oid": "64b2687e47a764cfb5321778"
+    },
+    {
+      "$oid": "64b268c147a764cfb532177f"
+    },
+    {
+      "$oid": "64b2692947a764cfb5321786"
+    },
+    {
+      "$oid": "64b2696947a764cfb532178d"
+    },
+    {
+      "$oid": "64b26bb85e5c03c9fa53e637"
+    },
+    {
+      "$oid": "64b26e9e5de2bd9d8f2a20fe"
+    },
+    {
+      "$oid": "64b26eb65de2bd9d8f2a2105"
+    },
+    {
+      "$oid": "64b3a18249ae6279865d120b"
+    }
+  ],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64b7e03dbfb0b7a1a5b48b4d"
+  },
+  "name": "Test",
+  "description": "Test",
+  "privileges": [
+    {
+      "$oid": "64a9492764e3db145d2976ef"
+    },
+    {
+      "$oid": "64a9490064e3db145d2976ec"
+    }
+  ],
+  "menuOptions": [
+    {
+      "$oid": "64b7701578b2c6d3997a222f"
+    },
+    {
+      "$oid": "64b7514198a59970e5d992d1"
+    }
+  ],
+  "__v": 0,
+  "assignAllPatients": false,
+  "assignAllProvidors": false
+},
+{
+  "_id": {
+    "$oid": "64ba82d6d83f87f48ee0fb8a"
+  },
+  "name": "Auditors",
+  "description": "Auditor users",
+  "privileges": [
+    {
+      "$oid": "64b2c00206fc5c3b27e5f48b"
+    }
+  ],
+  "menuOptions": [
+    {
+      "$oid": "64b7701578b2c6d3997a222f"
+    }
+  ],
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64e1c808525823c89a15452e"
+  },
+  "name": "Doctors",
+  "description": "Dispens medicin to patients",
+  "privileges": [],
+  "menuOptions": [],
+  "assignAllPatients": false,
+  "assignAllProvidors": false,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64e1c833525823c89a154534"
+  },
+  "name": "Doctors1",
+  "description": "Dispens medicin to patients",
+  "privileges": [],
+  "menuOptions": [],
+  "assignAllPatients": false,
+  "assignAllProvidors": false,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64ead34a86c6498dfa7155e6"
+  },
+  "name": "Art Distribution Group leads",
+  "description": "Group leads",
+  "privileges": [],
+  "menuOptions": [
+    {
+      "$oid": "64e6c6423b7877e1a0ff26c1"
+    },
+    {
+      "$oid": "64e6c7123b7877e1a0ff26c6"
+    }
+  ],
+  "assignAllPatients": false,
+  "assignAllProvidors": false,
+  "assignPickupCareGivers": false,
+  "assignGroupLeads": true,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64eb7a01cae2e18a24b1821f"
+  },
+  "name": "Group patients",
+  "description": "Users enrolled in group",
+  "privileges": [],
+  "menuOptions": [
+    {
+      "$oid": "64e6c6423b7877e1a0ff26c1"
+    },
+    {
+      "$oid": "64e6c7123b7877e1a0ff26c6"
+    }
+  ],
+  "assignAllPatients": false,
+  "assignAllProvidors": false,
+  "assignPickupCareGivers": false,
+  "assignGroupLeads": false,
+  "assignGroupMembers": true,
+  "__v": 2
 }]

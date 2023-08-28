@@ -1,0 +1,123 @@
+[{
+  "_id": {
+    "$oid": "64e8d75b51ddd01d77afa291"
+  },
+  "cccNumber": "1234500001",
+  "upiNumber": "MOH1223232332",
+  "nationalId": 7643521,
+  "firstName": "BETTY",
+  "lastName": "Mary",
+  "surName": "Edward",
+  "phoneNumber": "0900789067",
+  "primaryClinic": 12345,
+  "artModel": {
+    "name": "Community ART Distribution Group (Peer led)",
+    "description": "Community group lead by peer",
+    "modelCode": "community_art_peer",
+    "_id": {
+      "$oid": "64e8d4cf2e77a51f810f1211"
+    },
+    "__v": 0
+  },
+  "stable": true,
+  "__v": 0,
+  "user": {
+    "$oid": "64ac519e76f01bd0422dee73"
+  }
+},
+{
+  "_id": {
+    "$oid": "64ec5c417f92e181b0b46ed6"
+  },
+  "cccNumber": "1234500068",
+  "upiNumber": null,
+  "nationalId": 2756901,
+  "firstName": "Janet",
+  "lastName": "Howard",
+  "surName": "Jason",
+  "phoneNumber": "0793889658",
+  "primaryClinic": 12345,
+  "artModel": {
+    "name": "Fast Track",
+    "description": "Fast track",
+    "modelCode": "fast_track",
+    "_id": {
+      "$oid": "64e8d4892e77a51f810f120c"
+    },
+    "__v": 0
+  },
+  "stable": true,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64ec5cd27f92e181b0b46ee7"
+  },
+  "cccNumber": "1234500002",
+  "upiNumber": "MOH1223232332",
+  "nationalId": 7643523,
+  "firstName": "Joseph",
+  "lastName": "Oguri",
+  "surName": "Edward",
+  "phoneNumber": "0900789067",
+  "primaryClinic": 12345,
+  "artModel": {
+    "name": "Community ART Distribution Group (HCW led)",
+    "description": "Lead by health care worker",
+    "modelCode": "community_art_hcw",
+    "_id": {
+      "$oid": "64e8d50c2e77a51f810f1216"
+    },
+    "__v": 0
+  },
+  "stable": true,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64ec5d1a7f92e181b0b46f0a"
+  },
+  "cccNumber": "1234500003",
+  "upiNumber": "MOH1223232332",
+  "nationalId": 7643524,
+  "firstName": "Jeff",
+  "lastName": "Odhis",
+  "surName": "Edward",
+  "phoneNumber": "0900789067",
+  "primaryClinic": 12345,
+  "artModel": {
+    "name": "Facility ART Distribution group(HCW led)",
+    "description": "HCW led",
+    "modelCode": "facility_art_hcw",
+    "_id": {
+      "$oid": "64e8d5be2e77a51f810f1238"
+    },
+    "__v": 0
+  },
+  "stable": true,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64ec5d997f92e181b0b46f23"
+  },
+  "cccNumber": "1234500004",
+  "upiNumber": "MOH1223232332",
+  "nationalId": 7643525,
+  "firstName": "Risper",
+  "lastName": "Wanja",
+  "surName": "Edward",
+  "phoneNumber": "0900789067",
+  "primaryClinic": 12345,
+  "artModel": {
+    "name": "Fast Track",
+    "description": "Fast track",
+    "modelCode": "fast_track",
+    "_id": {
+      "$oid": "64e8d4892e77a51f810f120c"
+    },
+    "__v": 0
+  },
+  "stable": true,
+  "__v": 0
+}]

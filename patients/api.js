@@ -4,6 +4,16 @@ const config = require("config");
 const https = require("https");
 const path = require("path");
 const fs = require("fs");
+import("node-fetch")
+  .then((fetchModule) => {
+    // You can use fetchModule here
+    const fetch = fetchModule.default; // Assuming 'node-fetch' exports a default object
+    // Rest of your code using fetch
+  })
+  .catch((error) => {
+    // Handle error if import fails
+    console.error('Error importing "node-fetch":', error);
+  });
 
 const searchPatient = async (upi) => {
   try {

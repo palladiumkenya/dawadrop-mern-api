@@ -46,7 +46,6 @@ const getAllMyCareReceiversUpcomingAppointments = async (req, res) => {
     const support = await TreatmentSurport.find({
       careGiver: req.user._id,
     });
-    console.log(support);
     const patients = await Patient.find({
       _id: { $in: support.map((s) => s.careReceiver) },
     });
