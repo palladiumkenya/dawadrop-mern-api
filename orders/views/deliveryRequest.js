@@ -14,6 +14,7 @@ const Patient = require("../../patients/models/Patient");
 const TreatmentSurport = require("../../patients/models/TreatmentSurport");
 const ARTDistributionGroupEnrollment = require("../../art/models/ARTDistributionGroupEnrollment");
 const ARTDistributionGroup = require("../../art/models/ARTDistributionGroup");
+const ARTDistributionEventFeedBack = require("../../art/models/ARTDistributionEventFeedBack");
 
 const getDeliveryServiceRequest = async (req, res) => {
   const requests = await ARTDistributionModel.find();
@@ -200,12 +201,32 @@ const createDeliveryServiceRequest = async (req, res) => {
       }),
     });
     await request.save();
+    if (_event) {
+      // get or create feedback
+      let feedBack = await ARTDistributionEventFeedBack.findOne({
+        event,
+        user: req.user._id,
+      });
+      if (feedBack) {
+        feedBack.confirmedAttendance = false;
+        feedBack.deliveryRequest = request._id;
+        await feedBack.save();
+      } else {
+        feedBack = await ARTDistributionEventFeedBack({
+          event,
+          user: req.user._id,
+          deliveryRequest: request._id,
+        });
+        await feedBack.save();
+      }
+    }
     return res.json(request);
   } catch (ex) {
     const { error: err, status } = getValidationErrrJson(ex);
     return res.status(status).json(err);
   }
 };
+
 
 module.exports = {
   getDeliveryServiceRequestDetail,

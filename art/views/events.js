@@ -6,6 +6,8 @@ const ARTDistributionEvent = require("../models/ARTDistributionEvent");
 const ARTDistributionGroupLead = require("../models/ARTDistributionGroupLead");
 const ARTDistributionGroup = require("../models/ARTDistributionGroup");
 const fetchAndScheduleEventsNortification = require("../fetchAndScheduleEventsNortification");
+const ARTDistributionGroupEnrollment = require("../models/ARTDistributionGroupEnrollment");
+const ARTDistributionEventFeedBack = require("../models/ARTDistributionEventFeedBack");
 
 const getARTDistributionEvents = async (req, res) => {
   const user = req.user._id;
@@ -163,9 +165,59 @@ const createARTDistributionEvent = async (req, res) => {
   }
 };
 
+const confirmEventAttendance = async (req, res) => {
+  const eventId = req.params.id;
+  try {
+    if (!Types.ObjectId.isValid(eventId))
+      throw {
+        status: 404,
+        message: "ART Distribution Event not found",
+      };
+    let event = await ARTDistributionEvent.findById(eventId);
+    if (!event)
+      throw {
+        status: 404,
+        message: "ART Distribution Event not found",
+      };
+    const enrolment = await ARTDistributionGroupEnrollment.findOne({
+      group: event.group,
+      user: req.user._id,
+      isCurrent: true,
+    });
+    if (!enrolment)
+      throw {
+        status: 403,
+        message: "Fobbiddden.You are not actively subscribed to that event",
+      };
+
+    // get or create feedback
+    let feedBack = await ARTDistributionEventFeedBack.findOne({
+      event: eventId,
+      user: req.user._id,
+    });
+    if (feedBack) {
+      feedBack.confirmedAttendance = true;
+      delete feedBack.deliveryRequest;
+      await feedBack.save();
+    } else {
+      feedBack = await ARTDistributionEventFeedBack({
+        event,
+        user: req.user._id,
+        confirmEventAttendance: true,
+      });
+      await feedBack.save();
+    }
+    return res.json({ detail: "Confirmed successfull!" });
+  } catch (ex) {
+    const { error: err, status } = getValidationErrrJson(ex);
+    return res.status(status).json(err);
+  }
+};
+
 module.exports = {
   getARTDistributionEventDetail,
   getARTDistributionEvents,
   updateARTDistributionEvent,
   createARTDistributionEvent,
+  confirmEventAttendance,
 };

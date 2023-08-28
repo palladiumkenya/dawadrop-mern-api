@@ -17,6 +17,7 @@ const {
   createARTDistributionEvent,
   updateARTDistributionEvent,
   getARTDistributionEventDetail,
+  confirmEventAttendance,
 } = require("./views/events");
 const {
   getARTDistributionGroups,
@@ -43,6 +44,11 @@ router.get("/distribution-events", [auth], getARTDistributionEvents);
 router.post("/distribution-events", [auth], createARTDistributionEvent);
 router.get("/distribution-events/:id", [auth], getARTDistributionEventDetail);
 router.put("/distribution-events/:id", [auth], updateARTDistributionEvent);
+router.get(
+  "/distribution-events/:id/confirm-attendance",
+  [auth],
+  confirmEventAttendance
+);
 
 router.get("/distribution-groups", [auth], getARTDistributionGroups);
 router.get("/distribution-groups/:id", [auth], getARTDistributionGruopDetail);
