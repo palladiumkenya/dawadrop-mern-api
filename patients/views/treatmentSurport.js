@@ -14,45 +14,45 @@ const { pick, merge } = require("lodash");
 const validateAsociation = async (body, update) => {
   const value = await treatmentSurportValidator(body);
   const { careGiver, careReceiver } = value;
-  if (careGiver && careReceiver && careGiver === careReceiver)
-    throw {
-      status: 403,
-      message:
-        "Invalid Operation.Care giver must not be same with carereceiver",
-    };
-  if (
-    careGiver &&
-    (!Types.ObjectId.isValid(careGiver) || !(await User.findById(careGiver)))
-  )
-    throw {
-      details: [{ path: ["careGiver"], message: "Invalid Care giver" }],
-    };
-  if (
-    careReceiver &&
-    (!Types.ObjectId.isValid(careReceiver) ||
-      !(await Patient.findById(careReceiver)))
-  )
-    throw {
-      details: [{ path: ["careReceiver"], message: "Invalid Care receiver" }],
-    };
-  if (!update && careGiver && careReceiver) {
+
+  if (!update) {
     if (await TreatmentSurport.findOne({ careGiver, careReceiver }))
       throw {
         status: 403,
         message: "Invalid Operation.Relationship already exist",
       };
   }
-  if (
-    careGiver &&
-    careReceiver &&
-    (await Patient.findOne({ _id: careReceiver })).user.equals(careGiver)
-  )
+
+  const errors = [];
+  if (careGiver === careReceiver) {
+    errors.push({
+      path: ["careGiver"],
+      message: "Care giver must not be same with carereceiver",
+    });
+    errors.push({
+      path: ["careReceiver"],
+      message: "Care receiver must not be same with care giver",
+    });
+  }
+  const _careGiver = await User.findById(careGiver);
+  const _careReceiver = await Patient.findById(careReceiver);
+  if (!_careGiver)
+    errors.push({ path: ["careGiver"], message: "Invalid Care giver" });
+  if (!_careReceiver)
+    errors.push({ path: ["careReceiver"], message: "Invalid Care receiver" });
+
+  if (errors.length > 0)
+    throw {
+      details: errors,
+    };
+  if (_careReceiver.user?.equals(careGiver))
     throw {
       status: 403,
       message: "Invalid Operation.Cant care give yourself",
     };
   return value;
 };
+
 const createAssociation = async (req, res) => {
   try {
     const value = await validateAsociation(req.body);
@@ -77,6 +77,7 @@ const updateAssociation = async (req, res) => {
   }
 };
 
+// Deprecated
 const addCareGiver = async (req, res) => {
   // for patients
   try {
@@ -94,6 +95,7 @@ const addCareGiver = async (req, res) => {
     return res.status(status).json(err);
   }
 };
+// deprecated
 const updateCareGiver = async (req, res) => {
   // for patients
   try {
@@ -120,6 +122,7 @@ const updateCareGiver = async (req, res) => {
     return res.status(status).json(err);
   }
 };
+// deprecated
 const addCareReceiver = async (req, res) => {
   try {
     const value = await validateAsociation({
@@ -134,6 +137,7 @@ const addCareReceiver = async (req, res) => {
     return res.status(status).json(err);
   }
 };
+// deprecated
 const updateCareReceiver = async (req, res) => {
   try {
     if (
@@ -296,6 +300,7 @@ const getAssociationDetail = async (req, res) => {
   }
 };
 
+// Deprecated
 const acceptAssociation = async (req, res) => {
   try {
     const id = req.params.id;

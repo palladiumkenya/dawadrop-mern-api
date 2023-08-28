@@ -5,11 +5,9 @@ const Address = model(
   new Schema({
     latitude: {
       type: Number,
-      default: null,
     },
     longitude: {
       type: Number,
-      default: null,
     },
     address: {
       type: String,

@@ -6,10 +6,12 @@ const TreatmentSurport = model(
     careGiver: {
       type: Schema.Types.ObjectId,
       ref: "User",
+      required: true,
     },
     careReceiver: {
       type: Schema.Types.ObjectId,
       ref: "Patient",
+      required: true,
     },
     canPickUpDrugs: {
       type: Boolean,

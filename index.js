@@ -19,7 +19,7 @@ console.log(`[-]App name: ${config.get("name")}`);
 console.log(`[-]Database: ${config.get("db")}`);
 const moment = require("moment/moment");
 const fetchAndScheduleEventsNortification = require("./art/fetchAndScheduleEventsNortification");
-
+var cors = require("cors");
 mongoose
   .connect(config.get("db"))
   .then((result) => {
@@ -32,7 +32,7 @@ mongoose
 const app = express();
 const httpServer = createServer(app);
 createSocketServer(httpServer);
-
+app.use(cors());
 app.use(express.json());
 app.use(express.static(`${BASE_DIR}/${MEDIA_ROOT}`));
 if (app.get("env") === "development") {
