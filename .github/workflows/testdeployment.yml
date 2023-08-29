@@ -1,0 +1,38 @@
+name: Efficient Test Instance Deployment
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    name: Deploy to Test Instance
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Remote Connection Setup
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.CICD_SECRET }}
+        port: ${{ secrets.PORT }}
+        script: |
+          # Set up deployment directory
+          deploy_dir="/apps/githubworkflows/mhealth/dawadrop-mern-api"
+          sudo rm -rf "$deploy_dir"
+          sudo mkdir "$deploy_dir"
+          sudo chown -R cicd:cicd "$deploy_dir"
+          
+          # Clone repository
+          git config --global --add safe.directory "$deploy_dir"
+          git clone -b main https://github.com/palladiumkenya/dawadrop-mern-api "$deploy_dir"
+          
+          # Copy configuration files
+          cp /apps/dockerApps/dawadrop-mern-api/.env "$deploy_dir/"
+          
+          # Build and run Docker container
+          docker stop dawadrop || true
+          docker rm dawadrop || true
+          docker build -t dawadrop:latest "$deploy_dir"
+          docker run -p 3700:5000 --name dawadrop -d --restart always dawadrop:latest
