@@ -1,5 +1,14 @@
 [{
   "_id": {
+    "$oid": "64e4338bb4b98b8a7915fadf"
+  },
+  "label": "Test",
+  "image": "/menu-icons/1692677003649-ontransit.png",
+  "link": "Test",
+  "__v": 0
+},
+{
+  "_id": {
     "$oid": "64b4cc98c9a227215ea757cd"
   },
   "label": "Manage Privileges",
@@ -52,7 +61,7 @@
   "_id": {
     "$oid": "64b74f6d98a59970e5d99284"
   },
-  "label": "Orders",
+  "label": "Request Delivery",
   "description": "Orders",
   "image": "/menu-icons/1689735021332-2834c660-7a56-4272-a5a9-d119ac938c73.png",
   "link": "PatientOrders",
@@ -151,7 +160,7 @@
   "_id": {
     "$oid": "64d8f22c032ad914b9e1254b"
   },
-  "label": "Care Givers/Receivers",
+  "label": "Treatment Support",
   "description": "Manages care receiver in treatment surport",
   "image": "/menu-icons/1691939372725-df8db43a-7d66-4cd8-a912-286e260b1c17.png",
   "link": "CareGiversAndReceivers",
@@ -165,5 +174,44 @@
   "description": "Patients manage there care givers",
   "image": "/menu-icons/1691939435731-b0d58ced-2708-4854-97e1-654d2323bb70.png",
   "link": "OrderForAnother",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64e5cf5dd807fa0d9e613197"
+  },
+  "label": "Manage ART Models",
+  "image": "/menu-icons/1692782429622-niche.png",
+  "link": "ARTModels",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64e6c58f3b7877e1a0ff26bc"
+  },
+  "label": "Manage ART Group Leads",
+  "description": "Art group leads",
+  "image": "/menu-icons/1692845455407-a03841b1-bc7c-46bd-8396-210cb0c2691b.png",
+  "link": "ARTGroupLeads",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64e6c6423b7877e1a0ff26c1"
+  },
+  "label": "Distribution Groups",
+  "description": "Distribution Group",
+  "image": "/menu-icons/1692845634927-d07fc674-9935-4b6d-9d76-5b481186917c.png",
+  "link": "ARTDistributionGroups",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64e6c7123b7877e1a0ff26c6"
+  },
+  "label": "Distribution Events",
+  "description": "Distribution Event",
+  "image": "/menu-icons/1692845842807-8ee864ef-b8d7-4920-9173-f5cffc3acd62.png",
+  "link": "ARTDistributionEvents",
   "__v": 0
 }]

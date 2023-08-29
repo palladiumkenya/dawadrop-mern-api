@@ -1,0 +1,96 @@
+[{
+  "_id": {
+    "$oid": "64ac519e76f01bd0422dee73"
+  },
+  "username": "omosh",
+  "email": "lawiomosh@gmail.com",
+  "phoneNumber": "0793889658",
+  "password": "$2b$10$qFPId2gvWAKIRm30i50Q3OvhPWeo.pLxa1R1rLl0pPSVBBDCjcdVm",
+  "isActive": true,
+  "roles": [],
+  "isSuperUser": false,
+  "lastLogin": {
+    "$date": "2023-07-10T18:44:46.693Z"
+  },
+  "__v": 1,
+  "firstName": "Laurent",
+  "image": "/uploads/1689346098761-9d7d6e28-f0fb-453f-9c88-533dd991ddb1.jpeg",
+  "lastName": "Ouma"
+},
+{
+  "_id": {
+    "$oid": "64ae925153896e0eb8e46dc4"
+  },
+  "username": "patient",
+  "email": "physhamern1@gmail.com",
+  "phoneNumber": "0718222605",
+  "password": "$2b$10$Yt80ooE1lhBzWneKH7T8gu.J5DFmxP32aC2mNqZ0.6.lDW5Ma9RVa",
+  "isActive": true,
+  "roles": [],
+  "isSuperUser": false,
+  "lastLogin": {
+    "$date": "2023-07-12T11:45:21.570Z"
+  },
+  "__v": 0,
+  "firstName": "Patient",
+  "image": "/uploads/1689319001233-a84fef86-8a8a-44c8-8f83-cd303231e77c.jpeg",
+  "lastName": "Ree"
+},
+{
+  "_id": {
+    "$oid": "64b2569e7b6480a7fb6b7cd3"
+  },
+  "username": "agent",
+  "email": "omoshlawi3@gmail.com",
+  "phoneNumber": "0748155432",
+  "password": "$2b$10$v0K1vBKl1OXb/CaA0M4UfeXlAbaJACv83Up9/hn2j/RqRxTkxXrOO",
+  "isActive": true,
+  "roles": [],
+  "isSuperUser": false,
+  "lastLogin": {
+    "$date": "2023-07-15T08:19:42.694Z"
+  },
+  "__v": 8,
+  "firstName": "Joseph",
+  "image": "/uploads/1689409227115-ed43f270-ab30-415d-959b-7e2b631766a7.jpeg",
+  "lastName": "Sifuna"
+},
+{
+  "_id": {
+    "$oid": "64bf7d1919e0b28cb96537bf"
+  },
+  "username": "test",
+  "email": "test@gmail.com",
+  "phoneNumber": "0729207390",
+  "password": "$2b$10$ibPEfDMP.jjpIY.VCrikguBsJ0I3zamDIy6VmNTIB90hmYK5GZYfC",
+  "isActive": true,
+  "roles": [],
+  "isSuperUser": true,
+  "lastLogin": {
+    "$date": "2023-07-25T07:43:21.993Z"
+  },
+  "__v": 0,
+  "firstName": "Joan",
+  "image": "/uploads/1693208542637-8ef616cf-25e7-4e4b-b132-247462255a7e.jpeg",
+  "lastName": "User"
+},
+{
+  "_id": {
+    "$oid": "64ec51657f92e181b0b46cec"
+  },
+  "username": "sudo",
+  "email": "sudo@gmail.com",
+  "phoneNumber": "0793889652",
+  "password": "$2b$10$r0CjkG0QOOwsMX7IJtqV9ewsKd47ybEZ5/SOqkdeyqPKs837rWiby",
+  "isActive": true,
+  "roles": [
+    {
+      "$oid": "64a96cd2880e725f6dc6abf6"
+    }
+  ],
+  "isSuperUser": false,
+  "lastLogin": {
+    "$date": "2023-08-28T07:48:53.320Z"
+  },
+  "__v": 1
+}]

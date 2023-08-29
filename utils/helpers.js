@@ -133,11 +133,7 @@ const constructFilter = (
   };
 };
 
-const constructSearch = (
-  searchValue,
-  searchFields = [],
-  skipParse = [],
-) => {
+const constructSearch = (searchValue, searchFields = [], skipParse = []) => {
   const query = searchFields.reduce(
     (accumulated, current) => ({
       ...accumulated,
@@ -174,6 +170,20 @@ function parseQueryValues(query, skip = []) {
   return parsedQuery;
 }
 
+function generateRandomNumberInRange(min, max) {
+  if (min >= max) {
+    throw new Error("Invalid range: Minimum must be less than maximum.");
+  }
+
+  const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+  return randomNumber;
+}
+
+function generateRandomNumber() {
+  const randomNumber = Math.floor(Math.random() * 9000000000) + 1000000000;
+  return randomNumber.toString();
+}
+
 const cleanFalsyAttributes = (obj) => {
   return _.pickBy(obj, (value) => !!value || value === false);
 };
@@ -189,3 +199,5 @@ module.exports.constructFilter = constructFilter;
 module.exports.constructSearch = constructSearch;
 module.exports.cleanFalsyAttributes = cleanFalsyAttributes;
 module.exports.getUpdateFileAsync = getUpdateFileAsync;
+module.exports.generateRandomNumberInRange = generateRandomNumberInRange;
+module.exports.generateRandomNumber = generateRandomNumber;

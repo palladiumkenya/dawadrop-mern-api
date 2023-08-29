@@ -2,20 +2,42 @@ const dotenv = require("dotenv");
 dotenv.config();
 const config = require("config");
 const https = require("https");
+const path = require("path");
+const fs = require("fs");
+import("node-fetch")
+  .then((fetchModule) => {
+    // You can use fetchModule here
+    const fetch = fetchModule.default; // Assuming 'node-fetch' exports a default object
+    // Rest of your code using fetch
+  })
+  .catch((error) => {
+    // Handle error if import fails
+    console.error('Error importing "node-fetch":', error);
+  });
 
 const searchPatient = async (upi) => {
-  const response = await fetch(
-    `${config.get("ushauri")}mohupi/search_ccc?client_id=${upi}`,
-    {
-      method: "GET",
-    }
-  );
-  if (response.status === 200) {
-    const data = await response.json();
-    if (data.success) {
-      return data.message;
-    }
+  try {
+    const filePath = path.join(__dirname, "./patients.json");
+    const jsonData = await fs.promises.readFile(filePath, "utf8");
+    const transformedData = JSON.parse(jsonData);
+    return transformedData
+      .map(({ message }) => message)
+      .find(({ clinic_number }) => clinic_number === upi);
+  } catch (error) {
+    console.error("Error fetching Reports fact ART:", error);
   }
+  // const response = await fetch(
+  //   `${config.get("ushauri")}mohupi/search_ccc?client_id=${upi}`,
+  //   {
+  //     method: "GET",
+  //   }
+  // );
+  // if (response.status === 200) {
+  //   const data = await response.json();
+  //   if (data.success) {
+  //     return data.message;
+  //   }
+  // }
   return null;
 };
 

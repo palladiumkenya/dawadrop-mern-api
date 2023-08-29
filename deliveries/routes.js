@@ -11,9 +11,15 @@ const TimeSlot = require("./models/TimeSlot");
 const DeliveryMethod = require("./models/DeliveryMethod");
 const Delivery = require("./models/Delivery");
 const auth = require("./../middleware/auth");
-const Order = require("../orders/models/Order");
+const DeliveryServiceRequest = require("../orders/models/DeliveryServiceRequest");
 const { Types } = require("mongoose");
 const { merge } = require("lodash");
+const {
+  getCourrierServices,
+  createCourrierServices,
+  updateCourrierServices,
+  getCourrierServicesDetail,
+} = require("./views/courrier");
 
 const router = Router();
 
@@ -174,7 +180,7 @@ router.get("/history", [auth], async (req, res) => {
     [
       {
         path: "order",
-        model: "Order",
+        model: "DeliveryServiceRequest",
         select:
           "patient deliveryAddress deliveryTimeSlot deliveryMode phoneNumber",
       },
@@ -249,6 +255,12 @@ router.post("/:id/:action", async (req, res) => {
     return res.status(status).json(err);
   }
 });
+
+router.get("/courrier-services", getCourrierServices);
+router.post("/courrier-services", createCourrierServices);
+router.put("/courrier-services/:id", updateCourrierServices);
+router.get("/courrier-services/:id", getCourrierServicesDetail);
+
 router.get("/:id", async (req, res) => {
   const delivery = await Delivery.findById(req.params.id).populate(
     // "dispencedBy",
@@ -256,7 +268,7 @@ router.get("/:id", async (req, res) => {
     [
       {
         path: "order",
-        model: "Order",
+        model: "DeliveryServiceRequest",
         select:
           "patient deliveryAddress deliveryTimeSlot deliveryMode phoneNumber",
       },
@@ -277,4 +289,5 @@ router.get("/:id", async (req, res) => {
   }
   return res.json(delivery);
 });
+
 module.exports = router;

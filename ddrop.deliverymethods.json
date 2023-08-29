@@ -1,0 +1,18 @@
+[{
+  "_id": {
+    "$oid": "64c3ff5122952f4c3322e4db"
+  },
+  "name": "Through Treatement Surporters",
+  "description": "Treatment support budding ",
+  "blockOnTimeSlotFull": true,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64c3ff9722952f4c3322e4e0"
+  },
+  "name": "Through Courrier service",
+  "description": "Courrier service",
+  "blockOnTimeSlotFull": false,
+  "__v": 0
+}]

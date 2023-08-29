@@ -35,10 +35,21 @@ const privilegeActions = {
   update: actions[11],
   all: actions.filter((value, index) => index >= 8 && index <= 11),
 };
+
+const ORDER_MODELS = [
+  "fast_track",
+  "community_art_peer",
+  "community_art_hcw",
+  "facility_art_peer",
+  "facility_art_hcw",
+  "treatment_supporter",
+];
 const BASE_DIR = process.cwd();
 const MEDIA_ROOT = `media/`;
 const PROFILE_MEDIA = `uploads/`;
 const MENU_MEDIA = `menu-icons/`;
+
+const ALLOWED_ORDER_PERIOD = ""
 exports.surpotedPermisionAction = actions;
 exports.patientActions = patientActions;
 exports.roleActions = roleActions;
@@ -47,3 +58,4 @@ exports.BASE_DIR = BASE_DIR;
 exports.MEDIA_ROOT = MEDIA_ROOT;
 exports.PROFILE_MEDIA = PROFILE_MEDIA;
 exports.MENU_MEDIA = MENU_MEDIA;
+exports.ORDER_MODELS = ORDER_MODELS;

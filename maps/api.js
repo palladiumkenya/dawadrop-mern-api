@@ -1,6 +1,15 @@
-// const dotenv = require("dotenv");
-
-// dotenv.config();
+const dotenv = require("dotenv");
+dotenv.config();
+import("node-fetch")
+  .then((fetchModule) => {
+    // You can use fetchModule here
+    const fetch = fetchModule.default; // Assuming 'node-fetch' exports a default object
+    // Rest of your code using fetch
+  })
+  .catch((error) => {
+    // Handle error if import fails
+    console.error('Error importing "node-fetch":', error);
+  });
 
 const config = require("config");
 const { pick } = require("lodash");

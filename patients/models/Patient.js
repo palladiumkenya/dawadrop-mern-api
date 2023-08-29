@@ -1,4 +1,6 @@
 const { model, Schema } = require("mongoose");
+const ARTDistributionModel = require("../../art/models/ARTDistributionModel");
+
 const Patient = model(
   "Patient",
   new Schema(
@@ -44,6 +46,13 @@ const Patient = model(
       primaryClinic: {
         type: Number,
       },
+      artModel: {
+        type: ARTDistributionModel.schema,
+      },
+      stable: {
+        type: Boolean,
+        default: false,
+      },
     },
     {
       statics: {
@@ -57,8 +66,15 @@ const Patient = model(
             national_id: nationalId,
             upi_no: upiNumber,
             mfl_code: primaryClinic,
+            stable,
+            dispensing_model,
           } = remotePatient;
           let patient = await this.findOne({ cccNumber });
+          const _model = await ARTDistributionModel.findOne({
+            modelCode: dispensing_model,
+          });
+          if (!_model)
+            throw new Error("Dispensing model not surpotered in dawa drop");
           if (!patient) {
             patient = new this({
               cccNumber,
@@ -69,6 +85,8 @@ const Patient = model(
               nationalId,
               upiNumber,
               primaryClinic,
+              stable,
+              artModel: _model,
             });
             await patient.save();
           }

@@ -11,17 +11,25 @@ const timeSlotSchema = Joi.object({
   capacity: Joi.number().required().label("Capacity"),
   label: Joi.string().required().label("Label"),
 });
+const serviceSchema = Joi.object({
+  name: Joi.string().required().label("Curriour Service name"),
+});
 const deliveryMethodSchema = Joi.object({
   name: Joi.string().required().label("Name"),
   description: Joi.string().label("Description"),
   blockOnTimeSlotFull: Joi.bool().label("Block when slot is full"),
 });
 const deliverySchema = Joi.object({
-  order: Joi.string().required().label("Order").hex().length(24).messages({
-    "string.base": "{{#label}} invalid",
-    "string.hex": "{{#label}} invalid",
-    "string.length": "{{#label}} invalid",
-  }),
+  order: Joi.string()
+    .required()
+    .label("DeliveryServiceRequest")
+    .hex()
+    .length(24)
+    .messages({
+      "string.base": "{{#label}} invalid",
+      "string.hex": "{{#label}} invalid",
+      "string.length": "{{#label}} invalid",
+    }),
   location: Joi.object({
     latitude: Joi.number().required(),
     longitude: Joi.number().required(),
@@ -70,6 +78,11 @@ exports.agentDeliveryValidator = async (data) => {
 };
 exports.deliveryValidator = async (data) => {
   return deliverySchema.validateAsync(cleanFalsyAttributes(data), {
+    abortEarly: false,
+  });
+};
+exports.courrierServicesValidator = async (data) => {
+  return serviceSchema.validateAsync(cleanFalsyAttributes(data), {
     abortEarly: false,
   });
 };

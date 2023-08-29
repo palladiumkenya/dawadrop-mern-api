@@ -2,21 +2,26 @@ const { Router } = require("express");
 const auth = require("../middleware/auth");
 const isValidPatient = require("../middleware/isValidPatient");
 const Patient = require("../patients/models/Patient");
-const Order = require("./models/Order");
+const DeliveryServiceRequest = require("./models/DeliveryServiceRequest");
 const { orderValidator } = require("./validators");
 const { getValidationErrrJson, isValidDate } = require("../utils/helpers");
 const { Schema, Types } = require("mongoose");
 const Delivery = require("../deliveries/models/Delivery");
 const { isEmpty } = require("lodash");
+const {
+  createDeliveryServiceRequest,
+  updateDeliveryServiceRequest,
+  getDeliveryServiceRequestDetail,
+} = require("./views/deliveryRequest");
 
 const router = Router();
 
 router.get("/", [auth], async (req, res) => {
-  const orders = await Order.find();
+  const orders = await DeliveryServiceRequest.find();
   return res.json({ results: orders });
 });
 router.get("/pending", [auth], async (req, res) => {
-  const orders = await Order.aggregate([
+  const orders = await DeliveryServiceRequest.aggregate([
     {
       $lookup: {
         from: "deliveries",
@@ -101,12 +106,14 @@ router.get("/pending", [auth], async (req, res) => {
         },
       },
     },
-    {$match: {
-      $or: [
-        {hasDeliveryAndAllCanceled: true},
-        {noAsociatedDeliveryANDasignedToCurrentUserOrNoneTSB: true},
-      ]
-    }}
+    {
+      $match: {
+        $or: [
+          { hasDeliveryAndAllCanceled: true },
+          { noAsociatedDeliveryANDasignedToCurrentUserOrNoneTSB: true },
+        ],
+      },
+    },
   ]);
   return res.json({ results: orders });
 });
@@ -116,12 +123,12 @@ router.get("/dispense", [auth], async (req, res) => {
     if (!Types.ObjectId.isValid(search))
       throw {
         status: 404,
-        message: "No Order or delivery found!",
+        message: "No DeliveryServiceRequest or delivery found!",
       };
 
     const delivery = await Delivery.findById(search);
     const orderId = (delivery ? delivery.order.toString() : null) || search;
-    const order = await Order.aggregate([
+    const order = await DeliveryServiceRequest.aggregate([
       {
         $match: {
           _id: new Types.ObjectId(orderId),
@@ -147,7 +154,7 @@ router.get("/dispense", [auth], async (req, res) => {
     if (isEmpty(order))
       throw {
         status: 404,
-        message: "No Order or delivery found!",
+        message: "No DeliveryServiceRequest or delivery found!",
       };
     return res.json(await order[0]);
   } catch (error) {
@@ -161,13 +168,13 @@ router.post("/dispense", [auth], async (req, res) => {
     if (!Types.ObjectId.isValid(payload.order))
       throw {
         status: 404,
-        message: "Invalid Order.couldn't depense!",
+        message: "Invalid DeliveryServiceRequest.couldn't depense!",
       };
-    const order = await Order.findById(payload.order);
+    const order = await DeliveryServiceRequest.findById(payload.order);
     if (!order)
       throw {
         status: 404,
-        message: "Invalid Order.couldn't depense!",
+        message: "Invalid DeliveryServiceRequest.couldn't depense!",
       };
     if (!isValidDate(payload.nextAppointmentDate))
       throw {
@@ -184,34 +191,8 @@ router.post("/dispense", [auth], async (req, res) => {
     return res.status(status).json(err);
   }
 });
-router.post("/", [auth], async (req, res) => {
-  try {
-    const valid = await orderValidator(req.body);
-    if (!Types.ObjectId.isValid(valid.patient)) {
-      throw {
-        status: 404,
-        message: "Patient Not Found",
-      };
-    }
-    const patient = await Patient.findById(valid.patient);
-    if (!patient) {
-      throw {
-        status: 404,
-        message: "Patient Not Found",
-      };
-    }
-    const order = new Order(valid);
-    await order.save();
-    return res.json(await order.populate("patient"));
-  } catch (error) {
-    const { error: err, status } = getValidationErrrJson(error);
-    return res.status(status).json(err);
-  }
-});
-router.get("/:id", [auth, isValidPatient], async (req, res) => {
-  const order = await Order.findById(req.params.id);
-  if (!order) return res.status(404).json({ detail: "Order not found" });
-  return res.json({ results: await order.populate("patient") });
-});
+router.post("/", [auth], createDeliveryServiceRequest);
+router.put("/:id", [auth], updateDeliveryServiceRequest);
+router.get("/:id", [auth], getDeliveryServiceRequestDetail);
 
 module.exports = router;
