@@ -101,6 +101,7 @@ const roleUpdate = async (req, res) => {
     role.assignPickupCareGivers = value.assignPickupCareGivers;
     role.assignGroupLeads = value.assignGroupLeads;
     role.assignGroupMembers = value.assignGroupMembers;
+    role.assignAllUsers = value.assignAllUsers;
     if (!isEmpty(value.privileges)) role.privileges = value.privileges;
     if (!isEmpty(value.menuOptions)) role.menuOptions = value.menuOptions;
     await role.save();
