@@ -25,6 +25,7 @@ const {
   createARTDistributionGroup,
   updateARTDistributionGroup,
   addNewMemberToARTDistributionGroup,
+  changeIdentityInGroup,
 } = require("./views/groups");
 const isGroupLead = require("../middleware/isGroupLead");
 
@@ -62,6 +63,7 @@ router.post(
   [auth, isGroupLead],
   addNewMemberToARTDistributionGroup
 );
+router.post("/group-enrollment/:id/change-name", [auth], changeIdentityInGroup);
 router.put(
   "/distribution-groups/:id",
   [auth, isGroupLead],

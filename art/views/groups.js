@@ -55,15 +55,48 @@ const getARTDistributionGroups = async (req, res) => {
         ],
       },
     },
-    {$project: {
-      enrolledUsers: {
-        __v:0,
-        password: 0,
-        roles: 0,
-        lastLogin: 0
+    // {
+    //   $addFields: {
+    //     enrollments: {
+    //       $map: {
+    //         input: "$enrollments",
+    //         as: "enrollment",
+    //         in: {
+    //           $mergeObjects: [
+    //             "$$enrollment",
+    //             {
+    //               _user: {
+    //                 $arrayElemAt: [
+    //                   {
+    //                     $filter: {
+    //                       input: "$enrolledUsers",
+    //                       as: "user",
+    //                       cond: { $eq: ["$$user._id", "$$enrollment.user"] },
+    //                     },
+    //                   },
+    //                   0,
+    //                 ],
+    //               },
+    //             },
+    //           ],
+    //         },
+    //       },
+    //     },
+    //   },
+    // },
+    {
+      $project: {
+        enrolledUsers: {
+          __v: 0,
+          password: 0,
+          roles: 0,
+          lastLogin: 0,
+        },
+        enrollments: {
+          group: 0,
+        },
       },
-      enrollments: 0
-    }}
+    },
   ]);
   return res.json({ results: group });
 };
@@ -174,10 +207,42 @@ const addNewMemberToARTDistributionGroup = async (req, res) => {
   }
 };
 
+const changeIdentityInGroup = async (req, res) => {
+  try {
+    const enrollmentId = req.params.id;
+    if (!Types.ObjectId.isValid(enrollmentId))
+      throw { status: 404, message: "You are not enrolled in the group!" };
+    const enrollment = await ARTDistributionGroupEnrollment.findOne({
+      _id: enrollmentId,
+      isCurrent: true,
+      user: req.user._id,
+    });
+    if (!enrollment)
+      throw { status: 404, message: "You are not enrolled in the group!" };
+    const { name } = req.body;
+    if (!name)
+      throw {
+        details: [
+          {
+            path: ["name"],
+            message: "Name is required",
+          },
+        ],
+      };
+    enrollment.publicName = name;
+    await enrollment.save();
+    return res.json(enrollment);
+  } catch (ex) {
+    const { error: err, status } = getValidationErrrJson(ex);
+    return res.status(status).json(err);
+  }
+};
+
 module.exports = {
   getARTDistributionGruopDetail,
   getARTDistributionGroups,
   updateARTDistributionGroup,
   createARTDistributionGroup,
   addNewMemberToARTDistributionGroup,
+  changeIdentityInGroup,
 };

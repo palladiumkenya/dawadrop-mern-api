@@ -12,6 +12,9 @@ const ARTDistributionGroupEnrollment = model(
       type: Types.ObjectId,
       ref: "User",
     },
+    publicName: {
+      type: String,
+    },
     isCurrent: {
       type: Boolean,
       default: false,
