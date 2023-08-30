@@ -72,7 +72,13 @@ const getARTDistributionEvents = async (req, res) => {
       },
     },
   ]);
-  return res.json({ results: event });
+  return res.json({
+    viewer: {
+      isLead: await req.user.isGroupLead(),
+      
+    },
+    results: event,
+  });
 };
 
 const getARTDistributionEventDetail = async (req, res) => {

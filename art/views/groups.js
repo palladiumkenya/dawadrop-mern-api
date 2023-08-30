@@ -98,7 +98,12 @@ const getARTDistributionGroups = async (req, res) => {
       },
     },
   ]);
-  return res.json({ results: group });
+  return res.json({
+    viewer: {
+      isLead: await req.user.isGroupLead(),
+    },
+    results: group,
+  });
 };
 
 const getARTDistributionGruopDetail = async (req, res) => {
