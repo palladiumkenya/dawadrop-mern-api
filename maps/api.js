@@ -103,25 +103,28 @@ const openRouteMatrix = async ({
   dst: { lat: dstLat, lng: dstLng },
 }) => {
   const url = `${config.get("openroute")}v2/matrix/${profile}`;
-  const myHeaders = new Headers();
-  myHeaders.append("Authorization", config.get("openstreat_api"));
-  myHeaders.append("Content-Type", "application/json");
   const raw = JSON.stringify({
     locations: [
       [srcLat, srcLng],
       [dstLat, dstLng],
     ],
   });
+
   const requestOptions = {
     method: "POST",
-    headers: myHeaders,
+    headers: {
+      Authorization: config.get("openstreat_api"),
+      "Content-Type": "application/json",
+    },
     body: raw,
     redirect: "follow",
   };
+
   const response = await fetch(url, requestOptions);
   if (response.status === 200) {
     return await response.json();
   }
+  // Handle errors or unexpected responses here
 };
 
 const mapQuestMatrix = async ({
