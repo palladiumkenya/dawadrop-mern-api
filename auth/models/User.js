@@ -191,9 +191,9 @@ const User = model(
           if (this.isSuperUser) {
             return await Role.find().select("_id");
           }
-          let roles = await Role.find({ _id: { $in: this.roles } }).select(
-            "_id"
-          );
+          let roles = await Role.find()
+            .or([{ assignAllUsers: true }, { _id: { $in: this.roles } }])
+            .select("_id");
           if (await this.isPatient()) {
             // Include all pateint roles
             const patientRoles = await Role.find({

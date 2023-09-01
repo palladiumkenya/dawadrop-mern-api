@@ -62,7 +62,10 @@ const getARTDistributionEvents = async (req, res) => {
     },
     {
       $project: {
-        subscriptions: 0,
+        subscriptions: {
+          group: 0,
+          __v: 0,
+        },
         subscribers: {
           __v: 0,
           password: 0,
@@ -72,7 +75,12 @@ const getARTDistributionEvents = async (req, res) => {
       },
     },
   ]);
-  return res.json({ results: event });
+  return res.json({
+    viewer: {
+      isLead: await req.user.isGroupLead(),
+    },
+    results: event,
+  });
 };
 
 const getARTDistributionEventDetail = async (req, res) => {

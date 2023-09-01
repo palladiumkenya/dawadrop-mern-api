@@ -75,6 +75,9 @@ const roleSchema = Joi.object({
   assignGroupMembers: Joi.boolean()
     .label("Assign Roles to users in group")
     .default(false),
+  assignAllUsers: Joi.boolean()
+    .label("Assign Roles to all users")
+    .default(false),
 });
 
 const rolePrivilegeAddSchema = Joi.object({

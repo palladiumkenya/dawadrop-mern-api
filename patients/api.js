@@ -45,51 +45,63 @@ const sendOtp = async (otp, phone, create = true) => {
   const message = `Dear Dawa-Drop User, Your OTP ${
     create ? "to complete profile" : "for password reset"
   } is ${otp}. Valid for the next 24 hours.`;
+
   const url = config.get("sms_url");
   const apiKey = config.get("sms_api_key");
   const shortCode = config.get("short_code");
-  const myHeaders = new Headers();
-  myHeaders.append("Accept", "application/json");
-  myHeaders.append("api-token", apiKey);
-  myHeaders.append("Content-Type", "application/json");
+
+  const headers = {
+    Accept: "application/json",
+    "api-token": apiKey,
+    "Content-Type": "application/json",
+  };
+
   const raw = JSON.stringify({
     destination: phone,
     msg: message,
     sender_id: phone,
     gateway: shortCode,
   });
+
   const requestOptions = {
     method: "POST",
-    headers: myHeaders,
+    headers: headers,
     body: raw,
     // redirect: "follow",
     // mode: "cors",
     // credentials: "omit",
   };
+
   await fetch(url, requestOptions);
 };
+
 const sendSms = async (message, phone) => {
   const url = config.get("sms_url");
   const apiKey = config.get("sms_api_key");
   const shortCode = config.get("short_code");
-  const myHeaders = new Headers();
-  myHeaders.append("Accept", "application/json");
-  myHeaders.append("api-token", apiKey);
-  myHeaders.append("Content-Type", "application/json");
+
+  const headers = {
+    Accept: "application/json",
+    "api-token": apiKey,
+    "Content-Type": "application/json",
+  };
+
   const raw = JSON.stringify({
     destination: phone,
     msg: message,
     sender_id: phone,
     gateway: shortCode,
   });
+
   const requestOptions = {
     method: "POST",
-    headers: myHeaders,
+    headers: headers,
     body: raw,
     // redirect: "follow",
     // mode: "cors",
     // credentials: "omit",
   };
+
   await fetch(url, requestOptions);
 };
 
