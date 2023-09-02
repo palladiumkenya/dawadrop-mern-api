@@ -60,6 +60,7 @@ const getARTDistributionEvents = async (req, res) => {
         as: "subscribers",
       },
     },
+    { $addFields: { extraSubscribers: "$group.extraSubscribers" } },
     {
       $project: {
         subscriptions: {
@@ -71,6 +72,10 @@ const getARTDistributionEvents = async (req, res) => {
           password: 0,
           roles: 0,
           lastLogin: 0,
+        },
+        group: {
+          lead: 0,
+          extraSubscribers: 0,
         },
       },
     },
@@ -201,6 +206,56 @@ const confirmEventAttendance = async (req, res) => {
     // get or create feedback
     let feedBack = await ARTDistributionEventFeedBack.findOne({
       event: eventId,
+      user: req.user._id,
+    });
+    if (feedBack) {
+      feedBack.confirmedAttendance = true;
+      delete feedBack.deliveryRequest;
+      await feedBack.save();
+    } else {
+      feedBack = await ARTDistributionEventFeedBack({
+        event,
+        user: req.user._id,
+        confirmEventAttendance: true,
+      });
+      await feedBack.save();
+    }
+    return res.json({ detail: "Confirmed successfull!" });
+  } catch (ex) {
+    const { error: err, status } = getValidationErrrJson(ex);
+    return res.status(status).json(err);
+  }
+};
+
+const fullFillEventDeliveryRequest = async (req, res) => {
+  const feedBackId = req.params.id;
+  try {
+    if (!Types.ObjectId.isValid(feedBackId))
+      throw {
+        status: 404,
+        message: "Event FeedBack not found",
+      };
+    let event = await ARTDistributionEventFeedBack.findById(feedBackId);
+    if (!event)
+      throw {
+        status: 404,
+        message: "Event FeedBack not found",
+      };
+
+    const enrolment = await ARTDistributionGroupEnrollment.findOne({
+      group: event.group,
+      user: req.user._id,
+      isCurrent: true,
+    });
+    if (!enrolment)
+      throw {
+        status: 403,
+        message: "Fobbiddden.You are not actively subscribed to that event",
+      };
+
+    // get or create feedback
+    let feedBack = await ARTDistributionEventFeedBack.findOne({
+      event: feedBackId,
       user: req.user._id,
     });
     if (feedBack) {

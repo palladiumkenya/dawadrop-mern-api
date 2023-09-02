@@ -48,6 +48,9 @@ const eventSchema = Joi.object({
     .items(Joi.date())
     .label("Reminder dates")
     .default([]),
+});
+const groupSchema = Joi.object({
+  title: Joi.string().required().label("Art Group Name"),
   extraSubscribers: Joi.array()
     .items(
       Joi.object({
@@ -61,9 +64,6 @@ const eventSchema = Joi.object({
     )
     .default([])
     .label("Extra esubscribers"),
-});
-const groupSchema = Joi.object({
-  title: Joi.string().required().label("Art Group Name"),
   description: Joi.string().label("Group Description"),
 });
 const groupMemberShipSchema = Joi.object({
