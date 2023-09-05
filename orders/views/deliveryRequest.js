@@ -17,8 +17,8 @@ const ARTDistributionGroup = require("../../art/models/ARTDistributionGroup");
 const ARTDistributionEventFeedBack = require("../../art/models/ARTDistributionEventFeedBack");
 
 const getDeliveryServiceRequest = async (req, res) => {
-  const requests = await ARTDistributionModel.find();
-  return res.json({ results: requests });
+  const orders = await DeliveryServiceRequest.find();
+  return res.json({ results: orders });
 };
 
 const getDeliveryServiceRequestDetail = async (req, res) => {
@@ -228,9 +228,108 @@ const createDeliveryServiceRequest = async (req, res) => {
   }
 };
 
+const getPendingDeliveryServiceRequest = async (req, res) => {
+  const orders = await DeliveryServiceRequest.aggregate([
+    {
+      $lookup: {
+        from: "deliveries",
+        foreignField: "order",
+        localField: "_id",
+        as: "deliveries",
+      },
+    },
+    {
+      $addFields: {
+        //TSB and currUser===careGiver
+        priority: {
+          $cond: {
+            if: {
+              $and: [
+                { $eq: ["$deliveryMethod.blockOnTimeSlotFull", false] },
+                { $eq: ["$careGiver", req.user._id] },
+              ],
+            },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    // flag when there already exist deliveries
+    {
+      $addFields: {
+        hasDeliveryAndAllCanceled: {
+          $cond: {
+            if: {
+              $and: [
+                { $ne: [{ $size: "$deliveries" }, 0] }, // Check if deliveries array is not empty
+                {
+                  $eq: [
+                    {
+                      $size: {
+                        $setIntersection: ["$deliveries.status", ["canceled"]],
+                      },
+                    },
+                    { $size: "$deliveries" },
+                  ],
+                }, // Check if all deliveries have "canceled" status
+              ],
+            },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        asignedToCurrentUserOrNoneTSB: {
+          $cond: {
+            if: {
+              $or: [
+                { $eq: ["$deliveryMethod.blockOnTimeSlotFull", true] }, //None TSB
+                { $eq: ["$priority", true] }, // assigned to current user
+              ],
+            },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    // handle when no deliveries yet
+    {
+      $addFields: {
+        noAsociatedDeliveryANDasignedToCurrentUserOrNoneTSB: {
+          $cond: {
+            if: {
+              $and: [
+                { $eq: [{ $size: "$deliveries" }, 0] }, // No asociated delivery
+                { $eq: ["$asignedToCurrentUserOrNoneTSB", true] }, // nONE tsb or assighrned to current user
+              ],
+            },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      $match: {
+        $or: [
+          { hasDeliveryAndAllCanceled: true },
+          { noAsociatedDeliveryANDasignedToCurrentUserOrNoneTSB: true },
+        ],
+      },
+    },
+  ]);
+  return res.json({ results: orders });
+};
+
 module.exports = {
   getDeliveryServiceRequestDetail,
   getDeliveryServiceRequest,
   updateDeliveryServiceRequest,
   createDeliveryServiceRequest,
+  getPendingDeliveryServiceRequest,
 };

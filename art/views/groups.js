@@ -151,6 +151,8 @@ const updateARTDistributionGroup = async (req, res) => {
         message: "ART Distribution Group not found",
       };
     const values = await groupsValidator(req.body);
+    const { extraSubscribers } = values;
+    // TODO Make sure extra subscriber is not enroled somewhere else
     const _lead = await ARTDistributionGroupLead.findOne({
       user: req.user._id,
     });
