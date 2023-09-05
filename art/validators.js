@@ -55,6 +55,7 @@ const groupSchema = Joi.object({
     .items(
       Joi.object({
         name: Joi.string().required().label("Name"),
+        cccNumber: Joi.string().required().label("Patient CCC Number"),
         phoneNumber: Joi.string()
           .max(14)
           .min(9)

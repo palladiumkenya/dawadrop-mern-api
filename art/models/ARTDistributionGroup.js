@@ -33,6 +33,10 @@ const ARTDistributionGroup = model(
             type: String,
             require: true,
           },
+          cccNumber: {
+            type: String,
+            require: true,
+          },
           phoneNumber: {
             type: String,
             required: true,
