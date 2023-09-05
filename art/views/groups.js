@@ -11,6 +11,7 @@ const ARTDistributionGroupLead = require("../models/ARTDistributionGroupLead");
 const ARTDistributionGroup = require("../models/ARTDistributionGroup");
 const User = require("../../auth/models/User");
 const ARTDistributionGroupEnrollment = require("../models/ARTDistributionGroupEnrollment");
+const Patient = require("../../patients/models/Patient");
 
 const getARTDistributionGroups = async (req, res) => {
   const user = req.user._id;
@@ -41,9 +42,17 @@ const getARTDistributionGroups = async (req, res) => {
     },
     {
       $lookup: {
+        from: "patients",
+        foreignField: "_id",
+        localField: "enrollments.patient",
+        as: "enrolledPatients",
+      },
+    },
+    {
+      $lookup: {
         from: "users",
         foreignField: "_id",
-        localField: "enrollments.user",
+        localField: "enrolledPatients.user",
         as: "enrolledUsers",
       },
     },
@@ -51,7 +60,7 @@ const getARTDistributionGroups = async (req, res) => {
       $match: {
         $or: [
           { "lead.user": user }, // curr user is the lead to curr group
-          { "enrollments.user": user, "enrollments.isCurrent": true }, // curr user is the lead to curr group
+          { "enrolledUsers._id": user, "enrollments.isCurrent": true }, // curr user is the lead to curr group
         ],
       },
     },
@@ -177,12 +186,14 @@ const addNewMemberToARTDistributionGroup = async (req, res) => {
       throw { status: 404, message: "ART Distribution group not found" };
     const values = await groupsMemberShipValidator(req.body);
     const { paticipant } = values;
-    // 1.Check if user exists
-    const user = await User.findById(paticipant);
-    if (!user) throw { status: 404, message: "Paticipant is not a valid user" };
+
+    // 1.Check if patient exists
+    const patient = await Patient.findById(paticipant);
+    if (!patient)
+      throw { status: 404, message: "Paticipant is not a valid patient" };
     // 2. Check if paticipant is already in group
     const enrolments = await ARTDistributionGroupEnrollment.findOne({
-      user: user._id,
+      patient: patient._id,
       isCurrent: true,
     });
     if (enrolments)
@@ -191,16 +202,18 @@ const addNewMemberToARTDistributionGroup = async (req, res) => {
         message: "Paticipant already enroled in another group",
       };
     // 3. Check if user is a group lead
-    const groupLead = await ARTDistributionGroupLead.findOne({
-      user: user._id,
-    });
-    if (groupLead)
-      throw {
-        status: 403,
-        message: "Paticipant is a group lead",
-      };
+    if (patient.user) {
+      const groupLead = await ARTDistributionGroupLead.findOne({
+        user: patient.user,
+      });
+      if (groupLead)
+        throw {
+          status: 403,
+          message: "Paticipant is a group lead",
+        };
+    }
     const enrol = new ARTDistributionGroupEnrollment({
-      user: user._id,
+      patient: patient._id,
       isCurrent: true,
       group: group,
     });
@@ -217,10 +230,11 @@ const changeIdentityInGroup = async (req, res) => {
     const enrollmentId = req.params.id;
     if (!Types.ObjectId.isValid(enrollmentId))
       throw { status: 404, message: "You are not enrolled in the group!" };
+    const patient = await Patient.findOne({ user: req.user._id });
     const enrollment = await ARTDistributionGroupEnrollment.findOne({
       _id: enrollmentId,
       isCurrent: true,
-      user: req.user._id,
+      patient: patient._id,
     });
     if (!enrollment)
       throw { status: 404, message: "You are not enrolled in the group!" };

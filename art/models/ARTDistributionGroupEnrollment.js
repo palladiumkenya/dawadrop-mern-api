@@ -8,9 +8,9 @@ const ARTDistributionGroupEnrollment = model(
       type: ARTDistributionGroup.schema,
       required: true,
     },
-    user: {
+    patient: {
       type: Types.ObjectId,
-      ref: "User",
+      ref: "Patient",
     },
     publicName: {
       type: String,

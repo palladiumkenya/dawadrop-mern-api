@@ -29,15 +29,10 @@ const { validateOrder, eligibityTest } = require("./views/utils");
 const {
   createDeliveryServiceRequest,
 } = require("../orders/views/deliveryRequest");
+const { findPatient } = require("./views/patients");
 const router = Router();
 
-router.get("/", auth, async (req, res) => {
-  const patients = await Patient.find().populate("user", {
-    password: false,
-    __v: false,
-  });
-  res.json({ results: patients });
-});
+router.get("/", auth, findPatient);
 router.get("/appointments", [auth, isValidPatient], async (req, res) => {
   const query = req.params;
   const patient = await Patient.findOne({ user: req.user._id });

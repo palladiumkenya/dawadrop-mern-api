@@ -8,6 +8,7 @@ const ARTDistributionGroup = require("../models/ARTDistributionGroup");
 const fetchAndScheduleEventsNortification = require("../fetchAndScheduleEventsNortification");
 const ARTDistributionGroupEnrollment = require("../models/ARTDistributionGroupEnrollment");
 const ARTDistributionEventFeedBack = require("../models/ARTDistributionEventFeedBack");
+const Patient = require("../../patients/models/Patient");
 
 const getARTDistributionEvents = async (req, res) => {
   const user = req.user._id;
@@ -21,9 +22,25 @@ const getARTDistributionEvents = async (req, res) => {
       },
     },
     {
+      $lookup: {
+        from: "patients",
+        foreignField: "_id",
+        localField: "subscriptions.patient",
+        as: "patientSubscribers",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        foreignField: "_id",
+        localField: "patientSubscribers.user",
+        as: "subscribers",
+      },
+    },
+    {
       $match: {
         $or: [
-          { "subscriptions.user": user, "subscriptions.isCurrent": true }, //currentlyEnrolledInCurrentGroup
+          { "subscribers._id": user, "subscriptions.isCurrent": true }, //currentlyEnrolledInCurrentGroup
           { "group.lead.user": user }, // isLeaderOfCurrentGroup
         ],
       },
@@ -50,14 +67,6 @@ const getARTDistributionEvents = async (req, res) => {
         foreignField: "_id",
         localField: "group.lead.user",
         as: "leadUser",
-      },
-    },
-    {
-      $lookup: {
-        from: "users",
-        foreignField: "_id",
-        localField: "subscriptions.user",
-        as: "subscribers",
       },
     },
     { $addFields: { extraSubscribers: "$group.extraSubscribers" } },
@@ -192,9 +201,10 @@ const confirmEventAttendance = async (req, res) => {
         status: 404,
         message: "ART Distribution Event not found",
       };
+    const patient = await Patient.findOne({ user: req.user._id });
     const enrolment = await ARTDistributionGroupEnrollment.findOne({
       group: event.group,
-      user: req.user._id,
+      patient: patient._id,
       isCurrent: true,
     });
     if (!enrolment)

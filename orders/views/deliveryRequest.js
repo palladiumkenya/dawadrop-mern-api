@@ -112,9 +112,10 @@ const createDeliveryServiceRequest = async (req, res) => {
     if (event) {
       // make sure user is member of group
       const event_ = await ARTDistributionEvent.findById(event);
+      const patient = await Patient.findOne({ user: req.user._id });
       const subscription = await ARTDistributionGroupEnrollment.findOne({
         "group._id": event_.group._id,
-        user: req.user._id,
+        patient: patient._id,
       });
       if (subscription) _event = event_;
     }
@@ -226,7 +227,6 @@ const createDeliveryServiceRequest = async (req, res) => {
     return res.status(status).json(err);
   }
 };
-
 
 module.exports = {
   getDeliveryServiceRequestDetail,
