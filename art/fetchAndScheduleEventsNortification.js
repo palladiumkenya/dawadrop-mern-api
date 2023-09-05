@@ -28,6 +28,7 @@ async function fetchAndScheduleEventsNortification() {
           as: "subscribers",
         },
       },
+      { $addFields: { extraSubscribers: "$group.extraSubscribers" } },
       {
         $project: {
           subscriptions: 0,
