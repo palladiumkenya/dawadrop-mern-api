@@ -214,6 +214,19 @@ const addNewMemberToARTDistributionGroup = async (req, res) => {
           message: "Paticipant is a group lead",
         };
     }
+    // 4. Check if user is in grouped model
+    if (
+      ![
+        "community_art_peer",
+        "community_art_hcw",
+        "facility_art_peer",
+        "facility_art_hcw",
+      ].includes(patient.artModel.modelCode)
+    )
+      throw {
+        status: 403,
+        message: "Paticipant not in grouped groupe ART Model",
+      };
     const enrol = new ARTDistributionGroupEnrollment({
       patient: patient._id,
       isCurrent: true,

@@ -222,13 +222,15 @@ const confirmEventAttendance = async (req, res) => {
       feedBack.confirmedAttendance = true;
       delete feedBack.deliveryRequest;
       await feedBack.save();
+      console.log("Updated feedback ....");
     } else {
       feedBack = await ARTDistributionEventFeedBack({
-        event,
+        event: eventId,
         user: req.user._id,
-        confirmEventAttendance: true,
+        confirmedAttendance: true,
       });
       await feedBack.save();
+      console.log("Created feedBack ....");
     }
     return res.json({ detail: "Confirmed successfull!" });
   } catch (ex) {
