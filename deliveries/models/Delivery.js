@@ -3,6 +3,7 @@ const Address = require("../../orders/models/Address");
 const User = require("../../auth/models/User");
 const DeliveryServiceRequest = require("../../orders/models/DeliveryServiceRequest");
 const Patient = require("../../patients/models/Patient");
+const CourrierService = require("./CourrierService");
 
 const Delivery = model(
   "Delivery",
@@ -11,7 +12,6 @@ const Delivery = model(
       order: {
         type: Schema.Types.ObjectId,
         ref: "DeliveryServiceRequest",
-        required: true,
         validate: {
           message: "DeliveryServiceRequest don't exist",
           validator: async function (v) {
@@ -21,30 +21,43 @@ const Delivery = model(
           },
         },
       },
-      dispencedBy: {
+      patient: {
         type: Schema.Types.ObjectId,
-        ref: "User",
-        validate: {
-          message: "Dispensor don't exist",
-          validator: async function (v) {
-            if (v && !(await User.findById(v)))
-              throw new Error("Dispensor doesn't Exist");
-          },
-        },
+        ref: "Patient",
       },
-      deliveredBy: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
+      services: {
+        type: [String],
+        default: [],
+      },
+      deliveryType: {
+        type: String,
         required: true,
-        validate: {
-          message: "Delivery agent don't exist",
-          validator: async function (v) {
-            if (v && !(await User.findById(v)))
-              throw new Error("Delivery agent doesn't Exist");
-          },
-        },
+        enum: ["self", "courrier", "delegate", "patient-preferred"],
       },
-      location: {
+      courrierService: {
+        type: CourrierService.schema,
+      },
+      deliveryPerson: {
+        type: new Schema({
+          fullName: {
+            type: String,
+            required: true,
+          },
+          nationalId: {
+            type: Schema.Types.Number,
+            required: true,
+          },
+          phoneNumber: {
+            type: Schema.Types.String,
+            required: true,
+          },
+          pickUpTime: {
+            type: Schema.Types.Date,
+            required: true,
+          },
+        }),
+      },
+      deliveryAddress: {
         type: Address.schema,
         required: true,
       },
@@ -52,13 +65,8 @@ const Delivery = model(
         type: String,
         enum: {
           values: ["canceled", "delivered", "pending"],
-          message: "Status mus be either canceled, delivered and pending",
+          message: "Status must be either canceled, delivered and pending",
         },
-      },
-      streamUrl: {
-        type: String,
-        required: true,
-        match: /(https?:\/\/[^\s]+)/g,
       },
     },
     {

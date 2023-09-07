@@ -80,6 +80,41 @@ const groupMemberShipSchema = Joi.object({
     }),
 });
 
+const initiateDeliverySchema = Joi.object({
+  member: Joi.string().label("Member").required().hex().length(24).messages({
+    "string.base": "{{#label}} invalid",
+    "string.hex": "{{#label}} invalid",
+    "string.length": "{{#label}} invalid",
+  }),
+  services: Joi.array().items(Joi.string()).label("Extra services").default([]),
+  deliveryType: Joi.string()
+    .label("Delivery type")
+    .valid("self", "courrier", "delegate", "patient-preferred")
+    .required(),
+  courrierService: Joi.string()
+    .label("Courrier service")
+    .hex()
+    .length(24)
+    .messages({
+      "string.base": "{{#label}} invalid",
+      "string.hex": "{{#label}} invalid",
+      "string.length": "{{#label}} invalid",
+    }),
+  deliveryPerson: Joi.object({
+    fullName: Joi.string().required().label("Full name"),
+    nationalId: Joi.number().required().label("National Id"),
+    phoneNumber: Joi.string().required().label("Phone number"),
+    pickUpTime: Joi.date().required().label("Pick up time"),
+  }).label("Delivery person"),
+  deliveryAddress: Joi.object({
+    latitude: Joi.number().label("Latitude"),
+    longitude: Joi.number().label("Longitude"),
+    address: Joi.string().label("Address"),
+  })
+    .label("Delivery address")
+    .required(),
+});
+
 module.exports.artModelValidator = async (data) => {
   return await artModelSchema.validateAsync(cleanFalsyAttributes(data), {
     abortEarly: false,
@@ -104,4 +139,12 @@ module.exports.groupsMemberShipValidator = async (data) => {
   return await groupMemberShipSchema.validateAsync(cleanFalsyAttributes(data), {
     abortEarly: false,
   });
+};
+module.exports.initiateDeliveryValidator = async (data) => {
+  return await initiateDeliverySchema.validateAsync(
+    cleanFalsyAttributes(data),
+    {
+      abortEarly: false,
+    }
+  );
 };

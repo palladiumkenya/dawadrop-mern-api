@@ -1,7 +1,7 @@
 const { Types } = require("mongoose");
 const { getValidationErrrJson } = require("../../utils/helpers");
 const { merge } = require("lodash");
-const { eventsValidator } = require("../validators");
+const { eventsValidator, initiateDeliveryValidator } = require("../validators");
 const ARTDistributionEvent = require("../models/ARTDistributionEvent");
 const ARTDistributionGroupLead = require("../models/ARTDistributionGroupLead");
 const ARTDistributionGroup = require("../models/ARTDistributionGroup");
@@ -9,6 +9,8 @@ const fetchAndScheduleEventsNortification = require("../fetchAndScheduleEventsNo
 const ARTDistributionGroupEnrollment = require("../models/ARTDistributionGroupEnrollment");
 const ARTDistributionEventFeedBack = require("../models/ARTDistributionEventFeedBack");
 const Patient = require("../../patients/models/Patient");
+const CourrierService = require("../../deliveries/models/CourrierService");
+const Delivery = require("../../deliveries/models/Delivery");
 
 const getARTDistributionEvents = async (req, res) => {
   const user = req.user._id;
@@ -67,6 +69,14 @@ const getARTDistributionEvents = async (req, res) => {
         foreignField: "_id",
         localField: "group.lead.user",
         as: "leadUser",
+      },
+    },
+    {
+      $lookup: {
+        from: "deliveryservicerequests",
+        foreignField: "_id",
+        localField: "feedBacks.deliveryRequest",
+        as: "deliveryRequests",
       },
     },
     { $addFields: { extraSubscribers: "$group.extraSubscribers" } },
@@ -239,49 +249,35 @@ const confirmEventAttendance = async (req, res) => {
   }
 };
 
-const fullFillEventDeliveryRequest = async (req, res) => {
-  const feedBackId = req.params.id;
+const initiateDelivery = async (req, res) => {
+  const eventId = req.params.id;
   try {
-    if (!Types.ObjectId.isValid(feedBackId))
+    if (!Types.ObjectId.isValid(eventId))
       throw {
         status: 404,
-        message: "Event FeedBack not found",
+        message: "Event not found",
       };
-    let event = await ARTDistributionEventFeedBack.findById(feedBackId);
+    const event = await ARTDistributionEvent.findById(eventId);
     if (!event)
       throw {
         status: 404,
-        message: "Event FeedBack not found",
+        message: "Event not found",
       };
 
-    const enrolment = await ARTDistributionGroupEnrollment.findOne({
-      group: event.group,
-      user: req.user._id,
-      isCurrent: true,
-    });
-    if (!enrolment)
-      throw {
-        status: 403,
-        message: "Fobbiddden.You are not actively subscribed to that event",
-      };
+    const values = await initiateDeliveryValidator(req.body);
+    const { member, courrierService } = values;
+    const patient = await Patient.findById(member);
+    let service;
+    if (courrierService)
+      service = await CourrierService.findById(courrierService);
 
-    // get or create feedback
-    let feedBack = await ARTDistributionEventFeedBack.findOne({
-      event: feedBackId,
-      user: req.user._id,
+    const delivery = new Delivery({
+      ...values,
+      courrierService: service,
+      patient,
     });
-    if (feedBack) {
-      feedBack.confirmedAttendance = true;
-      delete feedBack.deliveryRequest;
-      await feedBack.save();
-    } else {
-      feedBack = await ARTDistributionEventFeedBack({
-        event,
-        user: req.user._id,
-        confirmEventAttendance: true,
-      });
-      await feedBack.save();
-    }
+
+    await delivery.save();
     return res.json({ detail: "Confirmed successfull!" });
   } catch (ex) {
     const { error: err, status } = getValidationErrrJson(ex);
@@ -295,4 +291,5 @@ module.exports = {
   updateARTDistributionEvent,
   createARTDistributionEvent,
   confirmEventAttendance,
+  initiateDelivery,
 };
