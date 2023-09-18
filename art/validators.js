@@ -35,7 +35,11 @@ const eventSchema = Joi.object({
       "string.hex": "{{#label}} invalid",
       "string.length": "{{#label}} invalid",
     }),
-  distributionTime: Joi.date().label("Distribution time").required(),
+  distributionTime: Joi.date()
+    .min("now")
+    .iso()
+    .label("Distribution time")
+    .required(),
   distributionLocation: Joi.object({
     latitude: Joi.number().label("Latitude"),
     longitude: Joi.number().label("Longitude"),
@@ -45,7 +49,7 @@ const eventSchema = Joi.object({
     .required(),
   remarks: Joi.string().label("Remarks"),
   remiderNortificationDates: Joi.array()
-    .items(Joi.date())
+    .items(Joi.date().min("now").iso())
     .label("Reminder dates")
     .default([]),
 });
