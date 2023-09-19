@@ -4,6 +4,7 @@ const User = require("../../auth/models/User");
 const DeliveryServiceRequest = require("../../orders/models/DeliveryServiceRequest");
 const Patient = require("../../patients/models/Patient");
 const CourrierService = require("./CourrierService");
+const { generateOTP } = require("../../utils/helpers");
 
 const Delivery = model(
   "Delivery",
@@ -61,15 +62,21 @@ const Delivery = model(
         type: Address.schema,
         required: true,
       },
-      status: {
+      isDelivered: {
+        type: Boolean,
+        default: false,
+      },
+      event: {
+        type: Types.ObjectId,
+        ref: "ARTDistributionEvent",
+      },
+      code: {
         type: String,
-        enum: {
-          values: ["canceled", "delivered", "pending"],
-          message: "Status must be either canceled, delivered and pending",
-        },
+        required: true,
       },
     },
     {
+      timestamps: true, // Automatically add createdAt and updatedAt fields
       virtuals: {
         created: {
           get: function () {

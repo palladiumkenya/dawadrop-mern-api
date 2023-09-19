@@ -1,49 +1,48 @@
 const { Types } = require("mongoose");
 const { getValidationErrrJson } = require("../../utils/helpers");
 const { merge } = require("lodash");
-const {
-  deliveryValidator,
-} = require("../validators");
+const { deliveryValidator } = require("../validators");
 const Delivery = require("../models/Delivery");
 
 const getDeliveries = async (req, res) => {
-  const methods = await Delivery.find().populate(
-    // "dispencedBy",
-    // "deliveredBy",
-    [
-      "order",
+  try {
+    const methods = await Delivery.aggregate([
       {
-        path: "dispencedBy",
-        model: "User",
+        $match: {},
       },
-      {
-        path: "deliveredBy",
-        model: "User",
-      },
-    ]
-  );
-  return res.json({ results: methods });
+    ]);
+    return res.json({ results: methods });
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
 };
 
 const getMyDeliveriesHistory = async (req, res) => {
-  const methods = await Delivery.find({ deliveredBy: req.user._id }).populate(
-    // "dispencedBy",
-    // "deliveredBy",
-    [
+  try {
+    const methods = await Delivery.aggregate([
       {
-        path: "order",
-        model: "DeliveryServiceRequest",
-        select:
-          "patient deliveryAddress deliveryTimeSlot deliveryMode phoneNumber",
+        $match: {},
       },
       {
-        path: "deliveredBy",
-        model: "User",
-        select: "username email phoneNumber image",
+        $lookup: {
+          from: "artdistributionevents",
+          foreignField: "_id",
+          localField: "event",
+          as: "event",
+        },
       },
-    ]
-  );
-  return res.json({ results: methods });
+      // {
+      //   $addFields: {
+      //     phoneNumber:
+      //   },
+      // },
+    ]);
+    return res.json({ results: methods });
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
 };
 
 const createDelivery = async (req, res) => {
@@ -145,5 +144,5 @@ module.exports = {
   createDelivery,
   updateDelivery,
   deliveryAction,
-  getDeliveryDetail
+  getDeliveryDetail,
 };

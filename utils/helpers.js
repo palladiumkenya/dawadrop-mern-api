@@ -1,5 +1,6 @@
 const _ = require("lodash");
 const fs = require("fs");
+const moment = require("moment/moment");
 const { Types } = require("mongoose");
 const getValidationErrrJson = (err) => {
   const validationErrors = {};
@@ -187,6 +188,21 @@ function generateRandomNumber() {
 const cleanFalsyAttributes = (obj) => {
   return _.pickBy(obj, (value) => !!value || value === false);
 };
+
+function generateOTP(length = 5) {
+  var string = "0123456789";
+  let OTP = "";
+  var len = string.length;
+  for (let i = 0; i < length; i++) {
+    OTP += string[Math.floor(Math.random() * len)];
+  }
+  return OTP;
+}
+function generateExpiryTime(minutes = 5) {
+  return moment().add(minutes, "minute");
+}
+module.exports.generateOTP = generateOTP;
+module.exports.generateExpiryTime = generateExpiryTime;
 module.exports.getValidationErrrJson = getValidationErrrJson;
 module.exports.base64Encode = base64Encode;
 module.exports.base64Decode = base64Decode;

@@ -1,5 +1,5 @@
 const { Types } = require("mongoose");
-const { getValidationErrrJson } = require("../../utils/helpers");
+const { getValidationErrrJson, generateOTP } = require("../../utils/helpers");
 const { merge } = require("lodash");
 const { eventsValidator, initiateDeliveryValidator } = require("../validators");
 const ARTDistributionEvent = require("../models/ARTDistributionEvent");
@@ -11,6 +11,8 @@ const ARTDistributionEventFeedBack = require("../models/ARTDistributionEventFeed
 const Patient = require("../../patients/models/Patient");
 const CourrierService = require("../../deliveries/models/CourrierService");
 const Delivery = require("../../deliveries/models/Delivery");
+const { sendSms } = require("../../patients/api");
+const User = require("../../auth/models/User");
 
 const getARTDistributionEvents = async (req, res) => {
   const user = req.user._id;
@@ -79,6 +81,15 @@ const getARTDistributionEvents = async (req, res) => {
         as: "deliveryRequests",
       },
     },
+    {
+      $lookup: {
+        from: "deliveries",
+        foreignField: "event",
+        localField: "_id",
+        as: "deliveries",
+      },
+    },
+
     { $addFields: { extraSubscribers: "$group.extraSubscribers" } },
     {
       $project: {
@@ -271,13 +282,64 @@ const initiateDelivery = async (req, res) => {
     if (courrierService)
       service = await CourrierService.findById(courrierService);
 
+    let code = generateOTP(5);
+    // Check for undelivered and with same code, if so regenerate
+    while (
+      (await Delivery.aggregate([
+        {
+          $lookup: {
+            from: "deliveryfeedbacks",
+            foreignField: "delivery",
+            localField: "_id",
+            as: "feedBack",
+          },
+        },
+        {
+          $addFields: {
+            invalid: {
+              $cond: {
+                if: {
+                  $and: [
+                    { $ne: [{ $size: "$feedBack" }, 0] }, //undelivered
+                    { $eq: ["$code", code] }, //same code
+                  ],
+                }, // Check if deliveries array is not empty
+                then: true,
+                else: false,
+              },
+            },
+          },
+        },
+        {
+          $match: {
+            $eq: ["$invalid", true],
+          },
+        },
+      ]).length) !== 0
+    ) {
+      code = generateOTP(5);
+    }
     const delivery = new Delivery({
       ...values,
       courrierService: service,
       patient,
+      event: eventId,
+      code,
     });
 
     await delivery.save();
+    // Sending only for smartphone users
+    const user = await User.findById(patient.user);
+    if (user) {
+      sendSms(
+        `Dear ${
+          user.firstName || user.username
+        }, your delivery has been initiated.Kindly use the code: ${
+          delivery._id
+        }.`,
+        user.phoneNumber
+      );
+    }
     return res.json({ detail: "Confirmed successfull!" });
   } catch (ex) {
     const { error: err, status } = getValidationErrrJson(ex);
