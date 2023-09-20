@@ -49,7 +49,7 @@ const router = Router();
 router.get("/", auth, findPatient);
 router.get("/appointments", [auth, isValidPatient], getPatientAppointments);
 router.get("/appointments/:id", [auth, isValidPatient], getAppointmentDetail);
-router.get("/orders", [auth, isValidPatient], getPatientsDeliveryRequests);
+router.get("/orders", [auth], getPatientsDeliveryRequests);
 router.get("/deliveries", [auth, isValidPatient], getPatientDeliveries);
 
 router.get(

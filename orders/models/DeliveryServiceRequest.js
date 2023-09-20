@@ -48,8 +48,15 @@ const DeliveryServiceRequest = model(
         required: true,
       },
       deliveryMethod: {
-        type: DeliveryMethod.schema,
+        type: String,
         required: true,
+        enum: {
+          values: ["in-parcel", "in-person"],
+          message: `{VALUE} not supported.Must be in surpoted actions: [${[
+            "in-parcel",
+            "in-person",
+          ].join(", ")}]`,
+        },
       },
       courrierService: {
         type: CourrierService.schema,

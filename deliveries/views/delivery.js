@@ -1,8 +1,9 @@
 const { Types } = require("mongoose");
 const { getValidationErrrJson } = require("../../utils/helpers");
-const { merge } = require("lodash");
+const { merge, omit, includes } = require("lodash");
 const { deliveryValidator } = require("../validators");
 const Delivery = require("../models/Delivery");
+const Patient = require("../../patients/models/Patient");
 
 const getDeliveries = async (req, res) => {
   try {
@@ -20,9 +21,26 @@ const getDeliveries = async (req, res) => {
 
 const getMyDeliveriesHistory = async (req, res) => {
   try {
+    const patient = await Patient.findOne({ user: req.user._id });
     const methods = await Delivery.aggregate([
       {
-        $match: {},
+        $lookup: {
+          from: "deliveryservicerequests",
+          foreignField: "_id",
+          localField: "order",
+          as: "order",
+        },
+      },
+
+      {
+        $match: {
+          $or: [
+            { patient: patient?._id, include: patient },
+            { "order.orderedBy": req.user._id, include: true },
+          ]
+            .filter((f) => f.include)
+            .map((f) => omit(f, ["include"])),
+        },
       },
       {
         $lookup: {

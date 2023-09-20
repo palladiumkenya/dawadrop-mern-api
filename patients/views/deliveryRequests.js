@@ -1,3 +1,4 @@
+const { omit } = require("lodash");
 const Delivery = require("../../deliveries/models/Delivery");
 const DeliveryFeedBack = require("../../deliveries/models/DeliveryFeedBack");
 const DeliveryServiceRequest = require("../../orders/models/DeliveryServiceRequest");
@@ -11,7 +12,12 @@ const getPatientsDeliveryRequests = async (req, res) => {
   const orders = await DeliveryServiceRequest.aggregate([
     {
       $match: {
-        patient: patient._id,
+        $or: [
+          { patient: patient?._id, include: patient },
+          { orderedBy: req.user._id, include: true },
+        ]
+          .filter((f) => f.include)
+          .map((f) => omit(f, ["include"])),
       },
     },
     {

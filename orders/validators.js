@@ -128,15 +128,7 @@ const deliveryServiceRequestSchema = Joi.object({
   deliveryMethod: Joi.string()
     .required()
     .label("Delivery Method")
-    .hex()
-    .length(24)
-    .messages({
-      "any.required":
-        "You must specify how you want your drug delivered to you",
-      "string.base": "{{#label}} invalid",
-      "string.hex": "{{#label}} invalid",
-      "string.length": "{{#label}} invalid",
-    }),
+    .valid("in-parcel", "in-person"),
   courrierService: Joi.string()
     .label("Courrier service")
     .hex()

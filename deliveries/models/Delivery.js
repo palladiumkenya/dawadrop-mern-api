@@ -22,7 +22,7 @@ const Delivery = model(
           },
         },
       },
-      patient: {
+      patient: { //subscriber
         type: Schema.Types.ObjectId,
         ref: "Patient",
       },

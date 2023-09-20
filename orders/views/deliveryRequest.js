@@ -101,7 +101,6 @@ const createDeliveryServiceRequest = async (req, res) => {
         message:
           "Invalid Operation.You are not allowed to order for another using event!",
       };
-    const _deliveryMethod = await DeliveryMethod.findById(deliveryMethod);
 
     let _courrierService;
     let _event;
@@ -140,21 +139,14 @@ const createDeliveryServiceRequest = async (req, res) => {
         path: ["deliveryAddress"],
         message: "Invalid Address",
       });
-
-    if (!_deliveryMethod)
-      errors.push({
-        path: ["deliveryMethod"],
-        message: "Invalid deliveryMethod",
-      });
     //   IF dELIVERY METHOD BY COURRIER AND COURRIER OF CHOICE NOT PROVIDED
-    if (_deliveryMethod?.blockOnTimeSlotFull === false && !_courrierService)
+    if (deliveryMethod === "in-parcel" && !_courrierService)
       errors.push({
         path: ["courrierService"],
         message: "Invalid courrierService or courrier service not provided",
       });
     // IF DELIVERY METHOD NOT BY CURRIOUR BT PERSON OR CURRIOR SERVICE PROVIDED THEN IGNORE THEM
-    if (_deliveryMethod?.blockOnTimeSlotFull === true && deliveryPerson) {
-      delete values.deliveryPerson;
+    if (deliveryMethod === "in-person" && deliveryPerson) {
       delete values.courrierService;
     }
 
@@ -194,7 +186,6 @@ const createDeliveryServiceRequest = async (req, res) => {
       ...cleanFalsyAttributes({
         ...values,
         appointment: _appointment,
-        deliveryMethod: _deliveryMethod,
         event: _event,
         courrierService: _courrierService,
         orderedBy: req.user._id,
