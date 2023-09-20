@@ -1,5 +1,5 @@
 const { Types } = require("mongoose");
-const { getValidationErrrJson, generateOTP } = require("../../utils/helpers");
+const { getValidationErrrJson } = require("../../utils/helpers");
 const { merge } = require("lodash");
 const { eventsValidator, initiateDeliveryValidator } = require("../validators");
 const ARTDistributionEvent = require("../models/ARTDistributionEvent");
@@ -282,49 +282,11 @@ const initiateDelivery = async (req, res) => {
     if (courrierService)
       service = await CourrierService.findById(courrierService);
 
-    let code = generateOTP(5);
-    // Check for undelivered and with same code, if so regenerate
-    while (
-      (await Delivery.aggregate([
-        {
-          $lookup: {
-            from: "deliveryfeedbacks",
-            foreignField: "delivery",
-            localField: "_id",
-            as: "feedBack",
-          },
-        },
-        {
-          $addFields: {
-            invalid: {
-              $cond: {
-                if: {
-                  $and: [
-                    { $ne: [{ $size: "$feedBack" }, 0] }, //undelivered
-                    { $eq: ["$code", code] }, //same code
-                  ],
-                }, // Check if deliveries array is not empty
-                then: true,
-                else: false,
-              },
-            },
-          },
-        },
-        {
-          $match: {
-            $eq: ["$invalid", true],
-          },
-        },
-      ]).length) !== 0
-    ) {
-      code = generateOTP(5);
-    }
     const delivery = new Delivery({
       ...values,
       courrierService: service,
       patient,
       event: eventId,
-      code,
     });
 
     await delivery.save();

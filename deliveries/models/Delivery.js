@@ -70,10 +70,6 @@ const Delivery = model(
         type: Types.ObjectId,
         ref: "ARTDistributionEvent",
       },
-      code: {
-        type: String,
-        required: true,
-      },
     },
     {
       timestamps: true, // Automatically add createdAt and updatedAt fields
