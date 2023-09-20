@@ -11,6 +11,22 @@ const getDeliveries = async (req, res) => {
       {
         $match: {},
       },
+      {
+        $lookup: {
+          from: "patients",
+          foreignField: "_id",
+          localField: "patient",
+          as: "patient",
+        },
+      },
+      {
+        $lookup: {
+          from: "artdistributionevents",
+          foreignField: "_id",
+          localField: "event",
+          as: "event",
+        },
+      },
     ]);
     return res.json({ results: methods });
   } catch (error) {
@@ -31,23 +47,32 @@ const getMyDeliveriesHistory = async (req, res) => {
           as: "order",
         },
       },
-
-      {
-        $match: {
-          $or: [
-            { patient: patient?._id, include: patient },
-            { "order.orderedBy": req.user._id, include: true },
-          ]
-            .filter((f) => f.include)
-            .map((f) => omit(f, ["include"])),
-        },
-      },
       {
         $lookup: {
           from: "artdistributionevents",
           foreignField: "_id",
           localField: "event",
           as: "event",
+        },
+      },
+      {
+        $match: {
+          $or: [
+            { patient: patient?._id, include: patient },
+            { "order.orderedBy": req.user._id, include: true },
+            { "event.group.lead.user": req.user._id, include: true },
+          ]
+            .filter((f) => f.include)
+            .map((f) => omit(f, ["include"])),
+        },
+      },
+
+      {
+        $lookup: {
+          from: "patients",
+          foreignField: "_id",
+          localField: "patient",
+          as: "patient",
         },
       },
       // {
