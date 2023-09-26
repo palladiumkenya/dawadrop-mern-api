@@ -61,7 +61,7 @@ router.get("/orders/:id", [auth, isValidPatient], getDeliveryRequestDetail);
 router.post("/orders", [auth, isValidPatient], createDeliveryServiceRequest);
 router.post("/create-profile", [auth, hasNoProfile], createProfile);
 router.post("/verify", auth, verify);
-router.post("/delivery-feedback", [auth, isValidPatient], deliveryFeedBack);
+router.post("/delivery-feedback", [auth], deliveryFeedBack);
 router.post("/ralations/add-care-giver", [auth, isValidPatient], addCareGiver);
 router.post(
   "/ralations/verify-and-add-care-receiver",

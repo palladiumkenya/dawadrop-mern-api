@@ -5,5 +5,9 @@
     "nishauri": "https://ushauriapi.kenyahmis.org/nishauri/",
     "ushauri": "https://ushauriapi.kenyahmis.org/",
     "mapquest":"https://www.mapquestapi.com/",
-    "openroute": "https://api.openrouteservice.org/"
+    "openroute": "https://api.openrouteservice.org/",
+    "deliveryConfirmationMessage": {
+        "template": ""
+    }
+
 }

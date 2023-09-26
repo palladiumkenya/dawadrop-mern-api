@@ -41,7 +41,15 @@ const getPatientsDeliveryRequests = async (req, res) => {
         from: "deliveries",
         foreignField: "order",
         localField: "_id",
-        as: "deliveries",
+        as: "delivery",
+      },
+    },
+    {
+      $lookup: {
+        from: "deliveryfeedbacks",
+        foreignField: "delivery",
+        localField: "delivery._id",
+        as: "feedBack",
       },
     },
   ]);
@@ -89,15 +97,24 @@ const deliveryFeedBack = async (req, res) => {
       throw {
         details: [{ path: ["delivery"], message: "Invalid Delivery" }],
       };
-    if (delivery.status !== "pending")
-      throw {
-        details: [{ path: ["delivery"], message: "Invalid Delivery" }],
-      };
-    const isRecepient = await delivery.isRecepientUser(req.user._id);
-    if (!isRecepient)
-      throw {
-        details: [{ path: ["delivery"], message: "Invalid Delivery" }],
-      };
+    // Check if delivery is based on order/request
+    const orderId = delivery.order;
+    if (orderId) {
+      const order = await DeliveryServiceRequest.findOne({ _id: orderId });
+      // if delivery is asociated with order, make sure order exist and was ordered by current user
+      if (!order || !order.orderedBy.equals(req.user._id)) {
+        throw {
+          details: [{ path: ["delivery"], message: "Invalid Delivery" }],
+        };
+      }
+    } else {
+      // If not asociated with order, makes sure curr user is patient and delivery.patient is curr patient
+      const patient = await Patient.findOne({ user: req.user._id });
+      if (!patient || !delivery.patient.equals(patient._id))
+        throw {
+          details: [{ path: ["delivery"], message: "Invalid Delivery" }],
+        };
+    }
     const feedBack = new DeliveryFeedBack(value);
     await feedBack.save();
     delivery.status = "delivered";

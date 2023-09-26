@@ -1,5 +1,9 @@
 const { Types } = require("mongoose");
-const { getValidationErrrJson, isValidDate } = require("../../utils/helpers");
+const {
+  getValidationErrrJson,
+  isValidDate,
+  constructSearch,
+} = require("../../utils/helpers");
 const { merge, isEmpty } = require("lodash");
 const {} = require("../validators");
 const DeliveryServiceRequest = require("../models/DeliveryServiceRequest");
@@ -8,20 +12,12 @@ const Delivery = require("../../deliveries/models/Delivery");
 const getDispenseOrder = async (req, res) => {
   try {
     const search = req.query.search;
-    if (!Types.ObjectId.isValid(search))
+    if (!search)
       throw {
         status: 404,
         message: "No DeliveryServiceRequest or delivery found!",
       };
-
-    const delivery = await Delivery.findById(search);
-    const orderId = (delivery ? delivery.order.toString() : null) || search;
     const order = await DeliveryServiceRequest.aggregate([
-      {
-        $match: {
-          _id: new Types.ObjectId(orderId),
-        },
-      },
       {
         $lookup: {
           from: "deliveries",
@@ -38,13 +34,39 @@ const getDispenseOrder = async (req, res) => {
           as: "patient",
         },
       },
+      {
+        $match: {
+          deliveries: {
+            $size: 0, // Filter by undelivered requests
+          },
+          "patient.artModel.modelCode": "fast_track", // Filter for patient in fast track
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "patient._id",
+          as: "user",
+        },
+      },
+      constructSearch(
+        search,
+        ["_id", "patient._id", "patient.cccNumber", "deliveries._id"],
+        ["patient.cccNumber"]
+      ),
+      {
+        $sort: {
+          createdAt: 1, // 1 for ascending order, -1 for descending order
+        },
+      },
     ]);
     if (isEmpty(order))
       throw {
         status: 404,
         message: "No DeliveryServiceRequest or delivery found!",
       };
-    return res.json(await order[0]);
+    return res.json({results: order});
   } catch (error) {
     const { error: err, status } = getValidationErrrJson(error);
     return res.status(status).json(err);

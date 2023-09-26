@@ -27,6 +27,15 @@ const getDeliveries = async (req, res) => {
           as: "event",
         },
       },
+      {
+        $lookup: {
+          from: "deliveryfeedbacks",
+          foreignField: "delivery",
+          localField: "_id",
+          as: "feedBack",
+        },
+      },
+      
     ]);
     return res.json({ results: methods });
   } catch (error) {
@@ -73,6 +82,14 @@ const getMyDeliveriesHistory = async (req, res) => {
           foreignField: "_id",
           localField: "patient",
           as: "patient",
+        },
+      },
+      {
+        $lookup: {
+          from: "deliveryfeedbacks",
+          foreignField: "delivery",
+          localField: "_id",
+          as: "feedBack",
         },
       },
       // {

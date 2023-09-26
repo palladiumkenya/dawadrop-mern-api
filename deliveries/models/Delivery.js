@@ -22,7 +22,8 @@ const Delivery = model(
           },
         },
       },
-      patient: { //subscriber
+      patient: {
+        //subscriber
         type: Schema.Types.ObjectId,
         ref: "Patient",
       },
@@ -61,10 +62,6 @@ const Delivery = model(
       deliveryAddress: {
         type: Address.schema,
         required: true,
-      },
-      isDelivered: {
-        type: Boolean,
-        default: false,
       },
       event: {
         type: Types.ObjectId,

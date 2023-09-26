@@ -39,10 +39,6 @@ const DeliveryServiceRequest = model(
       event: {
         type: ARTDistributionEvent.schema,
       },
-      updated: {
-        type: Date,
-        default: Date.now,
-      },
       deliveryAddress: {
         type: Address.schema,
         required: true,
@@ -109,6 +105,7 @@ const DeliveryServiceRequest = model(
         },
       },
       // Options for virtual properties
+      timestamps: true,
       toJSON: { virtuals: true, getters: true }, // Include virtual properties and getters when converting to JSON
       toObject: { virtuals: true, getters: true }, // Include virtual properties and getters when converting to object
     }
