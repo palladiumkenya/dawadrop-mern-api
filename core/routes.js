@@ -8,9 +8,9 @@ const {
 
 const router = Router();
 
-router.get("/", getSmsConfigs);
-router.put("/:id", updateSmsConfig);
-router.delete("/:id", deleteSmsConfig);
-router.post("/", createSmsConfig);
+router.get("/sms-config", getSmsConfigs);
+router.put("/sms-config/:id", updateSmsConfig);
+router.delete("/sms-config/:id", deleteSmsConfig);
+router.post("/sms-config", createSmsConfig);
 
 module.exports = router;
