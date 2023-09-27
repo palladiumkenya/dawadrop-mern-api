@@ -260,54 +260,7 @@ const confirmEventAttendance = async (req, res) => {
   }
 };
 
-const initiateDelivery = async (req, res) => {
-  const eventId = req.params.id;
-  try {
-    if (!Types.ObjectId.isValid(eventId))
-      throw {
-        status: 404,
-        message: "Event not found",
-      };
-    const event = await ARTDistributionEvent.findById(eventId);
-    if (!event)
-      throw {
-        status: 404,
-        message: "Event not found",
-      };
 
-    const values = await initiateDeliveryValidator(req.body);
-    const { member, courrierService } = values;
-    const patient = await Patient.findById(member);
-    let service;
-    if (courrierService)
-      service = await CourrierService.findById(courrierService);
-
-    const delivery = new Delivery({
-      ...values,
-      courrierService: service,
-      patient,
-      event: eventId,
-    });
-
-    await delivery.save();
-    // Sending only for smartphone users
-    const user = await User.findById(patient.user);
-    if (user) {
-      sendSms(
-        `Dear ${
-          user.firstName || user.username
-        }, your delivery has been initiated.Kindly use the code: ${
-          delivery._id
-        }.`,
-        user.phoneNumber
-      );
-    }
-    return res.json({ detail: "Confirmed successfull!" });
-  } catch (ex) {
-    const { error: err, status } = getValidationErrrJson(ex);
-    return res.status(status).json(err);
-  }
-};
 
 module.exports = {
   getARTDistributionEventDetail,
@@ -315,5 +268,4 @@ module.exports = {
   updateARTDistributionEvent,
   createARTDistributionEvent,
   confirmEventAttendance,
-  initiateDelivery,
 };

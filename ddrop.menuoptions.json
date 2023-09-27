@@ -1,14 +1,5 @@
 [{
   "_id": {
-    "$oid": "64e4338bb4b98b8a7915fadf"
-  },
-  "label": "Test",
-  "image": "/menu-icons/1692677003649-ontransit.png",
-  "link": "Test",
-  "__v": 0
-},
-{
-  "_id": {
     "$oid": "64b4cc98c9a227215ea757cd"
   },
   "label": "Manage Privileges",
@@ -61,7 +52,7 @@
   "_id": {
     "$oid": "64b74f6d98a59970e5d99284"
   },
-  "label": "Request Delivery",
+  "label": "Delivery Service Request",
   "description": "Orders",
   "image": "/menu-icons/1689735021332-2834c660-7a56-4272-a5a9-d119ac938c73.png",
   "link": "PatientOrders",
@@ -111,7 +102,7 @@
   "_id": {
     "$oid": "64bcd0f5e8b243d73b59f1d5"
   },
-  "label": "My delivery tasks",
+  "label": "Deliveries",
   "description": "Agent delivery tasks",
   "image": "/menu-icons/1690095861864-573d3ec3-0f0f-4580-ab74-cf321c7da1aa.png",
   "link": "CurriourDeliveryTasks",
@@ -214,4 +205,14 @@
   "image": "/menu-icons/1692845842807-8ee864ef-b8d7-4920-9173-f5cffc3acd62.png",
   "link": "ARTDistributionEvents",
   "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64ec964d140f997713fb90b8"
+  },
+  "label": "SMS Notification Configuration",
+  "image": "/menu-icons/1695803095395-fbf5cdfb-c796-436b-9cfb-be2e7d18c186.png",
+  "link": "NotificationConfig",
+  "__v": 0,
+  "description": "Sms Templates"
 }]

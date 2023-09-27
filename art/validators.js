@@ -85,7 +85,17 @@ const groupMemberShipSchema = Joi.object({
 });
 
 const initiateDeliverySchema = Joi.object({
-  member: Joi.string().label("Member").required().hex().length(24).messages({
+  order: Joi.string().label("Delivery Request").hex().length(24).messages({
+    "string.base": "{{#label}} invalid",
+    "string.hex": "{{#label}} invalid",
+    "string.length": "{{#label}} invalid",
+  }),
+  member: Joi.string().label("Member").hex().length(24).messages({
+    "string.base": "{{#label}} invalid",
+    "string.hex": "{{#label}} invalid",
+    "string.length": "{{#label}} invalid",
+  }),
+  event: Joi.string().label("Distribution Event").hex().length(24).messages({
     "string.base": "{{#label}} invalid",
     "string.hex": "{{#label}} invalid",
     "string.length": "{{#label}} invalid",
