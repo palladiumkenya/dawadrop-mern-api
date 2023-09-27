@@ -6,8 +6,8 @@
     "ushauri": "https://ushauriapi.kenyahmis.org/",
     "mapquest":"https://www.mapquestapi.com/",
     "openroute": "https://api.openrouteservice.org/",
-    "deliveryConfirmationMessage": {
-        "template": ""
+    "sms": {
+        "EVENT_REMINDER": "Dear {{name}}, this message is to remind you of the forth comming event {{event_title}} for {{event_group}} scheduled for {{event_time}} at {{event_venue}}.Please note {{event_remarks}}.For more inquiries kindly contact {{event_organizer}}"
     }
 
 }

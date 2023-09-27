@@ -9,12 +9,16 @@ const deliveryRoutes = require("./deliveries/routes");
 const ordersRoutes = require("./orders/routes");
 const mapsRoute = require("./maps/routes");
 const artRoute = require("./art/routes");
+const coreRoute = require("./core/routes");
 const { createServer } = require("http");
 dotenv.config();
 const config = require("config");
 const { MEDIA_ROOT, BASE_DIR } = require("./utils/constants");
 const { createSocketServer } = require("./socket/socket");
-const { generateRandomNumberInRange } = require("./utils/helpers");
+const {
+  generateRandomNumberInRange,
+  parseMessage,
+} = require("./utils/helpers");
 console.log(`[-]App name: ${config.get("name")}`);
 console.log(`[-]Database: ${config.get("db")}`);
 const moment = require("moment/moment");
@@ -46,6 +50,7 @@ app.use("/deliveries", deliveryRoutes);
 app.use("/orders", ordersRoutes);
 app.use("/maps", mapsRoute);
 app.use("/art", artRoute);
+app.use("/", coreRoute);
 app.get("/data", (req, res) => {
   const appointmentType = [
     "Re-Fill",

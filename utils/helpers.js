@@ -201,6 +201,29 @@ function generateOTP(length = 5) {
 function generateExpiryTime(minutes = 5) {
   return moment().add(minutes, "minute");
 }
+
+function parseMessage(object, template) {
+  // regular expression to match placeholders like {{field}}
+  const placeholderRegex = /{{(.*?)}}/g;
+
+  // Use a replace function to replace placeholders with corresponding values
+  const parsedMessage = template.replace(
+    placeholderRegex,
+    (match, fieldName) => {
+      // The fieldName variable contains the field name inside the placeholder
+      // Check if the field exists in the event object
+      if (object.hasOwnProperty(fieldName)) {
+        return object[fieldName]; // Replace with the field's value
+      } else {
+        // Placeholder not found in event, leave it unchanged
+        return match;
+      }
+    }
+  );
+
+  return parsedMessage;
+}
+module.exports.parseMessage = parseMessage;
 module.exports.generateOTP = generateOTP;
 module.exports.generateExpiryTime = generateExpiryTime;
 module.exports.getValidationErrrJson = getValidationErrrJson;
