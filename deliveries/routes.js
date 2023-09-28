@@ -23,10 +23,10 @@ const {
 const {
   getDeliveries,
   getMyDeliveriesHistory,
-  createDelivery,
   updateDelivery,
   deliveryAction,
   getDeliveryDetail,
+  initiateDelivery,
 } = require("./views/delivery");
 const {
   getDeliveryMethods,
@@ -39,7 +39,12 @@ const {
   createTimeSlot,
   updateTimeSlot,
 } = require("./views/timeslot");
-const { getModes, getModeDetail, createMode, updateMode } = require("./views/modes");
+const {
+  getModes,
+  getModeDetail,
+  createMode,
+  updateMode,
+} = require("./views/modes");
 
 const router = Router();
 
@@ -64,7 +69,7 @@ router.put("/methods/:id", updateDeliveryMethod);
 
 router.get("/", getDeliveries);
 router.get("/history", [auth], getMyDeliveriesHistory);
-router.post("/", createDelivery);
+router.post("/", initiateDelivery);
 router.put("/:id", updateDelivery);
 router.post("/:id/:action", deliveryAction);
 

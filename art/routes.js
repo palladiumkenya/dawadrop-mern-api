@@ -18,7 +18,6 @@ const {
   updateARTDistributionEvent,
   getARTDistributionEventDetail,
   confirmEventAttendance,
-  initiateDelivery,
 } = require("./views/events");
 const {
   getARTDistributionGroups,
@@ -51,11 +50,6 @@ router.get(
   "/distribution-events/:id/confirm-attendance",
   [auth, isValidPatient],
   confirmEventAttendance
-);
-router.post(
-  "/distribution-events/:id/initiate-delivery",
-  [auth],
-  initiateDelivery
 );
 
 router.get("/distribution-groups", [auth], getARTDistributionGroups);

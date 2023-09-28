@@ -369,8 +369,8 @@ const getDeliveryDetail = async (req, res) => {
 module.exports = {
   getDeliveries,
   getMyDeliveriesHistory,
-  createDelivery,
   updateDelivery,
   deliveryAction,
   getDeliveryDetail,
+  initiateDelivery
 };
