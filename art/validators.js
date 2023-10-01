@@ -84,50 +84,81 @@ const groupMemberShipSchema = Joi.object({
     }),
 });
 
-const initiateDeliverySchema = Joi.object({
-  order: Joi.string().label("Delivery Request").hex().length(24).messages({
-    "string.base": "{{#label}} invalid",
-    "string.hex": "{{#label}} invalid",
-    "string.length": "{{#label}} invalid",
-  }),
-  member: Joi.string().label("Member").hex().length(24).messages({
-    "string.base": "{{#label}} invalid",
-    "string.hex": "{{#label}} invalid",
-    "string.length": "{{#label}} invalid",
-  }),
-  event: Joi.string().label("Distribution Event").hex().length(24).messages({
-    "string.base": "{{#label}} invalid",
-    "string.hex": "{{#label}} invalid",
-    "string.length": "{{#label}} invalid",
-  }),
-  services: Joi.array().items(Joi.string()).label("Extra services").default([]),
-  deliveryType: Joi.string()
-    .label("Delivery type")
-    .valid("self", "courrier", "delegate", "patient-preferred")
-    .required(),
-  courrierService: Joi.string()
-    .label("Courrier service")
-    .hex()
-    .length(24)
-    .messages({
+const createDeliverySchema = async (event) => {
+  const bing = Joi.object({
+    order: Joi.string().label("Order").hex().length(24).messages({
       "string.base": "{{#label}} invalid",
       "string.hex": "{{#label}} invalid",
       "string.length": "{{#label}} invalid",
     }),
-  deliveryPerson: Joi.object({
-    fullName: Joi.string().required().label("Full name"),
-    nationalId: Joi.number().required().label("National Id"),
-    phoneNumber: Joi.string().required().label("Phone number"),
-    pickUpTime: Joi.date().required().label("Pick up time"),
-  }).label("Delivery person"),
-  deliveryAddress: Joi.object({
-    latitude: Joi.number().label("Latitude"),
-    longitude: Joi.number().label("Longitude"),
-    address: Joi.string().label("Address"),
-  })
-    .label("Delivery address")
-    .required(),
-});
+    event: Joi.string().label("Distribution Event").hex().length(24).messages({
+      "string.base": "{{#label}} invalid",
+      "string.hex": "{{#label}} invalid",
+      "string.length": "{{#label}} invalid",
+    }),
+    member: Joi.string()
+      .label("Member")
+      .hex()
+      .length(24)
+      .messages({
+        "string.base": "{{#label}} invalid",
+        "string.hex": "{{#label}} invalid",
+        "string.length": "{{#label}} invalid",
+      })
+      .when("event", {
+        is: Joi.exist(),
+        then: Joi.string().required(),
+        otherwise: Joi.string(),
+      }),
+    services: Joi.array().default([]).label("Extra services"),
+    deliveryType: Joi.string()
+      .label("Delivery type")
+      .valid("self", "courrier", "delegate")
+      .required()
+      .when("member", {
+        is: Joi.exist(),
+        then: Joi.valid(" ", "courrier", "delegate", "patient-preferred"),
+        otherwise: Joi.valid("self", "courrier", "delegate"),
+      }),
+    courrierService: Joi.string()
+      .label("Courrier service")
+      .when("deliveryType", {
+        is: "courrier",
+        then: Joi.string().required(),
+        otherwise: Joi.string(),
+      }),
+    deliveryPerson: Joi.object({
+      fullName: Joi.string().required().label("Full name"),
+      nationalId: Joi.number().required().label("National Id"),
+      phoneNumber: Joi.string().label("Phone number").required(),
+      pickUpTime: Joi.date().required().label("Pick up time"),
+    })
+      .label("Delivery person")
+      .when("deliveryType", {
+        is: ["courrier", "delegate"],
+        then: Joi.object({
+          fullName: Joi.string().required().label("Full name"),
+          nationalId: Joi.number().required().label("National Id"),
+          phoneNumber: Joi.string().label("Phone number").required(),
+          pickUpTime: Joi.date().required().label("Pick up time"),
+        }).required(),
+        otherwise: Joi.object({
+          fullName: Joi.string().required().label("Full name"),
+          nationalId: Joi.number().required().label("National Id"),
+          phoneNumber: Joi.string().label("Phone number").required(),
+          pickUpTime: Joi.date().required().label("Pick up time"),
+        }),
+      }),
+    deliveryAddress: Joi.object({
+      latitude: Joi.number().label("Latitude"),
+      longitude: Joi.number().label("Longitude"),
+      address: Joi.string().label("Address"),
+    })
+      .label("Delivery address")
+      .required(),
+  }).xor("order", "event");
+  return bing;
+};
 
 module.exports.artModelValidator = async (data) => {
   return await artModelSchema.validateAsync(cleanFalsyAttributes(data), {
@@ -155,10 +186,9 @@ module.exports.groupsMemberShipValidator = async (data) => {
   });
 };
 module.exports.initiateDeliveryValidator = async (data) => {
-  return await initiateDeliverySchema.validateAsync(
-    cleanFalsyAttributes(data),
-    {
-      abortEarly: false,
-    }
-  );
+  return await (
+    await createDeliverySchema()
+  ).validateAsync(cleanFalsyAttributes(data), {
+    abortEarly: false,
+  });
 };

@@ -8,6 +8,8 @@ const { initiateDeliveryValidator } = require("../../art/validators");
 const DeliveryServiceRequest = require("../../orders/models/DeliveryServiceRequest");
 const CourrierService = require("../models/CourrierService");
 const ARTDistributionEvent = require("../../art/models/ARTDistributionEvent");
+const User = require("../../auth/models/User");
+const { sendSms } = require("../../patients/api");
 
 const getDeliveries = async (req, res) => {
   try {
@@ -110,159 +112,83 @@ const getMyDeliveriesHistory = async (req, res) => {
 
 const initiateDelivery = async (req, res) => {
   try {
-    const errors = [];
     const values = await initiateDeliveryValidator(req.body);
     const {
       event: eventId,
       order: orderId,
       member,
-      courrierService,
+      courrierService: serviceId,
       deliveryType,
     } = values;
-    // make sure both event and order are not peovided && make sure that both event and order are not missing
-    if ((eventId && orderId) || (!eventId && !orderId)) {
-      errors.push({
-        path: ["event"],
-        message:
-          "You must provide either event or delivery request and not both",
-      });
-      errors.push({
-        path: ["order"],
-        message:
-          "You must provide either event or delivery request and not both",
-      });
-    }
+    let event;
+    let order;
+    let courrierService;
+    let patient;
     if (eventId) {
-      const _event = await ARTDistributionEvent.aggregate([
-        {
-          $match: {
-            _id: new Types.ObjectId(eventId),
-          },
-        },
-        {
-          $lookup: {
-            from: "artdistributiongroupenrollments",
-            foreignField: "group._id",
-            localField: "group._id",
-            as: "subscriptions",
-          },
-        },
-        {
-          $lookup: {
-            from: "patients",
-            foreignField: "_id",
-            localField: "subscriptions.patient",
-            as: "patientSubscribers",
-          },
-        },
-        {
-          $lookup: {
-            from: "users",
-            foreignField: "_id",
-            localField: "patientSubscribers.user",
-            as: "subscribers",
-          },
-        },
-        {
-          $lookup: {
-            from: "artdistributioneventfeedbacks",
-            foreignField: "event",
-            localField: "_id",
-            as: "feedBacks",
-          },
-        },
-        {
-          $lookup: {
-            from: "deliveryservicerequests",
-            foreignField: "_id",
-            localField: "feedBacks.deliveryRequest",
-            as: "deliveryRequests",
-          },
-        },
-      ]);
-      const event = _event[0];
+      event = await ARTDistributionEvent.findById(eventId);
       if (!event)
-        errors.push({
-          path: ["event"],
-          message: "Invalid event.Event does not exist",
-        });
-      if (event && !member)
-        errors.push({
-          path: ["member"],
-          message: "Subscriber field is required",
-        });
-        // if(event && member.)
-      const patient = await Patient.findById(member);
+        throw {
+          errors: [
+            {
+              path: ["event"],
+              message: "Invalid Event",
+            },
+          ],
+        };
+    }
+    if (deliveryType !== "courrier") delete values.courrierService;
+    if (serviceId) {
+      courrierService = await CourrierService.findById(values.courrierService);
+      if (!courrierService)
+        throw {
+          details: [
+            {
+              path: ["courrierService"],
+              message: "Invalid courrierService",
+            },
+          ],
+        };
+    }
+    if (event && member) {
+      patient = await Patient.findById(member);
       if (!patient)
-        errors.push({
-          path: ["member"],
-          message: "Invalid Subscriber.Subscriber does not exist",
-        });
-      const { feedBacks, patientSubscribers, deliveryRequests } = event;
-      // get current subscriber feedback on event
-      const feedBack = feedBacks.find(
-        ({ user }) =>
-          user ===
-          patientSubscribers.find(({ _id }) => _id.equals(patient._id))?.user
-      );
-      // Get current user delivery request if they requested home delivery
-      const deliveryRequest = deliveryRequests.find(({ _id }) =>
-        _id.equals(feedBack?.deliveryRequest)
-      );
-      // If subscriber make a request intead of confirming atendance then allow patient-preferred method
-      if (feedBack?.confirmedAttendance === false) {
-        if (
-          !["self", "courrier", "delegate", "patient-preferred"].includes(
-            deliveryType
-          )
-        )
-          errors.push({
-            path: ["deliveryType"],
-            message:
-              "Unsupotered Delivery type.Must be one of " +
-              ["self", "courrier", "delegate", "patient-preferred"].join(", "),
-          });
-      }
-      // If subscriber did not request delivery
-      if (feedBack?.confirmedAttendance === true) {
-        if (!["self", "courrier", "delegate"].includes(deliveryType))
-          errors.push({
-            path: ["deliveryType"],
-            message:
-              "Unsupotered Delivery type.Must be one of " +
-              ["self", "courrier", "delegate"].join(", "),
-          });
-      }
+        throw {
+          details: [
+            {
+              path: ["member"],
+              message: "Invalid Member",
+            },
+          ],
+        };
     }
+
+    // If Order the set patient/subscriber to order owner
     if (orderId) {
-      const deliveryRequest = await DeliveryServiceRequest.findById(orderId);
-      if (!deliveryRequest)
-        errors.push({
-          path: ["order"],
-          message: "Invalid Delivery request.Request does not exist",
-        });
+      order = await DeliveryServiceRequest.findById(orderId);
+      if (!order)
+        throw {
+          details: [
+            {
+              path: ["order"],
+              message: "Invalid order",
+            },
+          ],
+        };
+      patient = await Patient.findById(order.patient);
     }
-
-    if (deliveryType === "courrier" && !courrierService)
-      errors.push({
-        path: ["courrierService"],
-        message: "Cuourrier service is required",
-      });
-    if (courrierService) {
-      const service = await CourrierService.findById(courrierService);
-      if (!service)
-        errors.push({
-          path: ["courrierService"],
-          message: "Invalid Courrier service",
-        });
+    if (["patient-preferred", "self"].includes(deliveryType)) {
+      delete values.deliveryPerson;
     }
-    let service;
-
+    if (["patient-preferred"].includes(deliveryType)) {
+      delete values.deliveryAddress;
+    }
+    // del person, del address
     const delivery = new Delivery({
       ...values,
-      courrierService: service,
-      patient,
-      event: eventId,
+      courrierService,
+      patient: patient._id,
+      event: event?._id,
+      order: order?._id,
     });
 
     await delivery.save();
@@ -339,6 +265,7 @@ const deliveryAction = async (req, res) => {
 };
 
 const getDeliveryDetail = async (req, res) => {
+  /*
   const delivery = await Delivery.findById(req.params.id).populate(
     // "dispencedBy",
     // "deliveredBy",
@@ -360,7 +287,52 @@ const getDeliveryDetail = async (req, res) => {
         select: "username email phoneNumber image",
       },
     ]
-  );
+  );*/
+  const _delivery = await Delivery.aggregate([
+    {
+      $match: {
+        _id: new Types.ObjectId(req.params.id),
+      },
+    },
+    {
+      $lookup: {
+        from: "deliveryservicerequests",
+        foreignField: "_id",
+        localField: "order",
+        as: "order",
+      },
+    },
+    {
+      $lookup: {
+        from: "artdistributionevents",
+        foreignField: "_id",
+        localField: "event",
+        as: "event",
+      },
+    },
+    {
+      $lookup: {
+        from: "patients",
+        foreignField: "_id",
+        localField: "patient",
+        as: "patient",
+      },
+    },
+    {
+      $lookup: {
+        from: "deliveryfeedbacks",
+        foreignField: "delivery",
+        localField: "_id",
+        as: "feedBack",
+      },
+    },
+    // {
+    //   $addFields: {
+    //     phoneNumber:
+    //   },
+    // },
+  ]);
+  const delivery = _delivery[0];
   if (!delivery) {
     return res.status(404).json({ detail: "Delivery  not found" });
   }
@@ -372,5 +344,5 @@ module.exports = {
   updateDelivery,
   deliveryAction,
   getDeliveryDetail,
-  initiateDelivery
+  initiateDelivery,
 };

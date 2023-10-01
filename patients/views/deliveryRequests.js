@@ -97,6 +97,14 @@ const deliveryFeedBack = async (req, res) => {
       throw {
         details: [{ path: ["delivery"], message: "Invalid Delivery" }],
       };
+    // make sure is delivered
+    const _feedBack = await DeliveryFeedBack.findOne({
+      delivery: delivery._id,
+    });
+    if (_feedBack)
+      throw {
+        details: [{ path: ["delivery"], message: "Invalid Delivery" }],
+      };
     // Check if delivery is based on order/request
     const orderId = delivery.order;
     if (orderId) {
