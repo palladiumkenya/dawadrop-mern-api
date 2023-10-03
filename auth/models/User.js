@@ -110,6 +110,9 @@ const User = model(
         type: Boolean,
         default: false,
       },
+      pushNotificationToken: {
+        type: String,
+      }
     },
     {
       methods: {

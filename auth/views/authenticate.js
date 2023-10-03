@@ -18,6 +18,7 @@ const bcrypt = require("bcrypt");
 const { isEmpty, pick, merge } = require("lodash");
 const { PROFILE_MEDIA } = require("../../utils/constants");
 const Role = require("../models/Role");
+const { use } = require("../routes");
 
 const register = async (req, res) => {
   // let user = User.findOne({email})
@@ -291,6 +292,21 @@ const updateProfile = async (req, res) => {
   }
 };
 
+
+const addExpoPushToken = async (req, res) => {
+  try {
+    const { expoPushToken } = req.body
+    const user = req.user
+    if (expoPushToken) {
+      user.pushNotificationToken = expoPushToken
+      await user.save()
+    }
+    return res.json({ token: user.pushNotificationToken })
+  } catch (error) {
+    const { error: err, status } = getValidationErrrJson(error);
+    return res.status(status).json(err);
+  }
+}
 module.exports = {
   register,
   login,
@@ -298,4 +314,5 @@ module.exports = {
   changePassword,
   updateProfile,
   usersList,
+  addExpoPushToken
 };
