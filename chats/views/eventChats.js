@@ -1,8 +1,12 @@
 const { Types } = require("mongoose");
 const ARTDistributionEvent = require("../../art/models/ARTDistributionEvent");
-const { getValidationErrrJson } = require("../../utils/helpers");
+const {
+  getValidationErrrJson,
+  deleteUploadedFileAsyncMannual,
+} = require("../../utils/helpers");
 const Chat = require("../models/Chat");
 const { chatValidator } = require("../validators");
+const { CHATS_MEDIA } = require("../../utils/constants");
 
 const getEventChats = async (req, res) => {
   const eventId = req.params.id;
@@ -63,12 +67,21 @@ const addChat = async (req, res) => {
         status: 404,
         message: "ART Distribution Event not found",
       };
-    const values = await chatValidator(req.body);
-    const chats = new Chat(values);
+    //   Make sure user is scribers
+    const body = req.body;
+    if (req.file) {
+      body.messageType = "image";
+      body.message = `/${CHATS_MEDIA}${req.file.filename}`;
+    } else {
+      body.messageType = "text";
+    }
+    const values = await chatValidator(body);
+    const chats = new Chat({ ...values, event: eventId, sender: req.user._id });
     await chats.save();
     return res.json(chats);
   } catch (ex) {
     const { error: err, status } = getValidationErrrJson(ex);
+    if (req.file) await deleteUploadedFileAsyncMannual(req.file.path);
     return res.status(status).json(err);
   }
 };

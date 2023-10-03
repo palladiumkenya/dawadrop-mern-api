@@ -48,13 +48,15 @@ const BASE_DIR = process.cwd();
 const MEDIA_ROOT = `media/`;
 const PROFILE_MEDIA = `uploads/`;
 const MENU_MEDIA = `menu-icons/`;
+const CHATS_MEDIA = `chats/`;
 
-const ALLOWED_ORDER_PERIOD = ""
+const ALLOWED_ORDER_PERIOD = "";
 exports.surpotedPermisionAction = actions;
 exports.patientActions = patientActions;
 exports.roleActions = roleActions;
 exports.privilegeActions = privilegeActions;
 exports.BASE_DIR = BASE_DIR;
+exports.CHATS_MEDIA = CHATS_MEDIA;
 exports.MEDIA_ROOT = MEDIA_ROOT;
 exports.PROFILE_MEDIA = PROFILE_MEDIA;
 exports.MENU_MEDIA = MENU_MEDIA;

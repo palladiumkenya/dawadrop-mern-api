@@ -7,11 +7,6 @@ const chatSchema = Joi.object({
     .label("Message Type")
     .required(),
   message: Joi.string().required().label("Message"),
-  sender: Joi.string().required().label("Sender").hex().length(24).messages({
-    "string.base": "{{#label}} invalid",
-    "string.hex": "{{#label}} invalid",
-    "string.length": "{{#label}} invalid",
-  }),
 });
 
 exports.chatValidator = async (data) => {

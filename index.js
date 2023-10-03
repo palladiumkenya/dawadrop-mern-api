@@ -10,6 +10,7 @@ const ordersRoutes = require("./orders/routes");
 const mapsRoute = require("./maps/routes");
 const artRoute = require("./art/routes");
 const coreRoute = require("./core/routes");
+const chatRoute = require("./chats/routes");
 const { createServer } = require("http");
 dotenv.config();
 const config = require("config");
@@ -50,6 +51,7 @@ app.use("/deliveries", deliveryRoutes);
 app.use("/orders", ordersRoutes);
 app.use("/maps", mapsRoute);
 app.use("/art", artRoute);
+app.use("/chats", chatRoute);
 app.use("/", coreRoute);
 app.get("/data", (req, res) => {
   const appointmentType = [
