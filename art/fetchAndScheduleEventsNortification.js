@@ -4,7 +4,7 @@ const { sendSms } = require("../patients/api");
 const { parseMessage } = require("../utils/helpers");
 const config = require("config");
 const SmsConfig = require("../core/models/SmsConfig");
-const moment = require("moment/moment")
+const moment = require("moment/moment");
 async function fetchAndScheduleEventsNortification() {
   try {
     const currentDate = new Date();
@@ -25,6 +25,14 @@ async function fetchAndScheduleEventsNortification() {
       },
       {
         $lookup: {
+          from: "patients",
+          foreignField: "_id",
+          localField: "subscriptions.patient",
+          as: "patientSubscribers",
+        },
+      },
+      {
+        $lookup: {
           from: "users",
           foreignField: "_id",
           localField: "group.lead.user",
@@ -35,7 +43,7 @@ async function fetchAndScheduleEventsNortification() {
         $lookup: {
           from: "users",
           foreignField: "_id",
-          localField: "subscriptions.user",
+          localField: "patientSubscribers.user",
           as: "subscribers",
         },
       },
@@ -85,6 +93,7 @@ async function fetchAndScheduleEventsNortification() {
             // Send nortification to all event subscribers
             for (const subscriber of event.subscribers) {
               const { username, phoneNumber, firstName } = subscriber;
+              console.log("Sending sms to ....", username, phoneNumber);
               const name = firstName || username;
               await sendSms(
                 parseMessage(
@@ -100,6 +109,7 @@ async function fetchAndScheduleEventsNortification() {
             // send nortification to extra subscribers
             for (const subscriber of event.extraSubscribers) {
               const { name, phoneNumber } = subscriber;
+              console.log("Sending sms to ....", name, phoneNumber);
               await sendSms(
                 parseMessage({ ...eventDetails, name }, template),
                 phoneNumber

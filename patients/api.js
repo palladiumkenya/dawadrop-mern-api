@@ -1,19 +1,10 @@
+const axios = require("axios");
 const dotenv = require("dotenv");
 dotenv.config();
 const config = require("config");
 const https = require("https");
 const path = require("path");
 const fs = require("fs");
-import("node-fetch")
-  .then((fetchModule) => {
-    // You can use fetchModule here
-    const fetch = fetchModule.default; // Assuming 'node-fetch' exports a default object
-    // Rest of your code using fetch
-  })
-  .catch((error) => {
-    // Handle error if import fails
-    console.error('Error importing "node-fetch":', error);
-  });
 
 const searchPatient = async (upi) => {
   try {
@@ -26,17 +17,18 @@ const searchPatient = async (upi) => {
   } catch (error) {
     console.error("Error fetching Reports fact ART:", error);
   }
-  // const response = await fetch(
-  //   `${config.get("ushauri")}mohupi/search_ccc?client_id=${upi}`,
-  //   {
-  //     method: "GET",
+  // const url = `${config.get("ushauri")}mohupi/search_ccc?client_id=${upi}`;
+  // try {
+  //   const response = await axios.get(url);
+
+  //   if (response.status === 200) {
+  //     const data = response.data;
+  //     if (data.success) {
+  //       return data.message;
+  //     }
   //   }
-  // );
-  // if (response.status === 200) {
-  //   const data = await response.json();
-  //   if (data.success) {
-  //     return data.message;
-  //   }
+  // } catch (error) {
+  //   console.error("Error searching patient:", error);
   // }
   return null;
 };
@@ -56,23 +48,27 @@ const sendOtp = async (otp, phone, create = true) => {
     "Content-Type": "application/json",
   };
 
-  const raw = JSON.stringify({
+  const data = {
     destination: phone,
     msg: message,
     sender_id: phone,
     gateway: shortCode,
-  });
-
-  const requestOptions = {
-    method: "POST",
-    headers: headers,
-    body: raw,
-    // redirect: "follow",
-    // mode: "cors",
-    // credentials: "omit",
   };
 
-  await fetch(url, requestOptions);
+  try {
+    const response = await axios.post(url, data, { headers });
+
+    if (response.status === 200) {
+      const responseBody = response.data;
+      if (responseBody.success) {
+        return responseBody.message;
+      }
+    }
+  } catch (error) {
+    console.error("Error sending OTP:", error);
+  }
+
+  return null;
 };
 
 const sendSms = async (message, phone) => {
@@ -86,36 +82,36 @@ const sendSms = async (message, phone) => {
     "Content-Type": "application/json",
   };
 
-  const raw = JSON.stringify({
+  const data = {
     destination: phone,
     msg: message,
     sender_id: phone,
     gateway: shortCode,
-  });
-
-  const requestOptions = {
-    method: "POST",
-    headers: headers,
-    body: raw,
-    // redirect: "follow",
-    // mode: "cors",
-    // credentials: "omit",
   };
 
-  await fetch(url, requestOptions);
+  try {
+    await axios.post(url, data, { headers });
+  } catch (error) {
+    console.error("Error sending SMS:", error);
+  }
 };
 
 const getRegimen = async (cccNumber) => {
   const url = `http://prod.kenyahmis.org:8002/api/patient/${cccNumber}/regimen`;
-  // return "ABC + GPT + LOP";
 
-  const response = await fetch(url, { method: "GET" });
-  if (response.status === 200) {
-    const data = await response.json();
-    if (data["status"] === "success") {
-      return data.message;
+  try {
+    const response = await axios.get(url);
+
+    if (response.status === 200) {
+      const data = response.data;
+      if (data["status"] === "success") {
+        return data.message;
+      }
     }
+  } catch (error) {
+    console.error("Error getting regimen:", error);
   }
+
   return null;
 };
 
