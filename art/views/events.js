@@ -224,7 +224,7 @@ const confirmEventAttendance = async (req, res) => {
       };
     const patient = await Patient.findOne({ user: req.user._id });
     const enrolment = await ARTDistributionGroupEnrollment.findOne({
-      group: event.group,
+      "group._id": event.group._id,
       patient: patient._id,
       isCurrent: true,
     });
@@ -259,8 +259,6 @@ const confirmEventAttendance = async (req, res) => {
     return res.status(status).json(err);
   }
 };
-
-
 
 module.exports = {
   getARTDistributionEventDetail,
