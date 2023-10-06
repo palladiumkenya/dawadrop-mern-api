@@ -2,8 +2,9 @@ const { Types } = require("mongoose");
 const {
   getValidationErrrJson,
   cleanFalsyAttributes,
+  parseMessage,
 } = require("../../utils/helpers");
-const { merge } = require("lodash");
+const { merge, template } = require("lodash");
 const { deliveryServiceRequestValidator } = require("../validators");
 const DeliveryServiceRequest = require("../models/DeliveryServiceRequest");
 const CourrierService = require("../../deliveries/models/CourrierService");
@@ -15,6 +16,9 @@ const TreatmentSurport = require("../../patients/models/TreatmentSurport");
 const ARTDistributionGroupEnrollment = require("../../art/models/ARTDistributionGroupEnrollment");
 const ARTDistributionGroup = require("../../art/models/ARTDistributionGroup");
 const ARTDistributionEventFeedBack = require("../../art/models/ARTDistributionEventFeedBack");
+const { sendSms } = require("../../patients/api");
+const SmsConfig = require("../../core/models/SmsConfig");
+const config = require("config")
 
 const getDeliveryServiceRequest = async (req, res) => {
   const orders = await DeliveryServiceRequest.find();
@@ -212,6 +216,24 @@ const createDeliveryServiceRequest = async (req, res) => {
         await feedBack.save();
       }
     }
+
+    // Send sms of succesfull Order
+
+    const orderDetail = {
+      name: req.user.firstName || req.user.username,
+      deliveryAddress: request.deliveryAddress?.address,
+      phoneNumber: request.phoneNumber
+    }
+
+    const smsTemplate =  (
+      await SmsConfig.findOne({
+        smsType: "ORDER_SUCCESS",
+      })
+    )?.smsTemplate || config.get("sms.ORDER_SUCCESS");
+
+    const message = parseMessage(orderDetail, smsTemplate)
+    sendSms(message, req.user.phoneNumber)
+
     return res.json(request);
   } catch (ex) {
     const { error: err, status } = getValidationErrrJson(ex);

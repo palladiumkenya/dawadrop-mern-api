@@ -95,7 +95,7 @@ async function fetchAndScheduleEventsNortification() {
               const { username, phoneNumber, firstName } = subscriber;
               console.log("Sending sms to ....", username, phoneNumber);
               const name = firstName || username;
-              await sendSms(
+              sendSms(
                 parseMessage(
                   {
                     ...eventDetails,
@@ -110,7 +110,7 @@ async function fetchAndScheduleEventsNortification() {
             for (const subscriber of event.extraSubscribers) {
               const { name, phoneNumber } = subscriber;
               console.log("Sending sms to ....", name, phoneNumber);
-              await sendSms(
+              sendSms(
                 parseMessage({ ...eventDetails, name }, template),
                 phoneNumber
               );
