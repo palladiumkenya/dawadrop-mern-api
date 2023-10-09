@@ -86,16 +86,19 @@ const groupMemberShipSchema = Joi.object({
 
 const createDeliverySchema = async (event) => {
   const bing = Joi.object({
+    // Optional bt required when event not provided: setled
     order: Joi.string().label("Order").hex().length(24).messages({
       "string.base": "{{#label}} invalid",
       "string.hex": "{{#label}} invalid",
       "string.length": "{{#label}} invalid",
     }),
+    // Optional bt required when orders not provided: settled
     event: Joi.string().label("Distribution Event").hex().length(24).messages({
       "string.base": "{{#label}} invalid",
       "string.hex": "{{#label}} invalid",
       "string.length": "{{#label}} invalid",
     }),
+    // Optional bt required when event is provided : settled
     member: Joi.string()
       .label("Member")
       .hex()
@@ -110,18 +113,34 @@ const createDeliverySchema = async (event) => {
         then: Joi.string().required(),
         otherwise: Joi.string(),
       }),
+      // Optional:Settled
     services: Joi.array().default([]).label("Extra services"),
+    // 1.Required
+    // 2. If based on delivery request then values must be self, courrier, patient-prefered
+    // 
     deliveryType: Joi.string()
-      .label("Delivery type")
-      .valid("self", "courrier", "delegate")
+      .label("Delivery type") 
+      .valid("self", "courrier")
       .required()
       .when("member", {
         is: Joi.exist(),
-        then: Joi.valid(" ", "courrier", "delegate", "patient-preferred"),
-        otherwise: Joi.valid("self", "courrier", "delegate"),
+        then: Joi.valid("self", "courrier", "patient-preferred"),
+        otherwise: Joi.valid("self", "courrier"),
+      }).when("order", {
+        is: Joi.exist(),
+        then: Joi.valid("self", "courrier", "patient-preferred"),
+        otherwise: Joi.valid("self", "courrier"),
       }),
+      // Optional bt required if delivery type is courrier:settled
     courrierService: Joi.string()
       .label("Courrier service")
+      .hex()
+      .length(24)
+      .messages({
+        "string.base": "{{#label}} invalid",
+        "string.hex": "{{#label}} invalid",
+        "string.length": "{{#label}} invalid",
+      })
       .when("deliveryType", {
         is: "courrier",
         then: Joi.string().required(),
@@ -135,7 +154,7 @@ const createDeliverySchema = async (event) => {
     })
       .label("Delivery person")
       .when("deliveryType", {
-        is: ["courrier", "delegate"],
+        is: ["courrier"],
         then: Joi.object({
           fullName: Joi.string().required().label("Full name"),
           nationalId: Joi.number().required().label("National Id"),
@@ -155,7 +174,6 @@ const createDeliverySchema = async (event) => {
       address: Joi.string().label("Address"),
     })
       .label("Delivery address")
-      .required(),
   }).xor("order", "event");
   return bing;
 };

@@ -34,7 +34,7 @@ const Delivery = model(
       deliveryType: {
         type: String,
         required: true,
-        enum: ["self", "courrier", "delegate", "patient-preferred"],
+        enum: ["self", "courrier", "patient-preferred"],
       },
       courrierService: {
         type: CourrierService.schema,
@@ -61,12 +61,15 @@ const Delivery = model(
       },
       deliveryAddress: {
         type: Address.schema,
-        required: true,
       },
       event: {
         type: Types.ObjectId,
         ref: "ARTDistributionEvent",
       },
+      initiatedBy: {
+        type: Types.ObjectId,
+        ref: "User"
+      }
     },
     {
       timestamps: true, // Automatically add createdAt and updatedAt fields

@@ -1,5 +1,5 @@
 const { Types } = require("mongoose");
-const { getValidationErrrJson } = require("../../utils/helpers");
+const { getValidationErrrJson, parseMessage } = require("../../utils/helpers");
 const { merge, omit, includes } = require("lodash");
 const { deliveryValidator } = require("../validators");
 const Delivery = require("../models/Delivery");
@@ -10,6 +10,8 @@ const CourrierService = require("../models/CourrierService");
 const ARTDistributionEvent = require("../../art/models/ARTDistributionEvent");
 const User = require("../../auth/models/User");
 const { sendSms } = require("../../patients/api");
+const SmsConfig = require("../../core/models/SmsConfig");
+const config = require("config");
 
 const getDeliveries = async (req, res) => {
   try {
@@ -41,6 +43,30 @@ const getDeliveries = async (req, res) => {
           as: "feedBack",
         },
       },
+       {
+        $lookup: {
+          from: "deliveryservicerequests",
+          foreignField: "_id",
+          localField: "order",
+          as: "order",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "initiatedBy",
+          as: "initiatedBy",
+        },
+      },
+      {
+        $addFields: {
+          deliveryAddress: {
+            $ifNull: ["$deliveryAddress.address", "$order.deliveryAddress.address"]
+          }
+        }
+      }
+      
     ]);
     return res.json({ results: methods });
   } catch (error) {
@@ -75,6 +101,7 @@ const getMyDeliveriesHistory = async (req, res) => {
             { patient: patient?._id, include: patient },
             { "order.orderedBy": req.user._id, include: true },
             { "event.group.lead.user": req.user._id, include: true },
+            { initiatedBy: req.user._id, include: true },
           ]
             .filter((f) => f.include)
             .map((f) => omit(f, ["include"])),
@@ -97,6 +124,21 @@ const getMyDeliveriesHistory = async (req, res) => {
           as: "feedBack",
         },
       },
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "initiatedBy",
+          as: "initiatedBy",
+        },
+      },
+      {
+        $addFields: {
+          deliveryAddress: {
+            $ifNull: ["$deliveryAddress.address", "$order.deliveryAddress.address"]
+          }
+        }
+      }
       // {
       //   $addFields: {
       //     phoneNumber:
@@ -189,20 +231,30 @@ const initiateDelivery = async (req, res) => {
       patient: patient._id,
       event: event?._id,
       order: order?._id,
+      initiatedBy: req.user._id,
     });
 
     await delivery.save();
-    // Sending only for smartphone users
+    // Sending sms only for smartphone users
+
     const user = await User.findById(patient.user);
+    const deliveryDetails = {
+      name: user?.firstName || user?.username,
+      code: delivery._id,
+      customer_support: "0793889658",
+    };
+
+    const template =
+      (
+        await SmsConfig.findOne({
+          smsType: "DELIVERY_INITIATION",
+        })
+      )?.smsTemplate || config.get("sms.DELIVERY_INITIATION");
+
+    const message = parseMessage(deliveryDetails, template);
+
     if (user) {
-      sendSms(
-        `Dear ${
-          user.firstName || user.username
-        }, your delivery has been initiated.Kindly use the code: ${
-          delivery._id
-        }.`,
-        user.phoneNumber
-      );
+      sendSms(message, user.phoneNumber);
     }
     return res.json({ detail: "Confirmed successfull!" });
   } catch (ex) {
@@ -326,6 +378,29 @@ const getDeliveryDetail = async (req, res) => {
         as: "feedBack",
       },
     },
+    {
+      $lookup: {
+        from: "deliveryservicerequests",
+        foreignField: "_id",
+        localField: "order",
+        as: "order",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        foreignField: "_id",
+        localField: "initiatedBy",
+        as: "initiatedBy",
+      },
+    },
+    {
+      $addFields: {
+        deliveryAddress: {
+          $ifNull: ["$deliveryAddress.address", "$order.deliveryAddress.address"]
+        }
+      }
+    }
     // {
     //   $addFields: {
     //     phoneNumber:

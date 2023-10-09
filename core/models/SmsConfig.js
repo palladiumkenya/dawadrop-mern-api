@@ -13,7 +13,7 @@ const SmsConfig = model(
       type: String,
       require: true,
       unique: true,
-      enum: { values: ["EVENT_REMINDER"], message: "Invalid sms type" },
+      enum: { values: ["EVENT_REMINDER", "DELIVERY_INITIATION", "ORDER_SUCCESS", "DELIVERY_SUCCESS"], message: "Invalid sms type" },
       validate: {
         validator: async function (v) {
           const currConfig = this; // Reference to the current user document

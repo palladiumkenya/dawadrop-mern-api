@@ -69,7 +69,7 @@ router.put("/methods/:id", updateDeliveryMethod);
 
 router.get("/", getDeliveries);
 router.get("/history", [auth], getMyDeliveriesHistory);
-router.post("/", initiateDelivery);
+router.post("/", auth,initiateDelivery);
 router.put("/:id", updateDelivery);
 router.post("/:id/:action", deliveryAction);
 
