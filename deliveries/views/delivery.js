@@ -378,14 +378,7 @@ const getDeliveryDetail = async (req, res) => {
         as: "feedBack",
       },
     },
-    {
-      $lookup: {
-        from: "deliveryservicerequests",
-        foreignField: "_id",
-        localField: "order",
-        as: "order",
-      },
-    },
+   
     {
       $lookup: {
         from: "users",
