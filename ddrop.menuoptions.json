@@ -82,7 +82,7 @@
   "_id": {
     "$oid": "64bba8d07079280b50c7868f"
   },
-  "label": "Checkout Delivery",
+  "label": "Confirm Delivery",
   "description": "Patient delivery feedback",
   "image": "/menu-icons/1690020048019-843fc246-5b5a-4166-ae8c-2fd97d61d608.png",
   "link": "CheckoutDelivery",
@@ -92,7 +92,7 @@
   "_id": {
     "$oid": "64bccff8e8b243d73b59f1ce"
   },
-  "label": "Dispense Drugs",
+  "label": "Initiate Delivery",
   "description": "Patient Deliveries",
   "image": "/menu-icons/1690095608503-88ae519f-7665-4abc-933f-b60d9afefb43.png",
   "link": "DispenseDrugs",
@@ -180,7 +180,7 @@
   "_id": {
     "$oid": "64e6c58f3b7877e1a0ff26bc"
   },
-  "label": "Manage ART Group Leads",
+  "label": "Manage ART Case managers",
   "description": "Art group leads",
   "image": "/menu-icons/1692845455407-a03841b1-bc7c-46bd-8396-210cb0c2691b.png",
   "link": "ARTGroupLeads",
