@@ -1,72 +1,25 @@
 [{
   "_id": {
-    "$oid": "64abb0fe49b9434e9f6c8308"
+    "$oid": "64a9490064e3db145d2976ec"
   },
-  "name": "View Patient",
-  "description": "View Patient details",
-  "__v": 0,
-  "action": "create_patient"
-},
-{
-  "_id": {
-    "$oid": "64abd3afbf0d7e914b82db87"
-  },
-  "name": "Update Patient",
-  "action": "update_patient",
-  "description": "View Patient details",
+  "name": "create_patient",
+  "description": "Register a new Patient",
   "__v": 0
 },
 {
   "_id": {
-    "$oid": "64abd4af50b6ebee9d5dff17"
+    "$oid": "64a9492764e3db145d2976ef"
   },
-  "name": "Delete Patient",
-  "action": "delete_patient",
-  "description": "View Patient details",
+  "name": "view_patient",
+  "description": "View Patient's details",
   "__v": 0
 },
 {
   "_id": {
-    "$oid": "64abddf7a750c7c16fb0321e"
-  },
-  "name": "Create Privilege",
-  "action": "create_privilege",
-  "__v": 0,
-  "description": "Allow user create provileges"
-},
-{
-  "_id": {
-    "$oid": "64abde1ba750c7c16fb03222"
-  },
-  "name": "View Privilege",
-  "action": "view_privilege",
-  "__v": 0,
-  "description": "Allow user View privileges"
-},
-{
-  "_id": {
-    "$oid": "64abde27a750c7c16fb03226"
-  },
-  "name": "Delete Privilege",
-  "action": "delete_privilege",
-  "__v": 0,
-  "description": "Allow user Delete privilege"
-},
-{
-  "_id": {
-    "$oid": "64abde3aa750c7c16fb0322a"
+    "$oid": "64b2c00206fc5c3b27e5f48b"
   },
   "name": "Update Privilege",
   "action": "update_privilege",
-  "__v": 0,
-  "description": "Allow user update the privileges"
-},
-{
-  "_id": {
-    "$oid": "64b500e0c9a227215ea75c6a"
-  },
-  "name": "Can create Role",
-  "action": "create_role",
-  "description": "Allows user to mange role more specifically create role",
+  "description": "Update and manage privileges",
   "__v": 0
 }]

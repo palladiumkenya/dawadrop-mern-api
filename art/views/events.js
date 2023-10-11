@@ -1,13 +1,18 @@
 const { Types } = require("mongoose");
 const { getValidationErrrJson } = require("../../utils/helpers");
 const { merge } = require("lodash");
-const { eventsValidator } = require("../validators");
+const { eventsValidator, initiateDeliveryValidator } = require("../validators");
 const ARTDistributionEvent = require("../models/ARTDistributionEvent");
 const ARTDistributionGroupLead = require("../models/ARTDistributionGroupLead");
 const ARTDistributionGroup = require("../models/ARTDistributionGroup");
 const fetchAndScheduleEventsNortification = require("../fetchAndScheduleEventsNortification");
 const ARTDistributionGroupEnrollment = require("../models/ARTDistributionGroupEnrollment");
 const ARTDistributionEventFeedBack = require("../models/ARTDistributionEventFeedBack");
+const Patient = require("../../patients/models/Patient");
+const CourrierService = require("../../deliveries/models/CourrierService");
+const Delivery = require("../../deliveries/models/Delivery");
+const { sendSms } = require("../../patients/api");
+const User = require("../../auth/models/User");
 
 const getARTDistributionEvents = async (req, res) => {
   const user = req.user._id;
@@ -21,9 +26,25 @@ const getARTDistributionEvents = async (req, res) => {
       },
     },
     {
+      $lookup: {
+        from: "patients",
+        foreignField: "_id",
+        localField: "subscriptions.patient",
+        as: "patientSubscribers",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        foreignField: "_id",
+        localField: "patientSubscribers.user",
+        as: "subscribers",
+      },
+    },
+    {
       $match: {
         $or: [
-          { "subscriptions.user": user, "subscriptions.isCurrent": true }, //currentlyEnrolledInCurrentGroup
+          { "subscribers._id": user, "subscriptions.isCurrent": true }, //currentlyEnrolledInCurrentGroup
           { "group.lead.user": user }, // isLeaderOfCurrentGroup
         ],
       },
@@ -54,12 +75,22 @@ const getARTDistributionEvents = async (req, res) => {
     },
     {
       $lookup: {
-        from: "users",
+        from: "deliveryservicerequests",
         foreignField: "_id",
-        localField: "subscriptions.user",
-        as: "subscribers",
+        localField: "feedBacks.deliveryRequest",
+        as: "deliveryRequests",
       },
     },
+    {
+      $lookup: {
+        from: "deliveries",
+        foreignField: "event",
+        localField: "_id",
+        as: "deliveries",
+      },
+    },
+
+    { $addFields: { extraSubscribers: "$group.extraSubscribers" } },
     {
       $project: {
         subscriptions: {
@@ -71,6 +102,10 @@ const getARTDistributionEvents = async (req, res) => {
           password: 0,
           roles: 0,
           lastLogin: 0,
+        },
+        group: {
+          lead: 0,
+          extraSubscribers: 0,
         },
       },
     },
@@ -187,9 +222,10 @@ const confirmEventAttendance = async (req, res) => {
         status: 404,
         message: "ART Distribution Event not found",
       };
+    const patient = await Patient.findOne({ user: req.user._id });
     const enrolment = await ARTDistributionGroupEnrollment.findOne({
-      group: event.group,
-      user: req.user._id,
+      "group._id": event.group._id,
+      patient: patient._id,
       isCurrent: true,
     });
     if (!enrolment)
@@ -207,13 +243,15 @@ const confirmEventAttendance = async (req, res) => {
       feedBack.confirmedAttendance = true;
       delete feedBack.deliveryRequest;
       await feedBack.save();
+      console.log("Updated feedback ....");
     } else {
       feedBack = await ARTDistributionEventFeedBack({
-        event,
+        event: eventId,
         user: req.user._id,
-        confirmEventAttendance: true,
+        confirmedAttendance: true,
       });
       await feedBack.save();
+      console.log("Created feedBack ....");
     }
     return res.json({ detail: "Confirmed successfull!" });
   } catch (ex) {

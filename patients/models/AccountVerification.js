@@ -1,18 +1,8 @@
 const moment = require("moment/moment");
 const { model, Schema } = require("mongoose");
+const { generateOTP, generateExpiryTime } = require("../../utils/helpers");
 
-function generateOTP(length = 5) {
-  var string = "0123456789";
-  let OTP = "";
-  var len = string.length;
-  for (let i = 0; i < length; i++) {
-    OTP += string[Math.floor(Math.random() * len)];
-  }
-  return OTP;
-}
-function generateExpiryTime(minutes = 5) {
-  return moment().add(minutes, "minute");
-}
+
 const AccountVerification = model(
   "AccountVerification",
   new Schema(

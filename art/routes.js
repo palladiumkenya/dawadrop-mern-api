@@ -28,6 +28,7 @@ const {
   changeIdentityInGroup,
 } = require("./views/groups");
 const isGroupLead = require("../middleware/isGroupLead");
+const isValidPatient = require("../middleware/isValidPatient");
 
 const router = Router();
 
@@ -47,7 +48,7 @@ router.get("/distribution-events/:id", [auth], getARTDistributionEventDetail);
 router.put("/distribution-events/:id", [auth], updateARTDistributionEvent);
 router.get(
   "/distribution-events/:id/confirm-attendance",
-  [auth],
+  [auth, isValidPatient],
   confirmEventAttendance
 );
 
@@ -63,7 +64,11 @@ router.post(
   [auth, isGroupLead],
   addNewMemberToARTDistributionGroup
 );
-router.post("/group-enrollment/:id/change-name", [auth], changeIdentityInGroup);
+router.post(
+  "/group-enrollment/:id/change-name",
+  [auth, isValidPatient], //TODO add also isInGroupedModel
+  changeIdentityInGroup
+);
 router.put(
   "/distribution-groups/:id",
   [auth, isGroupLead],

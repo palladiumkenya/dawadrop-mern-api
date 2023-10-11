@@ -1,0 +1,10 @@
+[{
+  "_id": {
+    "$oid": "651402467ec2e195ad2bf7f4"
+  },
+  "name": "Distribution Event Reminder sms template",
+  "description": "Helpfull in shaping message sent as a reminder to patients",
+  "smsTemplate": "Dear {{name}}, this message is to remind you of the forth comming event {{event_title}} for {{event_group}} scheduled for {{event_time}} at {{event_venue}}.Please note {{event_remarks}}.For more inquiries kindly contact {{event_organizer}}.To stop reply with STOP",
+  "smsType": "EVENT_REMINDER",
+  "__v": 0
+}]

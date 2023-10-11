@@ -71,7 +71,7 @@
   },
   "__v": 0,
   "firstName": "Joan",
-  "image": "/uploads/1693208542637-8ef616cf-25e7-4e4b-b132-247462255a7e.jpeg",
+  "image": "/uploads/1695804228699-52ef87f6-c5a5-4e77-84ee-319401d2ac1c.jpeg",
   "lastName": "User"
 },
 {
@@ -93,4 +93,20 @@
     "$date": "2023-08-28T07:48:53.320Z"
   },
   "__v": 1
+},
+{
+  "_id": {
+    "$oid": "64ef47c5dab6e4b161e28091"
+  },
+  "username": "sapot",
+  "email": "sapot@gmail.com",
+  "phoneNumber": "072134652",
+  "password": "$2b$10$VhHvRax29z6Q..95j4NvouUEk6bw0CThY4yuDlGA..qmLgohDOZt6",
+  "isActive": true,
+  "roles": [],
+  "isSuperUser": false,
+  "lastLogin": {
+    "$date": "2023-08-30T13:44:37.290Z"
+  },
+  "__v": 0
 }]

@@ -1,0 +1,56 @@
+[{
+  "_id": {
+    "$oid": "64ec6c82c8f3645f734d90df"
+  },
+  "careGiver": {
+    "$oid": "64b2569e7b6480a7fb6b7cd3"
+  },
+  "careReceiver": {
+    "$oid": "64e8d75b51ddd01d77afa291"
+  },
+  "canPickUpDrugs": true,
+  "canOrderDrug": true,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64ec71dbc8f3645f734d933c"
+  },
+  "careGiver": {
+    "$oid": "64ac519e76f01bd0422dee73"
+  },
+  "careReceiver": {
+    "$oid": "64ec5cd27f92e181b0b46ee7"
+  },
+  "canPickUpDrugs": true,
+  "canOrderDrug": true,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "64ef481fdab6e4b161e28126"
+  },
+  "careGiver": {
+    "$oid": "64ef47c5dab6e4b161e28091"
+  },
+  "careReceiver": {
+    "$oid": "64ec5d1a7f92e181b0b46f0a"
+  },
+  "canPickUpDrugs": true,
+  "canOrderDrug": true,
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "650aa2b0f0a88a03f4829d53"
+  },
+  "careGiver": {
+    "$oid": "64ac519e76f01bd0422dee73"
+  },
+  "careReceiver": {
+    "$oid": "64ec5d997f92e181b0b46f23"
+  },
+  "canPickUpDrugs": true,
+  "canOrderDrug": true,
+  "__v": 0
+}]

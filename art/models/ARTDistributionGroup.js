@@ -26,6 +26,25 @@ const ARTDistributionGroup = model(
         message: "Group with name {VALUE} already exist!",
       },
     },
+    extraSubscribers: {
+      type: [
+        new Schema({
+          name: {
+            type: String,
+            require: true,
+          },
+          cccNumber: {
+            type: String,
+            require: true,
+          },
+          phoneNumber: {
+            type: String,
+            required: true,
+          },
+        }),
+      ],
+      default: [],
+    },
     description: {
       type: String,
     },

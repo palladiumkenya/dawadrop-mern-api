@@ -1,16 +1,7 @@
+const axios = require("axios");
 const config = require("config");
 const moment = require("moment/moment");
 const { generateRandomNumberInRange } = require("../utils/helpers");
-import("node-fetch")
-  .then((fetchModule) => {
-    // You can use fetchModule here
-    const fetch = fetchModule.default; // Assuming 'node-fetch' exports a default object
-    // Rest of your code using fetch
-  })
-  .catch((error) => {
-    // Handle error if import fails
-    console.error('Error importing "node-fetch":', error);
-  });
 
 const getAppointment = async (ccNumber, appointmenId) => {
   return {
@@ -57,23 +48,21 @@ const getPatientAppointments = async (cccNumber) => {
         date_attended: null,
         appointment: apt,
         next_appointment_date: moment(apt)
-          // .add(10, "days")
           .add([30, 90, 120][generateRandomNumberInRange(0, 3)], "days")
           .toISOString(),
       });
     }
     return data.filter(({ cccNumber: cc }) => cc === cccNumber);
 
+    // Uncomment the following code when you're ready to fetch data from the API
     // const url = `${config.get("nishauri")}appointments?ccc_no=${cccNumber}`;
-    // const response = await fetch(url);
+    // const response = await axios.get(url);
     // if (response.status === 200) {
-    //   const appointments = await response.json();
-    //   if (appointments.success) {
-    //     return appointments.data;
-    //   }
+    //   const appointments = response.data;
+    //   return appointments.data;
     // }
   } catch (err) {
-    console.log(err.message);
+    console.error(err.message);
   }
 };
 

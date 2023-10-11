@@ -17,21 +17,6 @@ const ARTDistributionEvent = model(
       type: Address.schema,
       required: true,
     },
-    extraSubscribers: {
-      type: [
-        new Schema({
-          name: {
-            type: String,
-            require: true,
-          },
-          phoneNumber: {
-            type: String,
-            required: true,
-          },
-        }),
-      ],
-      default: [],
-    },
     remiderNortificationDates: {
       type: [Schema.Types.Date],
       default: [],

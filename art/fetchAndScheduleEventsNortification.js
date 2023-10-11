@@ -1,7 +1,10 @@
 const schedule = require("node-schedule");
 const ARTDistributionEvent = require("./models/ARTDistributionEvent");
 const { sendSms } = require("../patients/api");
-
+const { parseMessage } = require("../utils/helpers");
+const config = require("config");
+const SmsConfig = require("../core/models/SmsConfig");
+const moment = require("moment/moment");
 async function fetchAndScheduleEventsNortification() {
   try {
     const currentDate = new Date();
@@ -22,12 +25,29 @@ async function fetchAndScheduleEventsNortification() {
       },
       {
         $lookup: {
+          from: "patients",
+          foreignField: "_id",
+          localField: "subscriptions.patient",
+          as: "patientSubscribers",
+        },
+      },
+      {
+        $lookup: {
           from: "users",
           foreignField: "_id",
-          localField: "subscriptions.user",
+          localField: "group.lead.user",
+          as: "leadUser",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          foreignField: "_id",
+          localField: "patientSubscribers.user",
           as: "subscribers",
         },
       },
+      { $addFields: { extraSubscribers: "$group.extraSubscribers" } },
       {
         $project: {
           subscriptions: 0,
@@ -52,22 +72,46 @@ async function fetchAndScheduleEventsNortification() {
         // Schedule the task to run at the specified reminder date
         const job = schedule.scheduleJob(reminderDate, async function () {
           try {
-            console.log(`Sending reminder for event: ${event.title}`);
+            const eventDetails = {
+              event_title: event.title,
+              event_group: event.group.title,
+              event_time: moment(event.distributionTime).format(
+                "ddd MMM Do  yyyy HH:mm"
+              ),
+              event_venue: event.distributionLocation.address,
+              event_remarks: event.remarks,
+              event_organizer: event.leadUser[0]?.phoneNumber,
+            };
+
+            const template =
+              (
+                await SmsConfig.findOne({
+                  smsType: "EVENT_REMINDER",
+                })
+              )?.smsTemplate || config.get("sms.EVENT_REMINDER");
+
             // Send nortification to all event subscribers
             for (const subscriber of event.subscribers) {
-              const { username, email, phoneNumber, firstName, lastName } =
-                subscriber;
+              const { username, phoneNumber, firstName } = subscriber;
+              console.log("Sending sms to ....", username, phoneNumber);
               const name = firstName || username;
-              await sendSms(
-                `Dear ${name}, this message is to remind you of the forth comming event ${event.title} scheduled for ${event.distributionTime} at ${event.distributionLocation.address}`,
+              sendSms(
+                parseMessage(
+                  {
+                    ...eventDetails,
+                    name,
+                  },
+                  template
+                ),
                 phoneNumber
               );
             }
             // send nortification to extra subscribers
             for (const subscriber of event.extraSubscribers) {
               const { name, phoneNumber } = subscriber;
-              await sendSms(
-                `Dear ${name}, this message is to remind you of the forth comming event ${event.title} scheduled for ${event.distributionTime} at ${event.distributionLocation.address}`,
+              console.log("Sending sms to ....", name, phoneNumber);
+              sendSms(
+                parseMessage({ ...eventDetails, name }, template),
                 phoneNumber
               );
             }

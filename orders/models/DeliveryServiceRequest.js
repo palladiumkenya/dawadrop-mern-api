@@ -39,17 +39,20 @@ const DeliveryServiceRequest = model(
       event: {
         type: ARTDistributionEvent.schema,
       },
-      updated: {
-        type: Date,
-        default: Date.now,
-      },
       deliveryAddress: {
         type: Address.schema,
         required: true,
       },
       deliveryMethod: {
-        type: DeliveryMethod.schema,
+        type: String,
         required: true,
+        enum: {
+          values: ["in-parcel", "in-person"],
+          message: `{VALUE} not supported.Must be in surpoted actions: [${[
+            "in-parcel",
+            "in-person",
+          ].join(", ")}]`,
+        },
       },
       courrierService: {
         type: CourrierService.schema,
@@ -102,6 +105,7 @@ const DeliveryServiceRequest = model(
         },
       },
       // Options for virtual properties
+      timestamps: true,
       toJSON: { virtuals: true, getters: true }, // Include virtual properties and getters when converting to JSON
       toObject: { virtuals: true, getters: true }, // Include virtual properties and getters when converting to object
     }

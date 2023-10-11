@@ -2,8 +2,9 @@ const { Types } = require("mongoose");
 const {
   getValidationErrrJson,
   cleanFalsyAttributes,
+  parseMessage,
 } = require("../../utils/helpers");
-const { merge } = require("lodash");
+const { merge, template } = require("lodash");
 const { deliveryServiceRequestValidator } = require("../validators");
 const DeliveryServiceRequest = require("../models/DeliveryServiceRequest");
 const CourrierService = require("../../deliveries/models/CourrierService");
@@ -15,10 +16,13 @@ const TreatmentSurport = require("../../patients/models/TreatmentSurport");
 const ARTDistributionGroupEnrollment = require("../../art/models/ARTDistributionGroupEnrollment");
 const ARTDistributionGroup = require("../../art/models/ARTDistributionGroup");
 const ARTDistributionEventFeedBack = require("../../art/models/ARTDistributionEventFeedBack");
+const { sendSms } = require("../../patients/api");
+const SmsConfig = require("../../core/models/SmsConfig");
+const config = require("config")
 
 const getDeliveryServiceRequest = async (req, res) => {
-  const requests = await ARTDistributionModel.find();
-  return res.json({ results: requests });
+  const orders = await DeliveryServiceRequest.find();
+  return res.json({ results: orders });
 };
 
 const getDeliveryServiceRequestDetail = async (req, res) => {
@@ -101,7 +105,6 @@ const createDeliveryServiceRequest = async (req, res) => {
         message:
           "Invalid Operation.You are not allowed to order for another using event!",
       };
-    const _deliveryMethod = await DeliveryMethod.findById(deliveryMethod);
 
     let _courrierService;
     let _event;
@@ -112,9 +115,10 @@ const createDeliveryServiceRequest = async (req, res) => {
     if (event) {
       // make sure user is member of group
       const event_ = await ARTDistributionEvent.findById(event);
+      const patient = await Patient.findOne({ user: req.user._id });
       const subscription = await ARTDistributionGroupEnrollment.findOne({
         "group._id": event_.group._id,
-        user: req.user._id,
+        patient: patient._id,
       });
       if (subscription) _event = event_;
     }
@@ -139,21 +143,14 @@ const createDeliveryServiceRequest = async (req, res) => {
         path: ["deliveryAddress"],
         message: "Invalid Address",
       });
-
-    if (!_deliveryMethod)
-      errors.push({
-        path: ["deliveryMethod"],
-        message: "Invalid deliveryMethod",
-      });
     //   IF dELIVERY METHOD BY COURRIER AND COURRIER OF CHOICE NOT PROVIDED
-    if (_deliveryMethod?.blockOnTimeSlotFull === false && !_courrierService)
+    if (deliveryMethod === "in-parcel" && !_courrierService)
       errors.push({
         path: ["courrierService"],
         message: "Invalid courrierService or courrier service not provided",
       });
     // IF DELIVERY METHOD NOT BY CURRIOUR BT PERSON OR CURRIOR SERVICE PROVIDED THEN IGNORE THEM
-    if (_deliveryMethod?.blockOnTimeSlotFull === true && deliveryPerson) {
-      delete values.deliveryPerson;
+    if (deliveryMethod === "in-person" && deliveryPerson) {
       delete values.courrierService;
     }
 
@@ -193,7 +190,6 @@ const createDeliveryServiceRequest = async (req, res) => {
       ...cleanFalsyAttributes({
         ...values,
         appointment: _appointment,
-        deliveryMethod: _deliveryMethod,
         event: _event,
         courrierService: _courrierService,
         orderedBy: req.user._id,
@@ -220,6 +216,24 @@ const createDeliveryServiceRequest = async (req, res) => {
         await feedBack.save();
       }
     }
+
+    // Send sms of succesfull Order
+
+    const orderDetail = {
+      name: req.user.firstName || req.user.username,
+      deliveryAddress: request.deliveryAddress?.address,
+      phoneNumber: request.phoneNumber
+    }
+
+    const smsTemplate =  (
+      await SmsConfig.findOne({
+        smsType: "ORDER_SUCCESS",
+      })
+    )?.smsTemplate || config.get("sms.ORDER_SUCCESS");
+
+    const message = parseMessage(orderDetail, smsTemplate)
+    sendSms(message, req.user.phoneNumber)
+
     return res.json(request);
   } catch (ex) {
     const { error: err, status } = getValidationErrrJson(ex);
@@ -227,10 +241,108 @@ const createDeliveryServiceRequest = async (req, res) => {
   }
 };
 
+const getPendingDeliveryServiceRequest = async (req, res) => {
+  const orders = await DeliveryServiceRequest.aggregate([
+    {
+      $lookup: {
+        from: "deliveries",
+        foreignField: "order",
+        localField: "_id",
+        as: "deliveries",
+      },
+    },
+    {
+      $addFields: {
+        //TSB and currUser===careGiver
+        priority: {
+          $cond: {
+            if: {
+              $and: [
+                { $eq: ["$deliveryMethod.blockOnTimeSlotFull", false] },
+                { $eq: ["$careGiver", req.user._id] },
+              ],
+            },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    // flag when there already exist deliveries
+    {
+      $addFields: {
+        hasDeliveryAndAllCanceled: {
+          $cond: {
+            if: {
+              $and: [
+                { $ne: [{ $size: "$deliveries" }, 0] }, // Check if deliveries array is not empty
+                {
+                  $eq: [
+                    {
+                      $size: {
+                        $setIntersection: ["$deliveries.status", ["canceled"]],
+                      },
+                    },
+                    { $size: "$deliveries" },
+                  ],
+                }, // Check if all deliveries have "canceled" status
+              ],
+            },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      $addFields: {
+        asignedToCurrentUserOrNoneTSB: {
+          $cond: {
+            if: {
+              $or: [
+                { $eq: ["$deliveryMethod.blockOnTimeSlotFull", true] }, //None TSB
+                { $eq: ["$priority", true] }, // assigned to current user
+              ],
+            },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    // handle when no deliveries yet
+    {
+      $addFields: {
+        noAsociatedDeliveryANDasignedToCurrentUserOrNoneTSB: {
+          $cond: {
+            if: {
+              $and: [
+                { $eq: [{ $size: "$deliveries" }, 0] }, // No asociated delivery
+                { $eq: ["$asignedToCurrentUserOrNoneTSB", true] }, // nONE tsb or assighrned to current user
+              ],
+            },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      $match: {
+        $or: [
+          { hasDeliveryAndAllCanceled: true },
+          { noAsociatedDeliveryANDasignedToCurrentUserOrNoneTSB: true },
+        ],
+      },
+    },
+  ]);
+  return res.json({ results: orders });
+};
 
 module.exports = {
   getDeliveryServiceRequestDetail,
   getDeliveryServiceRequest,
   updateDeliveryServiceRequest,
   createDeliveryServiceRequest,
+  getPendingDeliveryServiceRequest,
 };

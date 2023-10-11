@@ -12,6 +12,7 @@ const ARTDistributionEventFeedBack = model(
     user: {
       type: Schema.Types.ObjectId,
       required: true,
+      ref: "User",
     },
     confirmedAttendance: {
       type: Schema.Types.Boolean,
@@ -21,6 +22,7 @@ const ARTDistributionEventFeedBack = model(
       type: Schema.Types.ObjectId,
       ref: "DeliveryServiceRequest",
     },
+
     note: {
       type: String,
     },

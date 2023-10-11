@@ -10,6 +10,7 @@ const {
   changePassword,
   updateProfile,
   usersList,
+  addExpoPushToken,
 } = require("./views/authenticate");
 const {
   privilegeList,
@@ -55,7 +56,7 @@ const {
   getAssociationDetail,
   acceptAssociation,
 } = require("../patients/views/treatmentSurport");
-
+router.post("/register-user-push-token", auth, addExpoPushToken);
 router.post("/register", register);
 router.post("/login", login);
 router.post("/change-password", auth, changePassword);

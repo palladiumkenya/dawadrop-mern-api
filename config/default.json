@@ -5,5 +5,12 @@
     "nishauri": "https://ushauriapi.kenyahmis.org/nishauri/",
     "ushauri": "https://ushauriapi.kenyahmis.org/",
     "mapquest":"https://www.mapquestapi.com/",
-    "openroute": "https://api.openrouteservice.org/"
+    "openroute": "https://api.openrouteservice.org/",
+    "sms": {
+        "EVENT_REMINDER": "Dear {{name}}, this message is to remind you of the forth comming event {{event_title}} for {{event_group}} scheduled for {{event_time}} at {{event_venue}}.Please note {{event_remarks}}.For more inquiries kindly contact {{event_organizer}}",
+        "DELIVERY_INITIATION": "Dear {{name}}, Your request has been processed and delivery initiated, to confirm that you have received your delivery, please use the following confirmation code: {{code}}. Please use the code to checkout delivery and confirm the successful delivery. If you have any questions or encounter any issues, please contact our customer support team at {{customer_support}}.Thank you for using our delivery service, and we hope you are satisfied with your delivery experience.",
+        "ORDER_SUCCESS": "Dear {{name}}, we are delighted to inform you that your request has been received succesfully and is being processed, we will schedule the delivery accordingly.",
+        "DELIVERY_SUCCESS": "Dear {{name}}, We are pleased to inform you that your recent delivery request has been successfully completed. Your order has been delivered as requested.Thank you for choosing our delivery service. We look forward to serving you again in the future."
+    }
+
 }
