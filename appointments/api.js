@@ -28,12 +28,11 @@ const getPatientAppointments = async (cccNumber) => {
     for (let index = 0; index < 500; index++) {
       const aptTyp = appointmentType[generateRandomNumberInRange(0, 3)];
       const apt = new Date(
-        `${2023}-${generateRandomNumberInRange(
-          5,
-          9
+        `${new Date().getFullYear()}-${generateRandomNumberInRange(
+          1,
+          4
         )}-${generateRandomNumberInRange(1, 30)}`
       ).toISOString();
-
       data.push({
         id: Number(`207235${index}`),
         cccNumber: [
